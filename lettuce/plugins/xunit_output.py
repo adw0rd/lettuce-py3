@@ -56,17 +56,19 @@ def enable(filename=None):
         tc = doc.createElement("testcase")
         tc.setAttribute("classname", classname)
         tc.setAttribute("name", step.sentence)
-        tc.setAttribute("time", str(total_seconds((datetime.now() - step.started))))
 
-        if not step.ran:
+        if step.ran:
+            tc.setAttribute("time", str(total_seconds((datetime.now() - step.started))))
+        else:
+            tc.setAttribute("time", str(0))
             skip=doc.createElement("skipped")
+            skip.setAttribute("type", "UndefinedStep(%s)" % step.sentence)
             tc.appendChild(skip)
 
         if step.failed:
             cdata = doc.createCDATASection(step.why.traceback)
             failure = doc.createElement("failure")
-            if hasattr(step.why, 'cause'):
-                failure.setAttribute("message", step.why.cause)
+            failure.setAttribute("message", step.why.cause)
             failure.setAttribute("type", step.why.exception.__class__.__name__)
             failure.appendChild(cdata)
             tc.appendChild(failure)
@@ -99,6 +101,7 @@ def enable(filename=None):
     def output_xml(total):
         root.setAttribute("tests", str(total.steps))
         root.setAttribute("failures", str(total.steps_failed))
+        root.setAttribute("skipped", str(total.steps_skipped + total.steps_undefined))
         root.setAttribute("errors", '0')
         root.setAttribute("time", '0')
         doc.appendChild(root)
