@@ -58,6 +58,9 @@ class Command(BaseCommand):
         make_option('-s', '--scenarios', action='store', dest='scenarios', default=None,
             help='Comma separated list of scenarios to run'),
 
+        make_option('-b', '--browser', action='store', dest='browser', default='firefox',
+		            help='will set settings.BROWSER. This will allow to choose browser from terrain without changing code (firefox|chrome)'),
+
         make_option("-t", "--tag",
                     dest="tags",
                     type="str",
@@ -95,6 +98,7 @@ class Command(BaseCommand):
         setup_test_environment()
 
         settings.DEBUG = options.get('debug', False)
+		settings.BROWSER = options.get('browser', 'firefox')
 
         verbosity = int(options.get('verbosity', 4))
         apps_to_run = tuple(options.get('apps', '').split(","))
