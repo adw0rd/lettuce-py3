@@ -98,7 +98,7 @@ class Command(BaseCommand):
         setup_test_environment()
 
         settings.DEBUG = options.get('debug', False)
-		settings.BROWSER = options.get('browser', 'firefox')
+        settings.BROWSER = options.get('browser', 'firefox')
 
         verbosity = int(options.get('verbosity', 4))
         apps_to_run = tuple(options.get('apps', '').split(","))
