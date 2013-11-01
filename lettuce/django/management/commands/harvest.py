@@ -59,7 +59,7 @@ class Command(BaseCommand):
             help='Comma separated list of scenarios to run'),
 
         make_option('-b', '--browser', action='store', dest='browser', default='firefox',
-		            help='will set settings.BROWSER. This will allow to choose browser from terrain without changing code (firefox|chrome)'),
+            help='will set settings.LETTUCE_BROWSER. This will allow to choose browser from terrain without changing code (firefox|chrome)'),
 
         make_option("-t", "--tag",
                     dest="tags",
@@ -98,7 +98,7 @@ class Command(BaseCommand):
         setup_test_environment()
 
         settings.DEBUG = options.get('debug', False)
-        settings.BROWSER = options.get('browser', 'firefox')
+        settings.LETTUCE_BROWSER = options.get('browser', 'firefox')
 
         verbosity = int(options.get('verbosity', 4))
         apps_to_run = tuple(options.get('apps', '').split(","))
