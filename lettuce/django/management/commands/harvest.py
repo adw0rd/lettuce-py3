@@ -61,6 +61,9 @@ class Command(BaseCommand):
         make_option('-b', '--browser', action='store', dest='browser', default='firefox',
             help='will set settings.LETTUCE_BROWSER. This will allow to choose browser from terrain without changing code (firefox|chrome)'),
 
+        make_option('--failed-step-sleep', action='store', dest='failed_step_sleep', default=0,
+            help='When the step is failed, then we sleep for a specified number of seconds'),
+
         make_option("-t", "--tag",
                     dest="tags",
                     type="str",
@@ -99,6 +102,7 @@ class Command(BaseCommand):
 
         settings.DEBUG = options.get('debug', False)
         settings.LETTUCE_BROWSER = options.get('browser', 'firefox')
+        settings.LETTUCE_FAILED_STEP_SLEEP = options.get('failed_step_sleep')
 
         verbosity = int(options.get('verbosity', 4))
         apps_to_run = tuple(options.get('apps', '').split(","))
