@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from lettuce.terrain import after
 from lettuce.terrain import before
 from xml.dom import minidom
+from lettuce.strings import utf8_string
 
 
 def wrt_output(filename, content):
@@ -28,6 +29,10 @@ def wrt_output(filename, content):
 
     f.write(content)
     f.close()
+
+
+def write_xml_doc(filename, doc):
+    wrt_output(filename, doc.toxml())
 
 
 def total_seconds(td):
@@ -49,19 +54,23 @@ def enable(filename=None):
 
     @after.each_step
     def create_test_case_step(step):
-        if step.scenario.outlines:
+        parent = step.scenario or step.background
+        if getattr(parent, 'outlines', None):
             return
-
-        classname = "%s : %s" % (step.scenario.feature.name, step.scenario.name)
+        
+        name = getattr(parent, 'name', 'Background')    # Background sections are nameless
+        classname = u"%s : %s" % (parent.feature.name, name)
         tc = doc.createElement("testcase")
         tc.setAttribute("classname", classname)
         tc.setAttribute("name", step.sentence)
 
-        if step.ran:
+        try:
             tc.setAttribute("time", str(total_seconds((datetime.now() - step.started))))
-        else:
-            tc.setAttribute("time", str(0))
-            skip=doc.createElement("skipped")
+        except AttributeError:
+            tc.setAttribute("time", str(total_seconds(timedelta(seconds=0))))
+
+        if not step.ran:
+            skip = doc.createElement("skipped")
             skip.setAttribute("type", "UndefinedStep(%s)" % step.sentence)
             tc.appendChild(skip)
 
@@ -105,4 +114,4 @@ def enable(filename=None):
         root.setAttribute("errors", '0')
         root.setAttribute("time", '0')
         doc.appendChild(root)
-        wrt_output(output_filename, doc.toxml())
+        write_xml_doc(output_filename, doc)

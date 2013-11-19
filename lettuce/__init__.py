@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-version = '0.2.11'
+__version__ = version = '0.2.16'
+
 release = 'kryptonite'
 
 import os
@@ -41,7 +42,10 @@ from lettuce.registry import call_hook
 from lettuce.registry import STEP_REGISTRY
 from lettuce.registry import CALLBACK_REGISTRY
 from lettuce.exceptions import StepLoadingError
-from lettuce.plugins import xunit_output
+from lettuce.plugins import (
+    xunit_output,
+    autopdb
+)
 from lettuce import fs
 from lettuce import exceptions
 
@@ -83,7 +87,8 @@ class Runner(object):
     features and step definitions on there.
     """
     def __init__(self, base_path, scenarios=None, verbosity=0, random=False,
-                 enable_xunit=False, xunit_filename=None, tags=None):
+                 enable_xunit=False, xunit_filename=None, tags=None,
+                 failfast=False, auto_pdb=False):
         """ lettuce.Runner will try to find a terrain.py file and
         import it from within `base_path`
         """
@@ -99,6 +104,9 @@ class Runner(object):
         self.loader = fs.FeatureLoader(base_path)
         self.verbosity = verbosity
         self.scenarios = scenarios and map(int, scenarios.split(",")) or None
+        self.failfast = failfast
+        if auto_pdb:
+            autopdb.enable(self)
 
         sys.path.remove(base_path)
 
@@ -133,8 +141,6 @@ class Runner(object):
             print "Error loading step definitions:\n", e
             return
 
-        call_hook('before', 'all')
-
         results = []
         if self.single_feature:
             features_files = [self.single_feature]
@@ -147,29 +153,39 @@ class Runner(object):
             self.output.print_no_features_found(self.loader.base_dir)
             return
 
+        call_hook('before', 'all')
+
         failed = False
         try:
             for filename in features_files:
                 feature = Feature.from_file(filename)
                 results.append(
-                    feature.run(self.scenarios, tags=self.tags, random=self.random))
+                    feature.run(self.scenarios,
+                                tags=self.tags,
+                                random=self.random,
+                                failfast=self.failfast))
 
         except exceptions.LettuceSyntaxError, e:
             sys.stderr.write(e.msg)
             failed = True
         except:
-            e = sys.exc_info()[1]
-            print "Died with %s" % str(e)
-            traceback.print_exc()
+            if not self.failfast:
+                e = sys.exc_info()[1]
+                print "Died with %s" % str(e)
+                traceback.print_exc()
+            else:
+                print
+                print ("Lettuce aborted running any more tests "
+                       "because was called with the `--failfast` option")
+
             failed = True
 
         finally:
+            total = TotalResult(results)
+            call_hook('after', 'all', total)
+
             if failed:
                 raise SystemExit(2)
-
-            total = TotalResult(results)
-
-            call_hook('after', 'all', total)
 
             finished_at = datetime.now()
             time_took = finished_at - started_at
