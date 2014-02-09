@@ -63,6 +63,9 @@ class Command(BaseCommand):
         make_option('-s', '--scenarios', action='store', dest='scenarios', default=None,
             help='Comma separated list of scenarios to run'),
 
+        make_option('--failed-step-sleep', action='store', dest='failed_step_sleep', default=0,
+            help='When the step is failed, then we sleep for a specified number of seconds'),
+
         make_option("-t", "--tag",
                     dest="tags",
                     type="str",
@@ -151,6 +154,7 @@ class Command(BaseCommand):
                call_command('migrate', verbosity=0, interactive=False,)
 
         settings.DEBUG = options.get('debug', False)
+        settings.LETTUCE_FAILED_STEP_SLEEP = options.get('failed_step_sleep')
 
         paths = self.get_paths(args, apps_to_run, apps_to_avoid)
         server = get_server(port=options['port'])
