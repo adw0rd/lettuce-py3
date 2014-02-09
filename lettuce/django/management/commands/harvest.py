@@ -25,9 +25,9 @@ from django.test.utils import teardown_test_environment
 
 from lettuce import Runner
 from lettuce import registry
+from lettuce.core import SummaryTotalResults
 
-from lettuce.django.server import Server
-from lettuce.django import harvest_lettuces
+from lettuce.django import harvest_lettuces, get_server
 from lettuce.django.server import LettuceServerException
 
 
@@ -50,7 +50,8 @@ class Command(BaseCommand):
         make_option('-S', '--no-server', action='store_true', dest='no_server', default=False,
             help="will not run django's builtin HTTP server"),
 
-        make_option('-T', '--test-server', action='store_true', dest='test_database', default=False,
+        make_option('-T', '--test-server', action='store_true', dest='test_database',
+            default=getattr(settings, "LETTUCE_USE_TEST_DATABASE", False),
             help="will run django's builtin HTTP server using the test databases"),
 
         make_option('-P', '--port', type='int', dest='port',
@@ -75,14 +76,30 @@ class Command(BaseCommand):
         make_option('--with-xunit', action='store_true', dest='enable_xunit', default=False,
             help='Output JUnit XML test results to a file'),
 
+        make_option('--smtp-queue', action='store_true', dest='smtp_queue', default=False,
+                    help='Use smtp for mail queue (usefull with --no-server option'),
+
         make_option('--xunit-file', action='store', dest='xunit_file', default=None,
             help='Write JUnit XML to this file. Defaults to lettucetests.xml'),
+
+        make_option('--with-subunit',
+                    action='store_true',
+                    dest='enable_subunit',
+                    default=False,
+                    help='Output Subunit test results to a file'),
+
+        make_option('--subunit-file',
+                    action='store',
+                    dest='subunit_file',
+                    default=None,
+                    help='Write Subunit to this file. Defaults to subunit.bin'),
 
         make_option("--failfast", dest="failfast", default=False,
                     action="store_true", help='Stop running in the first failure'),
 
         make_option("--pdb", dest="auto_pdb", default=False,
                     action="store_true", help='Launches an interactive debugger upon error'),
+
     )
 
     def stopserver(self, failed=False):
@@ -104,16 +121,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         setup_test_environment()
 
-        settings.DEBUG = options.get('debug', False)
-
         verbosity = int(options.get('verbosity', 4))
         apps_to_run = tuple(options.get('apps', '').split(","))
         apps_to_avoid = tuple(options.get('avoid_apps', '').split(","))
         run_server = not options.get('no_server', False)
         test_database = options.get('test_database', False)
+        smtp_queue = options.get('smtp_queue', False)
         tags = options.get('tags', None)
         failfast = options.get('failfast', False)
         auto_pdb = options.get('auto_pdb', False)
+        with_summary = options.get('summary_display', False)
 
         if test_database:
             migrate_south = getattr(settings, "SOUTH_TESTS_MIGRATE", True)
@@ -124,8 +141,8 @@ class Command(BaseCommand):
                 migrate_south = False
                 pass
 
-            from django.test.simple import DjangoTestSuiteRunner
-            self._testrunner = DjangoTestSuiteRunner()
+            from django.test.utils import get_runner
+            self._testrunner = get_runner(settings)(interactive=False)
             self._testrunner.setup_test_environment()
             self._old_db_config = self._testrunner.setup_databases()
 
@@ -133,17 +150,18 @@ class Command(BaseCommand):
             if migrate_south:
                call_command('migrate', verbosity=0, interactive=False,)
 
-
-        server = Server(port=options['port'])
+        settings.DEBUG = options.get('debug', False)
 
         paths = self.get_paths(args, apps_to_run, apps_to_avoid)
+        server = get_server(port=options['port'])
+
         if run_server:
             try:
                 server.start()
             except LettuceServerException, e:
                 raise SystemExit(e)
 
-        os.environ['SERVER_NAME'] = server.address
+        os.environ['SERVER_NAME'] = str(server.address)
         os.environ['SERVER_PORT'] = str(server.port)
 
         failed = False
@@ -161,8 +179,11 @@ class Command(BaseCommand):
 
                 runner = Runner(path, options.get('scenarios'), verbosity,
                                 enable_xunit=options.get('enable_xunit'),
+                                enable_subunit=options.get('enable_subunit'),
                                 xunit_filename=options.get('xunit_file'),
-                                tags=tags, failfast=failfast, auto_pdb=auto_pdb)
+                                subunit_filename=options.get('subunit_file'),
+                                tags=tags, failfast=failfast, auto_pdb=auto_pdb,
+                                smtp_queue=smtp_queue)
 
                 result = runner.run()
                 if app_module is not None:
@@ -180,8 +201,10 @@ class Command(BaseCommand):
             traceback.print_exc(e)
 
         finally:
-            registry.call_hook('after', 'harvest', results)
-            
+            summary = SummaryTotalResults(results)
+            summary.summarize_all()
+            registry.call_hook('after', 'harvest', summary)
+
             if test_database:
                 self._testrunner.teardown_databases(self._old_db_config)
 
