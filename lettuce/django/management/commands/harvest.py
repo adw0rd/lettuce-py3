@@ -64,6 +64,9 @@ class Command(BaseCommand):
         make_option('--failed-step-sleep', action='store', dest='failed_step_sleep', default=0,
             help='When the step is failed, then we sleep for a specified number of seconds'),
 
+        make_option('--with-tablespace', action='store', dest='tablespace', default=0,
+            help='PostgrSQL Tablespace'),
+
         make_option("-t", "--tag",
                     dest="tags",
                     type="str",
@@ -103,6 +106,7 @@ class Command(BaseCommand):
         settings.DEBUG = options.get('debug', False)
         settings.LETTUCE_BROWSER = options.get('browser', 'firefox')
         settings.LETTUCE_FAILED_STEP_SLEEP = options.get('failed_step_sleep')
+        settings.DEFAULT_TABLESPACE = options.get('tablespace')
 
         verbosity = int(options.get('verbosity', 4))
         apps_to_run = tuple(options.get('apps', '').split(","))
