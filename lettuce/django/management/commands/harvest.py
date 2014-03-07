@@ -67,6 +67,9 @@ class Command(BaseCommand):
         make_option('--with-tablespace', action='store', dest='tablespace', default=0,
             help='PostgrSQL Tablespace'),
 
+        make_option('--disable-jscompile', action='store_true', dest='disable_jscompile', default=False,
+            help='Disable command call "jscompile"'),
+
         make_option("-t", "--tag",
                     dest="tags",
                     type="str",
@@ -107,6 +110,7 @@ class Command(BaseCommand):
         settings.LETTUCE_BROWSER = options.get('browser', 'firefox')
         settings.LETTUCE_FAILED_STEP_SLEEP = options.get('failed_step_sleep')
         settings.DEFAULT_TABLESPACE = options.get('tablespace')
+        settings.DISABLE_JSCOMPILE = options.get('disable_jscompile')
 
         verbosity = int(options.get('verbosity', 4))
         apps_to_run = tuple(options.get('apps', '').split(","))
