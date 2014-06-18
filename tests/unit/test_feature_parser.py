@@ -14,12 +14,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from sure import that, expect
+from sure import expect
+from sure.old import that
 from lettuce import step
 from lettuce.core import Scenario
 from lettuce.core import Feature
 from lettuce.core import Background
 from lettuce.core import HashList
+from lettuce.exceptions import LettuceSyntaxError
 from nose.tools import assert_equals
 
 FEATURE1 = """
@@ -330,6 +332,42 @@ Feature: Redis database server
         Then I expect server bootstrapping as M2
         And M2 is slave of M1
         And M2 contains database 3
+        """
+
+FEATURE18 = """
+@feature_runme
+Feature: correct matching
+  @runme1
+  Scenario: Holy tag, Batman [1]
+    Given this scenario has tags
+    Then it can be inspected from within the object
+
+  @runme2
+  Scenario: Holy tag2, Batman (2)
+    Given this scenario has other tags
+    Then it can be inspected from within the object even with the table
+    | What | Is | This  |
+    | It   | is | TABLE |
+
+  @runme3
+  Scenario: Holy tag3, Batman
+    Given this scenario has even more tags
+    Then it can be inspected from within the object
+
+"""
+
+
+FEATURE19 = """
+Feature: correct matching
+  @runme1
+  Scenario: Holy tag, Batman (1)
+    Given this scenario has tags
+    Then it can be inspected from within the object
+
+  @runme2
+  Scenario: Holy tag2, Batman [2]
+    Given this scenario has other tags
+    Then it can be inspected from within the object
 """
 
 FEATURE16 = """
@@ -374,11 +412,54 @@ Feature: Movie rental without MMF
         Then there are 10 more left
 """
 
+FEATURE20 = """
+Feature: My scenarios have no name
+    Scenario:
+        Given this scenario raises a syntax error
+"""
+
+FEATURE21 = """
+Feature: Taming the tag parser
+
+  Background:
+    Given the email addresses:
+      | name         | email                      |
+      | Chuck Norris | roundhouse@chucknorris.com |
+    Then the next scenario has only the tags it's supposed to
+
+  Scenario: I'm isolated
+    Given I am parsed
+    Then this scenario has only zero tags
+
+  @tag
+  Scenario: I'm so isolated
+    Given I am parsed
+    Then this scenario has one tag
+"""
+
+FEATURE22 = """
+Feature: one tag in the first scenario
+
+  @onetag
+  Scenario: This is the first scenario
+    Given I am parsed
+    Then this scenario has one tag
+"""
+
+FEATURE23 = """
+Feature: three tags in the first scenario
+
+  @onetag @another @$%^&even-weird_chars
+  Scenario: This is the first scenario
+    Given I am parsed
+    Then this scenario has three tags
+"""
+
 
 def test_feature_has_repr():
     "Feature implements __repr__ nicely"
     feature = Feature.from_string(FEATURE1)
-    assert_equals(repr(feature), '<Feature: "Rent movies">')
+    expect(repr(feature)).to.equal('<Feature: "Rent movies">')
 
 
 def test_scenario_has_name():
@@ -388,10 +469,7 @@ def test_scenario_has_name():
 
     assert isinstance(feature, Feature)
 
-    assert_equals(
-        feature.name,
-        "Rent movies"
-    )
+    expect(feature.name).to.equal("Rent movies")
 
 
 def test_feature_has_scenarios():
@@ -399,8 +477,8 @@ def test_feature_has_scenarios():
 
     feature = Feature.from_string(FEATURE1)
 
-    assert_equals(type(feature.scenarios), list)
-    assert_equals(len(feature.scenarios), 3, "It should have 3 scenarios")
+    expect(feature.scenarios).to.be.a(list)
+    expect(feature.scenarios).to.have.length_of(3)
 
     expected_scenario_names = [
         "Renting a featured movie",
@@ -409,17 +487,26 @@ def test_feature_has_scenarios():
     ]
 
     for scenario, expected_name in zip(feature.scenarios, expected_scenario_names):
-        assert_equals(type(scenario), Scenario)
-        assert_equals(scenario.name, expected_name)
+        expect(scenario).to.be.a(Scenario)
+        expect(scenario.name).to.equal(expected_name)
 
-    assert_equals(feature.scenarios[1].steps[0].keys, ('Name', 'Rating', 'New', 'Available'))
-    assert_equals(
-        feature.scenarios[1].steps[0].hashes,
-        [
-            {'Name': 'A night at the museum 2', 'Rating': '3 stars', 'New': 'yes', 'Available': '9'},
-            {'Name': 'Matrix Revolutions', 'Rating': '4 stars', 'New': 'no', 'Available': '6'},
-        ]
-    )
+    expect(feature.scenarios[1].steps[0].keys).to.equal(
+        ('Name', 'Rating', 'New', 'Available'))
+
+    expect(list(feature.scenarios[1].steps[0].hashes)).to.equal([
+        {
+            'Name': 'A night at the museum 2',
+            'Rating': '3 stars',
+            'New': 'yes',
+            'Available': '9',
+        },
+        {
+            'Name': 'Matrix Revolutions',
+            'Rating': '4 stars',
+            'New': 'no',
+            'Available': '6',
+        },
+    ])
 
 
 def test_can_parse_feature_description():
@@ -550,6 +637,20 @@ def test_single_scenario_single_scenario():
         'many', 'other', 'basic', 'tags', 'here', ':)'])
 
 
+def test_single_feature_single_tag():
+    "All scenarios within a feature inherit the feature's tags"
+    feature = Feature.from_string(FEATURE18)
+
+    assert that(feature.scenarios[0].tags).deep_equals([
+        'runme1', 'feature_runme'])
+
+    assert that(feature.scenarios[1].tags).deep_equals([
+        'runme2', 'feature_runme'])
+
+    assert that(feature.scenarios[2].tags).deep_equals([
+        'runme3', 'feature_runme'])
+
+
 def test_single_scenario_many_scenarios():
     "Untagged scenario following a tagged one should have no tags"
 
@@ -611,7 +712,6 @@ def test_scenarios_with_extra_whitespace():
     assert_equals(type(scenario), Scenario)
     assert_equals(scenario.name, "Extra whitespace scenario")
 
-
 def test_scenarios_parsing():
     "Tags are parsed correctly"
     feature = Feature.from_string(FEATURE15)
@@ -637,6 +737,15 @@ def test_scenarios_parsing():
         ('Restart farm', [u'restart_farm']),
     ])
 
+def test_scenarios_with_special_characters():
+    "Make sure that regex special characters in the scenario names are ignored"
+    feature = Feature.from_string(FEATURE19)
+
+    assert that(feature.scenarios[0].tags).deep_equals([
+        'runme1'])
+
+    assert that(feature.scenarios[1].tags).deep_equals([
+        'runme2'])
 
 def test_background_parsing_with_mmf():
     feature = Feature.from_string(FEATURE16)
@@ -708,3 +817,43 @@ def test_background_parsing_without_mmf():
         {u'Name': u'John Doe'},
         {u'Name': u'Foo Bar'},
     ]))
+
+
+def test_syntax_error_for_scenarios_with_no_name():
+    ("Trying to parse features with unnamed "
+     "scenarios will cause a syntax error")
+    expect(Feature.from_string).when.called_with(FEATURE20).to.throw(
+        LettuceSyntaxError,
+        ('In the feature "My scenarios have no name", '
+         'scenarios must have a name, make sure to declare '
+         'a scenario like this: `Scenario: name of your scenario`')
+    )
+
+
+def test_scenario_post_email():
+    ("Having a scenario which the body has an email address; "
+     "Then the following scenario should have no "
+     "tags related to the email")
+
+    feature = Feature.from_string(FEATURE21)
+    scenario1, scenario2 = feature.scenarios
+
+    scenario1.tags.should.be.empty
+    scenario2.tags.should.equal(['tag'])
+
+def test_feature_first_scenario_tag_extraction():
+    ("A feature object should be able to find the single tag "
+     "belonging to the first scenario")
+    feature = Feature.from_string(FEATURE22)
+
+    assert that(feature.scenarios[0].tags).deep_equals([
+        'onetag'])
+
+
+def test_feature_first_scenario_tags_extraction():
+    ("A feature object should be able to find the tags "
+     "belonging to the first scenario")
+    feature = Feature.from_string(FEATURE23)
+
+    assert that(feature.scenarios[0].tags).deep_equals([
+        'onetag', 'another', '$%^&even-weird_chars'])

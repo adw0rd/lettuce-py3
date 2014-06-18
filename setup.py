@@ -29,7 +29,7 @@ def get_packages():
 
     return packages
 
-required_modules = ['sure', 'fuzzywuzzy']
+required_modules = ['sure', 'fuzzywuzzy', 'python-subunit']
 
 if sys.version_info[:2] < (2, 6):
     required_modules.append('multiprocessing')
@@ -39,9 +39,9 @@ if os.name.lower() == 'nt':
 
 setup(
     name='lettuce',
-    version='0.2.11',
+    version='0.2.19',
     description='Behaviour Driven Development for python',
-    author=u'Gabriel Falcao',
+    author='Gabriel Falcao',
     author_email='gabriel@nacaolivre.org',
     url='http://lettuce.it',
     packages=get_packages(),

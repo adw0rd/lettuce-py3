@@ -21,6 +21,7 @@ from lettuce import core
 from lettuce import strings
 from lettuce.terrain import after
 from lettuce.terrain import before
+from lettuce.terrain import world
 
 
 def wrt(what):
@@ -31,6 +32,9 @@ def wrt(what):
 
 @after.each_step
 def print_step_running(step):
+    if not step.display:
+        return
+
     wrt(step.represent_string(step.original_sentence).rstrip())
     if not step.defined_at:
         wrt(" (undefined)")
@@ -48,6 +52,16 @@ def print_step_running(step):
 
 @before.each_scenario
 def print_scenario_running(scenario):
+    if scenario.background:
+        # Only print the background on the first scenario run
+        # So, we determine if this was called previously with the attached background.
+        # If so, skip the print_scenario() since we'll call it again in the after_background.
+        if not hasattr(world, 'background_scenario_holder'):
+            world.background_scenario_holder = {}
+        if scenario.background not in world.background_scenario_holder:
+            # We haven't seen this background before, add our 1st scenario
+            world.background_scenario_holder[scenario.background] = scenario
+            return
     wrt('\n')
     wrt(scenario.represented())
 
@@ -57,6 +71,12 @@ def print_background_running(background):
     wrt('\n')
     wrt(background.represented())
     wrt('\n')
+
+
+@after.each_background
+def print_first_scenario_running(background, results):
+    scenario = world.background_scenario_holder[background]
+    print_scenario_running(scenario)
 
 
 @after.outline
@@ -85,15 +105,23 @@ def print_feature_running(feature):
     wrt("\n")
     wrt(feature.represented())
 
-
+@after.harvest
 @after.all
-def print_end(total):
+def print_end(total=None):
     wrt("\n")
-    word = total.features_ran > 1 and "features" or "feature"
-    wrt("%d %s (%d passed)\n" % (
-        total.features_ran,
-        word,
-        total.features_passed))
+    if isinstance(total, core.SummaryTotalResults):
+        wrt("Test Suite Summary:\n")
+        word = total.features_ran_overall > 1 and "features" or "feature"
+        wrt("%d %s (%d passed)\n" % (
+            total.features_ran_overall,
+            word,
+            total.features_passed_overall))
+    else:
+        word = total.features_ran > 1 and "features" or "feature"
+        wrt("%d %s (%d passed)\n" % (
+            total.features_ran,
+            word,
+            total.features_passed))
 
     word = total.scenarios_ran > 1 and "scenarios" or "scenario"
     wrt("%d %s (%d passed)\n" % (
@@ -125,6 +153,13 @@ def print_end(total):
             wrt("def %s:\n" % method_name)
             wrt("    assert False, 'This step must be implemented'\n")
 
+
+    if total.failed_scenario_locations:
+        # print list of failed scenarios, with their file and line number
+        wrt("\nList of failed scenarios:\n")
+        for scenario in total.failed_scenario_locations:
+            wrt(scenario)
+        wrt("\n")
 
 def print_no_features_found(where):
     where = core.fs.relpath(where)

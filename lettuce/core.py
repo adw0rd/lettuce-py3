@@ -45,7 +45,8 @@ class REP(object):
     within_double_quotes = re.compile(r'("[^"]+")')
     within_single_quotes = re.compile(r"('[^']+')")
     only_whitespace = re.compile('^\s*$')
-    tag_extraction_regex = re.compile(r'(?:(?:^|\s+)[@]([^@\s]+))')
+    last_tag_extraction_regex = re.compile(ur'(?:\s|^)[@](\S+)\s*$')
+    first_tag_extraction_regex = re.compile(ur'^\s*[@](\S+)(?:\s|$)')
     tag_strip_regex = re.compile(ur'(?:(?:^\s*|\s+)[@]\S+\s*)+$', re.DOTALL)
     comment_strip1 = re.compile(ur'(^[^\'"]*)[#]([^\'"]*)$')
     comment_strip2 = re.compile(ur'(^[^\'"]+)[#](.*)$')
@@ -144,7 +145,7 @@ class StepDefinition(object):
             self.step.passed = True
         except Exception, e:
             self.step.failed = True
-            self.step.why = ReasonToFail(e)
+            self.step.why = ReasonToFail(self.step, e)
             raise
 
         return ret
@@ -157,8 +158,10 @@ class StepDescription(object):
         self.file = filename
         if self.file:
             self.file = fs.relpath(self.file)
+        else:
+            self.file = "unknown file"
 
-        self.line = line
+        self.line = line or 0
 
 
 class ScenarioDescription(object):
@@ -171,7 +174,9 @@ class ScenarioDescription(object):
 
         for pline, part in enumerate(string.splitlines()):
             part = part.strip()
-            if re.match(u"%s:[ ]+" % language.scenario_separator + re.escape(scenario.name), part):
+            # for performance reasons, avoid using the regex on all lines:
+            # first check if the scenario name is present, and use regex to verify this is the scenario definition
+            if (scenario.name in part) and re.match(u"%s:[ ]+" % language.scenario_separator + re.escape(scenario.name), part):
                 self.line = pline + 1
                 break
 
@@ -213,15 +218,19 @@ class Step(object):
     related_outline = None
     scenario = None
     background = None
+    display = True
+    columns = None
+    matrix = None
 
     def __init__(self, sentence, remaining_lines, line=None, filename=None):
         self.sentence = sentence
         self.original_sentence = sentence
         self._remaining_lines = remaining_lines
-        keys, hashes, self.multiline = self._parse_remaining_lines(remaining_lines)
-
+        keys, hashes, self.multiline, columns, nukeys = self._parse_remaining_lines(remaining_lines)
         self.keys = tuple(keys)
+        self.non_unique_keys = nukeys
         self.hashes = HashList(self, hashes)
+        self.columns = columns
         self.described_at = StepDescription(line, filename)
         self.proposed_method_name, self.proposed_sentence = self.propose_definition()
 
@@ -252,8 +261,9 @@ class Step(object):
 
         return method_name, sentence
 
-    def solve_and_clone(self, data):
+    def solve_and_clone(self, data, display_step):
         sentence = self.sentence
+        multiline = self.multiline
         hashes = self.hashes[:]  # deep copy
         for k, v in data.items():
 
@@ -267,11 +277,14 @@ class Step(object):
                 return new_row
 
             sentence = evaluate(sentence)
+            multiline = evaluate(multiline)
             hashes = map(evaluate_hash_value, hashes)
 
         new = deepcopy(self)
         new.sentence = sentence
+        new.multiline = multiline
         new.hashes = hashes
+        new.display = display_step
         return new
 
     def _calc_list_length(self, lst):
@@ -325,13 +338,22 @@ class Step(object):
         lines = strings.dicts_to_string(self.hashes, self.keys).splitlines()
         return u"\n".join([(u" " * self.table_indentation) + line for line in lines]) + "\n"
 
-    def __repr__(self):
+    def represent_columns(self):
+        lines = strings.json_to_string(self.columns, self.non_unique_keys).splitlines()
+        return u"\n".join([(u" " * self.table_indentation) + line for line in lines]) + "\n"
+
+    def __unicode__(self):
         return u'<Step: "%s">' % self.sentence
+
+    def __repr__(self):
+        return unicode(self).encode('utf-8')
 
     def _parse_remaining_lines(self, lines):
         multiline = strings.parse_multiline(lines)
         keys, hashes = strings.parse_hashes(lines)
-        return keys, hashes, multiline
+        non_unique_keys, columns = strings.parse_as_json(lines)
+        return keys, hashes, multiline, columns, non_unique_keys
+
 
     def _get_match(self, ignore_case):
         matched, func = None, lambda: None
@@ -390,7 +412,7 @@ class Step(object):
             for step in steps:
                 step.scenario = self.scenario
 
-        (_, _, steps_failed, steps_undefined, _) = self.run_all(steps)
+        (_, _, steps_failed, steps_undefined) = self.run_all(steps)
         if not steps_failed and not steps_undefined:
             self.passed = True
             self.failed = False
@@ -423,7 +445,7 @@ class Step(object):
         return line
 
     @staticmethod
-    def run_all(steps, outline=None, run_callbacks=False, ignore_case=True):
+    def run_all(steps, outline=None, run_callbacks=False, ignore_case=True, failfast=False, display_steps=True, reasons_to_fail=None):
         """Runs each step in the given list of steps.
 
         Returns a tuple of five lists:
@@ -438,17 +460,20 @@ class Step(object):
         steps_passed = []
         steps_failed = []
         steps_undefined = []
-        reasons_to_fail = []
+        if reasons_to_fail is None:
+            reasons_to_fail = []
 
         for step in steps:
             if outline:
-                step = step.solve_and_clone(outline)
+                step = step.solve_and_clone(outline, display_steps)
 
             try:
                 step.pre_run(ignore_case, with_outline=outline)
 
                 if run_callbacks:
                     call_hook('before_each', 'step', step)
+
+                call_hook('before_output', 'step', step)
 
                 if not steps_failed and not steps_undefined:
                     step.run(ignore_case)
@@ -460,13 +485,18 @@ class Step(object):
             except Exception, e:
                 steps_failed.append(step)
                 reasons_to_fail.append(step.why)
+                if failfast:
+                    raise
 
             finally:
                 all_steps.append(step)
+
+                call_hook('after_output', 'step', step)
+
                 if run_callbacks:
                     call_hook('after_each', 'step', step)
 
-        return (all_steps, steps_passed, steps_failed, steps_undefined, reasons_to_fail)
+        return (all_steps, steps_passed, steps_failed, steps_undefined)
 
     @classmethod
     def many_from_lines(klass, lines, filename=None, original_string=None):
@@ -488,8 +518,10 @@ class Step(object):
                 None,
                 invalid_first_line_error % (lines[0], 'multiline'))
 
-        # Select only lines that aren't end-to-end whitespace
-        lines = filter(lambda x: not REP.only_whitespace.match(x), lines)
+        # Select only lines that aren't end-to-end whitespace and aren't tags
+        # Tags could be included as steps if the first scenario following a background is tagged
+        # This then causes the test to fail, because lettuce looks for the step's definition (which doesn't exist)
+        lines = filter(lambda x: not (REP.only_whitespace.match(x) or re.match(r'^\s*@', x)), lines)
 
         step_strings = []
         in_multiline = False
@@ -536,7 +568,7 @@ class Scenario(object):
                  with_file=None,
                  original_string=None,
                  language=None,
-                 previous_scenario=None):
+                 tags=None):
 
         self.feature = None
         if not language:
@@ -544,6 +576,7 @@ class Scenario(object):
 
         self.name = name
         self.language = language
+        self.tags = tags
         self.remaining_lines = remaining_lines
         self.steps = self._parse_remaining_lines(remaining_lines,
                                                  with_file,
@@ -552,8 +585,6 @@ class Scenario(object):
         self.outlines = outlines
         self.with_file = with_file
         self.original_string = original_string
-
-        self.previous_scenario = previous_scenario
 
         if with_file and original_string:
             scenario_definition = ScenarioDescription(self, with_file,
@@ -564,11 +595,6 @@ class Scenario(object):
         self.solved_steps = list(self._resolve_steps(
             self.steps, self.outlines, with_file, original_string))
         self._add_myself_to_steps()
-
-        if original_string and '@' in self.original_string:
-            self.tags = self._find_tags_in(original_string)
-        else:
-            self.tags = []
 
     @property
     def max_length(self):
@@ -611,8 +637,11 @@ class Scenario(object):
     def _calc_value_length(self, data):
         return self._calc_list_length(data.values())
 
-    def __repr__(self):
+    def __unicode__(self):
         return u'<Scenario: "%s">' % self.name
+
+    def __repr__(self):
+        return unicode(self).encode('utf-8')
 
     def matches_tags(self, tags):
         if tags is None:
@@ -661,10 +690,10 @@ class Scenario(object):
 
     @property
     def evaluated(self):
-        for outline in self.outlines:
+        for outline_idx, outline in enumerate(self.outlines):
             steps = []
             for step in self.steps:
-                new_step = step.solve_and_clone(outline)
+                new_step = step.solve_and_clone(outline, display_step=(outline_idx == 0))
                 new_step.original_sentence = step.sentence
                 new_step.scenario = self
                 steps.append(new_step)
@@ -683,7 +712,7 @@ class Scenario(object):
     def failed(self):
         return any([step.failed for step in self.steps])
 
-    def run(self, ignore_case):
+    def run(self, ignore_case, failfast=False):
         """Runs a scenario, running each of its steps. Also call
         before_each and after_each callbacks for steps and scenario"""
 
@@ -691,13 +720,22 @@ class Scenario(object):
         call_hook('before_each', 'scenario', self)
 
         def run_scenario(almost_self, order=-1, outline=None, run_callbacks=False):
-            all_steps, steps_passed, steps_failed, steps_undefined, reasons_to_fail = Step.run_all(self.steps, outline, run_callbacks, ignore_case)
-            skip = lambda x: x not in steps_passed and x not in steps_undefined and x not in steps_failed
+            try:
+                if self.background:
+                    self.background.run(ignore_case)
 
+                reasons_to_fail = []
+                all_steps, steps_passed, steps_failed, steps_undefined = Step.run_all(self.steps, outline, run_callbacks, ignore_case, failfast=failfast, display_steps=(order < 1), reasons_to_fail=reasons_to_fail)
+            except:
+                call_hook('after_each', 'scenario', self)
+                raise
+            finally:
+                if outline:
+                    call_hook('outline', 'scenario', self, order, outline,
+                            reasons_to_fail)
+
+            skip = lambda x: x not in steps_passed and x not in steps_undefined and x not in steps_failed
             steps_skipped = filter(skip, all_steps)
-            if outline:
-                call_hook('outline', 'scenario', self, order, outline,
-                        reasons_to_fail)
 
             return ScenarioResult(
                 self,
@@ -708,10 +746,8 @@ class Scenario(object):
             )
 
         if self.outlines:
-            first = True
             for index, outline in enumerate(self.outlines):
-                results.append(run_scenario(self, index, outline, run_callbacks=first))
-                first = False
+                results.append(run_scenario(self, index, outline, run_callbacks=True))
         else:
             results.append(run_scenario(self, run_callbacks=True))
 
@@ -725,44 +761,10 @@ class Scenario(object):
         for step in self.solved_steps:
             step.scenario = self
 
-    def _find_tags_in(self, original_string):
-        broad_regex = re.compile(ur"([@].*)%s: (%s)" % (
-            self.language.scenario_separator,
-            self.name), re.DOTALL)
-
-        regexes = []
-        if not self.previous_scenario:
-            regexes.append(broad_regex)
-
-        else:
-            regexes.append(re.compile(ur"(?:%s: %s.*)([@]?.*)%s: (%s)\s*\n" % (
-                self.language.non_capturable_scenario_separator,
-                self.previous_scenario.name,
-                self.language.scenario_separator,
-                self.name), re.DOTALL))
-
-        def try_finding_with(regex):
-            found = regex.search(original_string)
-
-            if found:
-                tag_lines = found.group().splitlines()
-                tags = list(chain(*map(self._extract_tag, tag_lines)))
-                return tags
-
-        for regex in regexes:
-            found = try_finding_with(regex)
-            if found:
-                return found
-
-        return []
-
-    def _extract_tag(self, item):
-        return REP.tag_extraction_regex.findall(item)
-
     def _resolve_steps(self, steps, outlines, with_file, original_string):
-        for outline in outlines:
+        for outline_idx, outline in enumerate(outlines):
             for step in steps:
-                yield step.solve_and_clone(outline)
+                yield step.solve_and_clone(outline, display_step=(outline_idx == 0))
 
     def _parse_remaining_lines(self, lines, with_file, original_string):
         invalid_first_line_error = '\nInvalid step on scenario "%s".\n' \
@@ -816,9 +818,8 @@ class Scenario(object):
                     with_file=None,
                     original_string=None,
                     language=None,
-                    previous_scenario=None):
+                    tags=None):
         """ Creates a new scenario from string"""
-
         # ignoring comments
         string = "\n".join(strings.get_stripped_lines(string, ignore_lines_starting_with='#'))
 
@@ -835,10 +836,13 @@ class Scenario(object):
             keys, outlines = strings.parse_hashes(strings.get_stripped_lines(part))
 
         lines = strings.get_stripped_lines(string)
-        scenario_line = lines.pop(0)
+
+        scenario_line = lines.pop(0).strip()
 
         for repl in (language.scenario_outline, language.scenario):
-            scenario_line = strings.remove_it(scenario_line, u"(%s): " % repl)
+            scenario_line = strings.remove_it(scenario_line, u"(%s): " % repl).strip()
+
+
 
         scenario = new_scenario(
             name=scenario_line,
@@ -848,7 +852,7 @@ class Scenario(object):
             with_file=with_file,
             original_string=original_string,
             language=language,
-            previous_scenario=previous_scenario,
+            tags=tags,
         )
 
         return scenario
@@ -948,6 +952,11 @@ class Feature(object):
                                                     language)
             self._set_definition(feature_definition)
 
+        if original_string and '@' in self.original_string:
+            self.tags = self._find_tags_in(original_string)
+        else:
+            self.tags = None
+
         self._add_myself_to_scenarios()
 
     @property
@@ -974,9 +983,41 @@ class Feature(object):
     def _add_myself_to_scenarios(self):
         for scenario in self.scenarios:
             scenario.feature = self
+            if scenario.tags is not None and self.tags:
+                scenario.tags.extend(self.tags)
+
+    def _find_tags_in(self, original_string):
+        broad_regex = re.compile(ur"([@].*)%s: (%s)" % (
+            self.language.feature,
+            re.escape(self.name)), re.DOTALL)
+
+        regexes = [broad_regex]
+
+        def try_finding_with(regex):
+            found = regex.search(original_string)
+
+            if found:
+                tag_lines = found.group().splitlines()
+                tags = list(chain(*map(self._extract_tag, tag_lines)))
+                return tags
+
+        for regex in regexes:
+            found = try_finding_with(regex)
+            if found:
+                return found
+
+        return []
+
+    def _extract_tag(self, item):
+        regex = re.compile(r'(?:(?:^|\s+)[@]([^@\s]+))')
+        found = regex.findall(item)
+        return found
+
+    def __unicode__(self):
+        return u'<%s: "%s">' % (self.language.first_of_feature, self.name)
 
     def __repr__(self):
-        return u'<%s: "%s">' % (self.language.first_of_feature, self.name)
+        return unicode(self).encode('utf-8')
 
     def get_head(self):
         return u"%s: %s" % (self.language.first_of_feature, self.name)
@@ -998,7 +1039,11 @@ class Feature(object):
     @classmethod
     def from_string(new_feature, string, with_file=None, language=None):
         """Creates a new feature from string"""
-        lines = strings.get_stripped_lines(string, ignore_lines_starting_with='#')
+
+        lines = strings.get_stripped_lines(
+            string,
+            ignore_lines_starting_with='#',
+        )
         if not language:
             language = Language()
 
@@ -1040,6 +1085,15 @@ class Feature(object):
     def _set_definition(self, definition):
         self.described_at = definition
 
+    def _extract_tags(self, string, extract_regex=REP.last_tag_extraction_regex):
+        tags = []
+        while True:
+            m = extract_regex.search(string)
+            if not m:
+                return tags, string
+            tags.insert(0, m.groups()[0])
+            string = extract_regex.sub('', string)
+
     def _strip_next_scenario_tags(self, string):
         stripped = REP.tag_strip_regex.sub('', string)
         return stripped
@@ -1062,13 +1116,25 @@ class Feature(object):
         background_string = "".join(parts).splitlines()
         return description, background_string
 
+    def _check_scenario_syntax(self, lines, filename):
+        empty_scenario = ('%s:' % (self.language.first_of_scenario)).lower()
+        for line in lines:
+            if line.lower() == empty_scenario:
+                raise LettuceSyntaxError(
+                    filename,
+                    ('In the feature "%s", scenarios '
+                     'must have a name, make sure to declare a scenario like '
+                     'this: `Scenario: name of your scenario`' % self.name),
+                )
+
     def _parse_remaining_lines(self, lines, original_string, with_file=None):
         joined = u"\n".join(lines[1:])
 
+        self._check_scenario_syntax(lines, filename=with_file)
         # replacing occurrences of Scenario Outline, with just "Scenario"
         scenario_prefix = u'%s:' % self.language.first_of_scenario
         regex = re.compile(
-            u"%s:\s" % self.language.scenario_separator, re.U | re.I | re.DOTALL)
+            ur"%s:[\t\r\f\v]*" % self.language.scenario_separator, re.U | re.I | re.DOTALL)
 
         joined = regex.sub(scenario_prefix, joined)
 
@@ -1076,9 +1142,17 @@ class Feature(object):
 
         description = u""
         background = None
+        tags_scenario = []
 
         if not re.search("^" + scenario_prefix, joined):
-            description, background_lines = self._extract_desc_and_bg(parts[0])
+            if not parts:
+                raise LettuceSyntaxError(
+                    with_file,
+                    (u"Features must have scenarios.\n"
+                     "Please refer to the documentation available at http://lettuce.it for more information.")
+                )
+            tags_scenario, description_and_background = self._extract_tags(parts[0])
+            description, background_lines = self._extract_desc_and_bg(description_and_background)
 
             background = background_lines and Background.from_string(
                 background_lines,
@@ -1090,6 +1164,7 @@ class Feature(object):
             parts.pop(0)
 
         prefix = self.language.first_of_scenario
+
         upcoming_scenarios = [
             u"%s: %s" % (prefix, s) for s in parts if s.strip()]
 
@@ -1101,51 +1176,51 @@ class Feature(object):
 
         scenarios = []
         while upcoming_scenarios:
+            tags_next_scenario, current = self._extract_tags(upcoming_scenarios[0])
             current = self._strip_next_scenario_tags(upcoming_scenarios.pop(0))
 
-            previous_scenario = None
-            has_previous = len(scenarios) > 0
-
-            if has_previous:
-                previous_scenario = scenarios[-1]
-
             params = dict(
-                previous_scenario=previous_scenario,
+                tags=tags_scenario,
             )
 
             params.update(kw)
             current_scenario = Scenario.from_string(current, **params)
+            current_scenario.background = background
             scenarios.append(current_scenario)
+            tags_scenario = tags_next_scenario
 
         return background, scenarios, description
 
-    def run(self, scenarios=None, ignore_case=True, tags=None, random=False):
-        call_hook('before_each', 'feature', self)
+    def run(self, scenarios=None, ignore_case=True, tags=None, random=False, failfast=False):
         scenarios_ran = []
 
         if random:
             shuffle(self.scenarios)
 
+        scenario_nums_to_run = None
         if isinstance(scenarios, (tuple, list)):
             if all(map(lambda x: isinstance(x, int), scenarios)):
-                scenarios_to_run = scenarios
+                scenario_nums_to_run = scenarios
+
+        def should_run_scenario(num, scenario):
+            return scenario.matches_tags(tags) and \
+                   (scenario_nums_to_run is None or num in scenario_nums_to_run)
+        scenarios_to_run = [scenario for num, scenario in enumerate(self.scenarios, start=1)
+                                     if should_run_scenario(num, scenario)]
+        # If no scenarios in this feature will run, don't run the feature hooks.
+        if not scenarios_to_run:
+            return FeatureResult(self)
+
+        call_hook('before_each', 'feature', self)
+        try:
+            for scenario in scenarios_to_run:
+                scenarios_ran.extend(scenario.run(ignore_case, failfast=failfast))
+        except:
+            call_hook('after_each', 'feature', self)
+            raise
         else:
-            scenarios_to_run = range(1, len(self.scenarios) + 1)
-
-        for index, scenario in enumerate(self.scenarios):
-            if scenarios_to_run and (index + 1) not in scenarios_to_run:
-                continue
-
-            if not scenario.matches_tags(tags):
-                continue
-
-            if self.background:
-                self.background.run(ignore_case)
-
-            scenarios_ran.extend(scenario.run(ignore_case))
-
-        call_hook('after_each', 'feature', self)
-        return FeatureResult(self, *scenarios_ran)
+            call_hook('after_each', 'feature', self)
+            return FeatureResult(self, *scenarios_ran)
 
 
 class FeatureResult(object):
@@ -1180,7 +1255,8 @@ class ScenarioResult(object):
 
 
 class TotalResult(object):
-    def __init__(self, feature_results):
+
+    def __init__(self, feature_results=None):
         self.feature_results = feature_results
         self.scenario_results = []
         self.steps_passed = 0
@@ -1189,6 +1265,10 @@ class TotalResult(object):
         self.steps_undefined = 0
         self._proposed_definitions = []
         self.steps = 0
+        # store the scenario names that failed, with their location
+        self.failed_scenario_locations = []
+
+    def output_format(self):
         for feature_result in self.feature_results:
             for scenario_result in feature_result.scenario_results:
                 self.scenario_results.append(scenario_result)
@@ -1198,6 +1278,8 @@ class TotalResult(object):
                 self.steps_undefined += len(scenario_result.steps_undefined)
                 self.steps += scenario_result.total_steps
                 self._proposed_definitions.extend(scenario_result.steps_undefined)
+                if len(scenario_result.steps_failed) > 0:
+                    self.failed_scenario_locations.append(scenario_result.scenario.represented())
 
     def _filter_proposed_definitions(self):
         sentences = []
@@ -1225,3 +1307,51 @@ class TotalResult(object):
     @property
     def scenarios_passed(self):
         return len([result for result in self.scenario_results if result.passed])
+
+
+
+class SummaryTotalResults(TotalResult):
+
+    def __init__(self, total_results):
+        """Aggregates results per total results into a summary
+        @params: list of total result objects
+
+        """
+        super(SummaryTotalResults, self).__init__()
+        self.total_results = total_results
+        self.features_ran_overall = 0
+        self.features_passed_overall = 0
+
+
+    def __len__(self):
+        """ Overloaded len() to be able to use with tests
+
+        """
+        return len(self.total_results)
+
+    def __getitem__(self, item):
+        """ Needed for tests.
+
+        """
+        return self.total_results[item]
+
+    def summarize_all(self):
+        """Outputs the aggregated results for the TotalResult list
+
+        """
+        for partial_result in filter(None, self.total_results):
+            self.features_ran_overall += len(partial_result.feature_results)
+            self.features_passed_overall += len([feat for feat in partial_result.feature_results if feat.passed])
+            self.feature_results = partial_result.feature_results
+            for feature_result in self.feature_results:
+                for scenario_result in feature_result.scenario_results:
+                    self.scenario_results.append(scenario_result)
+                    self.steps_passed += len(scenario_result.steps_passed)
+                    self.steps_failed += len(scenario_result.steps_failed)
+                    self.steps_skipped += len(scenario_result.steps_skipped)
+                    self.steps_undefined += len(scenario_result.steps_undefined)
+                    self.steps += scenario_result.total_steps
+                    self._proposed_definitions.extend(scenario_result.steps_undefined)
+                    if len(scenario_result.steps_failed) > 0:
+                        self.failed_scenario_locations.append(scenario_result.scenario.represented())
+

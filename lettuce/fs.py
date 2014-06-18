@@ -22,6 +22,7 @@ import codecs
 import fnmatch
 import zipfile
 
+from functools import wraps
 from glob import glob
 from os.path import abspath, join, dirname, curdir, exists
 
@@ -33,7 +34,14 @@ class FeatureLoader(object):
         self.base_dir = FileSystem.abspath(base_dir)
 
     def find_and_load_step_definitions(self):
-        files = FileSystem.locate(self.base_dir, '*.py')
+        # find steps, possibly up several directories
+        base_dir = self.base_dir
+        while base_dir != '/':
+            files = FileSystem.locate(base_dir, '*.py')
+            if files:
+                break
+            base_dir = FileSystem.join(base_dir, '..')
+
         for filename in files:
             root = FileSystem.dirname(filename)
             sys.path.insert(0, root)
@@ -234,3 +242,20 @@ class FileSystem(object):
             path = cls.current_dir(name)
 
         return open(path, mode)
+
+    @classmethod
+    def in_directory(cls, *directories):
+        """Decorator to set the working directory around a function"""
+        def decorator(func):
+            @wraps(func)
+            def inner(*args, **kwargs):
+                cls.pushd(*directories)
+
+                try:
+                    return func(*args, **kwargs)
+
+                finally:
+                    cls.popd()
+                
+            return inner
+        return decorator

@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 LANGUAGES = {
     'en': {
         'examples': u'Examples|Scenarios',
@@ -74,7 +75,7 @@ LANGUAGES = {
         'scenario': u'Forgatókönyv',
         'scenario_outline': u'Forgatókönyv vázlat',
         'scenario_separator': u'(Forgatókönyv|Forgatókönyv vázlat)',
-        'background': u'(?:Background)',
+        'background': u'(?:Háttér)',
     },
     'fr': {
         'examples': u'Exemples|Scénarios',
@@ -84,8 +85,8 @@ LANGUAGES = {
         'scenario': u'Scénario',
         'scenario_outline': u'Plan de Scénario|Plan du Scénario',
         'scenario_separator': u'(Plan de Scénario|Plan du Scénario|Scénario)',
-        'background': u'(?:Background)',
-   },
+        'background': u'(?:Background|Contexte)',
+    },
     'de': {
         'examples': u'Beispiele|Szenarios',
         'feature': u'Funktionalität|Funktion',
@@ -95,7 +96,7 @@ LANGUAGES = {
         'scenario_outline': u'Szenario-Zusammenfassung|Zusammenfassung',
         'scenario_separator': u'(Szenario-Zusammenfassung|Zusammenfassung)',
         'background': u'(?:Background)',
-   },
+    },
     'ja': {
         'examples': u'例',
         'feature': u'フィーチャ',
@@ -115,8 +116,8 @@ LANGUAGES = {
         'scenario_outline': u'Senaryo taslağı|Senaryo Taslağı',
         'scenario_separator': u'(Senaryo taslağı|Senaryo Taslağı|Senaryo)',
         'background': u'(?:Background)',
-     },
-     'zh-CN': {
+    },
+    'zh-CN': {
         'examples': u'例如|场景集',
         'feature': u'特性',
         'name': u'Simplified Chinese',
@@ -126,7 +127,7 @@ LANGUAGES = {
         'scenario_separator': u'(场景模板|场景)',
         'background': u'(?:背景)',
     },
-     'zh-TW': {
+    'zh-TW': {
         'examples': u'例如|場景集',
         'feature': u'特性',
         'name': u'Traditional Chinese',
@@ -174,6 +175,27 @@ LANGUAGES = {
         'scenario': u'Situasjon',
         'scenario_outline': u'Situasjon Oversikt',
         'scenario_separator': u'(Situasjon Oversikt|Situasjon)',
+        'background': u'(?:Bakgrunn)',
+    },
+    'sv': {
+        'examples': u'Exempel|Scenarion',
+        'feature': u'Egenskaper',
+        'name': u'Swedish',
+        'native': u'Svenska',
+        'scenario': u'Scenario',
+        'scenario_outline': u'Scenarioöversikt',
+        'scenario_separator': u'(Scenarioöversikt|Scenario)',
+        'background': u'(?:Context)',
+    },
+    'cz': {
+        'examples': u'Příklady',
+        'feature': u'Požadavek',
+        'name': u'Czech',
+        'native': u'Čeština',
+        'scenario': u'Scénář|Požadavek',
+        'scenario_outline': u'Náčrt scénáře',
+        'scenario_separator': u'(Náčrt scénáře|Scénář)',
         'background': u'(?:Background)',
-    }
+    },
+
 }

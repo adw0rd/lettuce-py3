@@ -66,6 +66,30 @@ def main(args=sys.argv[1:]):
                       help='Write JUnit XML to this file. Defaults to '
                       'lettucetests.xml')
 
+    parser.add_option("--with-subunit",
+                      dest="enable_subunit",
+                      action="store_true",
+                      default=False,
+                      help='Output Subunit test results to a file')
+
+    parser.add_option("--subunit-file",
+                      dest="subunit_filename",
+                      default=None,
+                      help='Write Subunit data to this file. Defaults to '
+                      'subunit.bin')
+
+    parser.add_option("--failfast",
+                      dest="failfast",
+                      default=False,
+                      action="store_true",
+                      help='Stop running in the first failure')
+
+    parser.add_option("--pdb",
+                      dest="auto_pdb",
+                      default=False,
+                      action="store_true",
+                      help='Launches an interactive debugger upon error')
+
     options, args = parser.parse_args(args)
     if args:
         base_path = os.path.abspath(args[0])
@@ -75,6 +99,10 @@ def main(args=sys.argv[1:]):
     except ValueError:
         pass
 
+    tags = None
+    if options.tags:
+        tags = [tag.strip('@') for tag in options.tags]
+
     runner = lettuce.Runner(
         base_path,
         scenarios=options.scenarios,
@@ -82,7 +110,11 @@ def main(args=sys.argv[1:]):
         random=options.random,
         enable_xunit=options.enable_xunit,
         xunit_filename=options.xunit_file,
-        tags=options.tags,
+        enable_subunit=options.enable_subunit,
+        subunit_filename=options.subunit_filename,
+        failfast=options.failfast,
+        auto_pdb=options.auto_pdb,
+        tags=tags,
     )
 
     result = runner.run()

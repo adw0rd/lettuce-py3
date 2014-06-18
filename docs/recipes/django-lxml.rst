@@ -116,6 +116,13 @@ Once you install the ``lettuce.django`` app, the command ``harvest`` will be ava
 
    user@machine:~projects/djangoproject $ python manage.py harvest
 
+
+The ``harvest`` command executes the ``django.test.utils.setup_test_environment``
+function before it starts up the Django server. Typically, invoking this function
+would configure Django to use the locmem_ in-memory email backend. However,
+Lettuce uses a custom Django email backend to support retrieving email from
+Lettuce test scripts. See :ref:`lettuce-checking-email` for more details.
+
 5. specifying feature files
 ===========================
 
@@ -256,6 +263,34 @@ Notice the ``terrain.py`` file at the project root, there you can
 populate the :ref:`lettuce-world` and organize your features and steps
 with it :)
 
+.. _lettuce-checking-email:
+
+Checking email
+==============
+
+When you run your Django server under lettuce, emails sent by your server
+do not get transmitted over the Internet. Instead, these emails are
+added to a :class:`multiprocessing.Queue` object at
+``lettuce.django.mail.queue``.
+
+Example:
+
+.. highlight:: python
+
+::
+
+  from lettuce import step
+  from lettuce.django import mail
+  from nose.tools import assert_equals
+
+
+  @step(u'an email is sent to "([^"]*?)" with subject "([^"]*)"')
+  def email_sent(step, to, subject):
+      message = mail.queue.get(True, timeout=5)
+      assert_equals(message.subject, subject)
+      assert_equals(message.recipients(), [to])
+
+
 Running without HTTP server
 ===========================
 
@@ -307,6 +342,19 @@ For those cases lettuce provides the ``--debug-mode`` or ``-d`` option.
 
    python manage.py harvest --debug-mode
    python manage.py harvest -d
+
+using the test database
+=======================
+
+If you want to use a test database by default, instead of a live database,
+with your test server you can specify the ``-T`` flag or set the following
+configuration variable in ``settings.py``.
+
+.. highlight:: python
+
+::
+
+    LETTUCE_USE_TEST_DATABASE = True
 
 running only the specified scenarios
 ====================================
@@ -406,3 +454,4 @@ You can also specify it at ``settings.py`` so that you won't need to type the sa
 .. _windmill: http://www.getwindmill.com/
 .. _webdriver: http://code.google.com/p/selenium/wiki/PythonBindings?redir=1
 .. _GAE: http://code.google.com/appengine
+.. _locmem: https://docs.djangoproject.com/en/dev/topics/email/#in-memory-backend
