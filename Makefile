@@ -1,4 +1,4 @@
-all: check_dependencies unit functional integration doctest
+all: check_dependencies unit functional doctest
 
 filename=lettuce-`python -c 'import lettuce;print lettuce.version'`.tar.gz
 
@@ -46,7 +46,7 @@ deploy-documentation:documentation withdraw-documentation
 
 deploy: deploy-documentation
 
-release: clean unit functional integration doctest deploy-documentation publish
+release: clean unit functional doctest deploy-documentation publish
 	@printf "Exporting to $(filename)... "
 	@tar czf $(filename) lettuce setup.py README.md COPYING
 	@echo "DONE!"
