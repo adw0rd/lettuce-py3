@@ -23,8 +23,8 @@ class NullFkTests(TestCase):
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info').all(),
             [
-                (1, u'My first comment', '<Post: First Post>'),
-                (2, u'My second comment', 'None')
+                (1, 'My first comment', '<Post: First Post>'),
+                (2, 'My second comment', 'None')
             ],
             transform = lambda c: (c.id, c.comment_text, repr(c.post))
         )
@@ -35,8 +35,8 @@ class NullFkTests(TestCase):
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info__system_details'),
             [
-                (1, u'My first comment', '<Post: First Post>'),
-                (2, u'My second comment', 'None')
+                (1, 'My first comment', '<Post: First Post>'),
+                (2, 'My second comment', 'None')
             ],
             transform = lambda c: (c.id, c.comment_text, repr(c.post))
         )

@@ -53,9 +53,9 @@ class SpatialReference(GDALBase):
         buf = c_char_p('')
         srs_type = 'user'
 
-        if isinstance(srs_input, basestring):
+        if isinstance(srs_input, str):
             # Encoding to ASCII if unicode passed in.
-            if isinstance(srs_input, unicode):
+            if isinstance(srs_input, str):
                 srs_input = srs_input.encode('ascii')
             try:
                 # If SRID is a string, e.g., '4326', then make acceptable
@@ -64,7 +64,7 @@ class SpatialReference(GDALBase):
                 srs_input = 'EPSG:%d' % srid
             except ValueError:
                 pass
-        elif isinstance(srs_input, (int, long)):
+        elif isinstance(srs_input, int):
             # EPSG integer code was input.
             srs_type = 'epsg'
         elif isinstance(srs_input, self.ptr_type):
@@ -134,7 +134,7 @@ class SpatialReference(GDALBase):
         The attribute value for the given target node (e.g. 'PROJCS'). The index
         keyword specifies an index of the child node to return.
         """
-        if not isinstance(target, basestring) or not isinstance(index, int):
+        if not isinstance(target, str) or not isinstance(index, int):
             raise TypeError
         return capi.get_attr_value(self.ptr, target, index)
 

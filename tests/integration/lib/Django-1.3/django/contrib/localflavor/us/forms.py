@@ -29,11 +29,11 @@ class USPhoneNumberField(CharField):
     def clean(self, value):
         super(USPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\(|\)|\s+)', '', smart_unicode(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
+            return '%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
         raise ValidationError(self.error_messages['invalid'])
 
 class USSocialSecurityNumberField(Field):
@@ -58,7 +58,7 @@ class USSocialSecurityNumberField(Field):
     def clean(self, value):
         super(USSocialSecurityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         match = re.match(ssn_re, value)
         if not match:
             raise ValidationError(self.error_messages['invalid'])
@@ -76,7 +76,7 @@ class USSocialSecurityNumberField(Field):
            value == '078-05-1120' or \
            value == '219-09-9999':
             raise ValidationError(self.error_messages['invalid'])
-        return u'%s-%s-%s' % (area, group, serial)
+        return '%s-%s-%s' % (area, group, serial)
 
 class USStateField(Field):
     """
@@ -89,10 +89,10 @@ class USStateField(Field):
     }
 
     def clean(self, value):
-        from us_states import STATES_NORMALIZED
+        from .us_states import STATES_NORMALIZED
         super(USStateField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         try:
             value = value.strip().lower()
         except AttributeError:
@@ -109,7 +109,7 @@ class USStateSelect(Select):
     A Select widget that uses a list of U.S. states/territories as its choices.
     """
     def __init__(self, attrs=None):
-        from us_states import STATE_CHOICES
+        from .us_states import STATE_CHOICES
         super(USStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class USPSSelect(Select):
@@ -118,5 +118,5 @@ class USPSSelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from us_states import USPS_CHOICES
+        from .us_states import USPS_CHOICES
         super(USPSSelect, self).__init__(attrs, choices=USPS_CHOICES)

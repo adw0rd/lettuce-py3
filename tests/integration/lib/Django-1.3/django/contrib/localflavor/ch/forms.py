@@ -35,11 +35,11 @@ class CHPhoneNumberField(Field):
     def clean(self, value):
         super(CHPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\.|\s|/|-)', '', smart_unicode(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s %s %s %s' % (value[0:3], value[3:6], value[6:8], value[8:10])
+            return '%s %s %s %s' % (value[0:3], value[3:6], value[6:8], value[8:10])
         raise ValidationError(self.error_messages['invalid'])
 
 class CHStateSelect(Select):
@@ -47,7 +47,7 @@ class CHStateSelect(Select):
     A Select widget that uses a list of CH states as its choices.
     """
     def __init__(self, attrs=None):
-        from ch_states import STATE_CHOICES # relative import
+        from .ch_states import STATE_CHOICES # relative import
         super(CHStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class CHIdentityCardNumberField(Field):
@@ -99,7 +99,7 @@ class CHIdentityCardNumberField(Field):
     def clean(self, value):
         super(CHIdentityCardNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = re.match(id_re, value)
         if not match:
@@ -115,5 +115,5 @@ class CHIdentityCardNumberField(Field):
         if not self.has_valid_checksum(all_digits):
             raise ValidationError(self.error_messages['invalid'])
 
-        return u'%s%s%s' % (idnumber, pos9, checksum)
+        return '%s%s%s' % (idnumber, pos9, checksum)
 

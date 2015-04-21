@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from models import *
+from .models import *
 
 class GenericRelationTests(TestCase):
 

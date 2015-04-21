@@ -3,7 +3,7 @@ import datetime
 
 from django.test import TestCase
 
-from models import Group, Event, Happening
+from .models import Group, Event, Happening
 
 
 class PickleabilityTestCase(TestCase):

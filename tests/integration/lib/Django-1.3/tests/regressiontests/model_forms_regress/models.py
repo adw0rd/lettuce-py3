@@ -12,7 +12,7 @@ class Triple(models.Model):
     right = models.IntegerField()
 
     class Meta:
-        unique_together = (('left', 'middle'), (u'middle', u'right'))
+        unique_together = (('left', 'middle'), ('middle', 'right'))
 
 class FilePathModel(models.Model):
     path = models.FilePathField(path=os.path.dirname(__file__), match=".*\.py$", blank=True)

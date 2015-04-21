@@ -9,9 +9,10 @@ from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 
-from fields import Field, FileField
-from widgets import Media, media_property, TextInput, Textarea
-from util import flatatt, ErrorDict, ErrorList
+from .fields import Field, FileField
+from .widgets import Media, media_property, TextInput, Textarea
+from .util import flatatt, ErrorDict, ErrorList
+import collections
 
 __all__ = ('BaseForm', 'Form')
 
@@ -20,7 +21,7 @@ NON_FIELD_ERRORS = '__all__'
 def pretty_name(name):
     """Converts 'first_name' to 'First name'"""
     if not name:
-        return u''
+        return ''
     return name.replace('_', ' ').capitalize()
 
 def get_declared_fields(bases, attrs, with_base_fields=True):
@@ -34,7 +35,7 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     used. The distinction is useful in ModelForm subclassing.
     Also integrates any additional media definitions
     """
-    fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
+    fields = [(field_name, attrs.pop(field_name)) for field_name, obj in list(attrs.items()) if isinstance(obj, Field)]
     fields.sort(key=lambda x: x[1].creation_counter)
 
     # If this class is subclassing another Form, add that Form's fields.
@@ -43,11 +44,11 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     if with_base_fields:
         for base in bases[::-1]:
             if hasattr(base, 'base_fields'):
-                fields = base.base_fields.items() + fields
+                fields = list(base.base_fields.items()) + fields
     else:
         for base in bases[::-1]:
             if hasattr(base, 'declared_fields'):
-                fields = base.declared_fields.items() + fields
+                fields = list(base.declared_fields.items()) + fields
 
     return SortedDict(fields)
 
@@ -95,7 +96,7 @@ class BaseForm(StrAndUnicode):
         return self.as_table()
 
     def __iter__(self):
-        for name, field in self.fields.items():
+        for name, field in list(self.fields.items()):
             yield BoundField(self, field, name)
 
     def __getitem__(self, name):
@@ -133,21 +134,21 @@ class BaseForm(StrAndUnicode):
         """
         Add a 'initial' prefix for checking dynamic initial values
         """
-        return u'initial-%s' % self.add_prefix(field_name)
+        return 'initial-%s' % self.add_prefix(field_name)
 
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
         output, hidden_fields = [], []
 
-        for name, field in self.fields.items():
+        for name, field in list(self.fields.items()):
             html_class_attr = ''
             bf = BoundField(self, field, name)
             bf_errors = self.error_class([conditional_escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
-                    top_errors.extend([u'(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
-                hidden_fields.append(unicode(bf))
+                    top_errors.extend(['(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
+                hidden_fields.append(str(bf))
             else:
                 # Create a 'class="..."' atribute if the row should have any
                 # CSS classes applied.
@@ -172,12 +173,12 @@ class BaseForm(StrAndUnicode):
                 if field.help_text:
                     help_text = help_text_html % force_unicode(field.help_text)
                 else:
-                    help_text = u''
+                    help_text = ''
 
                 output.append(normal_row % {
                     'errors': force_unicode(bf_errors),
                     'label': force_unicode(label),
-                    'field': unicode(bf),
+                    'field': str(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr
                 })
@@ -186,7 +187,7 @@ class BaseForm(StrAndUnicode):
             output.insert(0, error_row % force_unicode(top_errors))
 
         if hidden_fields: # Insert any hidden fields in the last row.
-            str_hidden = u''.join(hidden_fields)
+            str_hidden = ''.join(hidden_fields)
             if output:
                 last_row = output[-1]
                 # Chop off the trailing row_ender (e.g. '</td></tr>') and
@@ -205,33 +206,33 @@ class BaseForm(StrAndUnicode):
                 # If there aren't any rows in the output, just append the
                 # hidden fields.
                 output.append(str_hidden)
-        return mark_safe(u'\n'.join(output))
+        return mark_safe('\n'.join(output))
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
         return self._html_output(
-            normal_row = u'<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
-            error_row = u'<tr><td colspan="2">%s</td></tr>',
-            row_ender = u'</td></tr>',
-            help_text_html = u'<br /><span class="helptext">%s</span>',
+            normal_row = '<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
+            error_row = '<tr><td colspan="2">%s</td></tr>',
+            row_ender = '</td></tr>',
+            help_text_html = '<br /><span class="helptext">%s</span>',
             errors_on_separate_row = False)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
         return self._html_output(
-            normal_row = u'<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
-            error_row = u'<li>%s</li>',
+            normal_row = '<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
+            error_row = '<li>%s</li>',
             row_ender = '</li>',
-            help_text_html = u' <span class="helptext">%s</span>',
+            help_text_html = ' <span class="helptext">%s</span>',
             errors_on_separate_row = False)
 
     def as_p(self):
         "Returns this form rendered as HTML <p>s."
         return self._html_output(
-            normal_row = u'<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
-            error_row = u'%s',
+            normal_row = '<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
+            error_row = '%s',
             row_ender = '</p>',
-            help_text_html = u' <span class="helptext">%s</span>',
+            help_text_html = ' <span class="helptext">%s</span>',
             errors_on_separate_row = True)
 
     def non_field_errors(self):
@@ -271,7 +272,7 @@ class BaseForm(StrAndUnicode):
             del self.cleaned_data
 
     def _clean_fields(self):
-        for name, field in self.fields.items():
+        for name, field in list(self.fields.items()):
             # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
@@ -286,7 +287,7 @@ class BaseForm(StrAndUnicode):
                 if hasattr(self, 'clean_%s' % name):
                     value = getattr(self, 'clean_%s' % name)()
                     self.cleaned_data[name] = value
-            except ValidationError, e:
+            except ValidationError as e:
                 self._errors[name] = self.error_class(e.messages)
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
@@ -294,7 +295,7 @@ class BaseForm(StrAndUnicode):
     def _clean_form(self):
         try:
             self.cleaned_data = self.clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
 
     def _post_clean(self):
@@ -328,7 +329,7 @@ class BaseForm(StrAndUnicode):
             # submitted data, but we'd need a way to easily get the string value
             # for a given field. Right now, that logic is embedded in the render
             # method of each widget.
-            for name, field in self.fields.items():
+            for name, field in list(self.fields.items()):
                 prefixed_name = self.add_prefix(name)
                 data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
                 if not field.show_hidden_initial:
@@ -348,7 +349,7 @@ class BaseForm(StrAndUnicode):
         Provide a description of all media required to render the widgets on this form
         """
         media = Media()
-        for field in self.fields.values():
+        for field in list(self.fields.values()):
             media = media + field.widget.media
         return media
     media = property(_get_media)
@@ -358,7 +359,7 @@ class BaseForm(StrAndUnicode):
         Returns True if the form needs to be multipart-encrypted, i.e. it has
         FileInput. Otherwise, False.
         """
-        for field in self.fields.values():
+        for field in list(self.fields.values()):
             if field.widget.needs_multipart_form:
                 return True
         return False
@@ -377,14 +378,8 @@ class BaseForm(StrAndUnicode):
         """
         return [field for field in self if not field.is_hidden]
 
-class Form(BaseForm):
+class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."
-    # This is a separate class from BaseForm in order to abstract the way
-    # self.fields is specified. This class (Form) is the one that does the
-    # fancy metaclass stuff purely for the semantic sugar -- it allows one
-    # to define a form using declarative syntax.
-    # BaseForm itself has no way of designating self.fields.
-    __metaclass__ = DeclarativeFieldsMetaclass
 
 class BoundField(StrAndUnicode):
     "A Field plus data"
@@ -468,7 +463,7 @@ class BoundField(StrAndUnicode):
         """
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
-            if callable(data):
+            if isinstance(data, collections.Callable):
                 data = data()
         else:
             data = self.field.bound_data(
@@ -489,7 +484,7 @@ class BoundField(StrAndUnicode):
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
             attrs = attrs and flatatt(attrs) or ''
-            contents = u'<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, unicode(contents))
+            contents = '<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, str(contents))
         return mark_safe(contents)
 
     def css_classes(self, extra_classes=None):

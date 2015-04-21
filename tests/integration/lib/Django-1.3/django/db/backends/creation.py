@@ -2,6 +2,7 @@ import sys
 import time
 
 from django.conf import settings
+import collections
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -24,7 +25,7 @@ class BaseDatabaseCreation(object):
         Generates a 32-bit digest of a set of arguments that can be used to
         shorten identifying names.
         """
-        return '%x' % (abs(hash(args)) % 4294967296L)  # 2**32
+        return '%x' % (abs(hash(args)) % 4294967296)  # 2**32
 
     def sql_create_model(self, model, style, known_models=set()):
         """
@@ -346,7 +347,7 @@ class BaseDatabaseCreation(object):
             test_db_repr = ''
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print "Creating test database for alias '%s'%s..." % (self.connection.alias, test_db_repr)
+            print("Creating test database for alias '%s'%s..." % (self.connection.alias, test_db_repr))
 
         self._create_test_db(verbosity, autoclobber)
 
@@ -416,21 +417,21 @@ class BaseDatabaseCreation(object):
         self.set_autocommit()
         try:
             cursor.execute("CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
-                confirm = raw_input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
+                confirm = input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
             if autoclobber or confirm == 'yes':
                 try:
                     if verbosity >= 1:
-                        print "Destroying old test database '%s'..." % self.connection.alias
+                        print("Destroying old test database '%s'..." % self.connection.alias)
                     cursor.execute("DROP DATABASE %s" % qn(test_database_name))
                     cursor.execute("CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
-                except Exception, e:
+                except Exception as e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
             else:
-                print "Tests cancelled."
+                print("Tests cancelled.")
                 sys.exit(1)
 
         return test_database_name
@@ -446,7 +447,7 @@ class BaseDatabaseCreation(object):
             test_db_repr = ''
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print "Destroying test database for alias '%s'%s..." % (self.connection.alias, test_db_repr)
+            print("Destroying test database for alias '%s'%s..." % (self.connection.alias, test_db_repr))
         self.connection.settings_dict['NAME'] = old_database_name
 
         self._destroy_test_db(test_database_name, verbosity)
@@ -466,7 +467,7 @@ class BaseDatabaseCreation(object):
     def set_autocommit(self):
         "Make sure a connection is in autocommit mode."
         if hasattr(self.connection.connection, "autocommit"):
-            if callable(self.connection.connection.autocommit):
+            if isinstance(self.connection.connection.autocommit, collections.Callable):
                 self.connection.connection.autocommit(True)
             else:
                 self.connection.connection.autocommit = True

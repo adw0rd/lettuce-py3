@@ -13,9 +13,9 @@ class FormsUtilTestCase(TestCase):
         # flatatt #
         ###########
 
-        self.assertEqual(flatatt({'id': "header"}), u' id="header"')
-        self.assertEqual(flatatt({'class': "news", 'title': "Read this"}), u' class="news" title="Read this"')
-        self.assertEqual(flatatt({}), u'')
+        self.assertEqual(flatatt({'id': "header"}), ' id="header"')
+        self.assertEqual(flatatt({'class': "news", 'title': "Read this"}), ' class="news" title="Read this"')
+        self.assertEqual(flatatt({}), '')
 
     def test_validation_error(self):
         ###################
@@ -27,7 +27,7 @@ class FormsUtilTestCase(TestCase):
                          '<ul class="errorlist"><li>There was an error.</li></ul>')
 
         # Can take a unicode string.
-        self.assertEqual(str(ErrorList(ValidationError(u"Not \u03C0.").messages)),
+        self.assertEqual(str(ErrorList(ValidationError("Not \u03C0.").messages)),
                          '<ul class="errorlist"><li>Not π.</li></ul>')
 
         # Can take a lazy string.
@@ -39,11 +39,11 @@ class FormsUtilTestCase(TestCase):
                          '<ul class="errorlist"><li>Error one.</li><li>Error two.</li></ul>')
 
         # Can take a mixture in a list.
-        self.assertEqual(str(ErrorList(ValidationError(["First error.", u"Not \u03C0.", ugettext_lazy("Error.")]).messages)),
+        self.assertEqual(str(ErrorList(ValidationError(["First error.", "Not \u03C0.", ugettext_lazy("Error.")]).messages)),
                          '<ul class="errorlist"><li>First error.</li><li>Not π.</li><li>Error.</li></ul>')
 
         class VeryBadError:
-            def __unicode__(self): return u"A very bad error."
+            def __unicode__(self): return "A very bad error."
 
         # Can take a non-string.
         self.assertEqual(str(ErrorList(ValidationError(VeryBadError()).messages)),

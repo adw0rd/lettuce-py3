@@ -69,7 +69,7 @@ class OGRGeometry(GDALBase):
     def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
-        str_instance = isinstance(geom_input, basestring)
+        str_instance = isinstance(geom_input, str)
 
         # If HEX, unpack input to to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
@@ -79,7 +79,7 @@ class OGRGeometry(GDALBase):
         # Constructing the geometry,
         if str_instance:
             # Checking if unicode
-            if isinstance(geom_input, unicode):
+            if isinstance(geom_input, str):
                 # Encoding to ASCII, WKT or HEX doesn't need any more.
                 geom_input = geom_input.encode('ascii')
 
@@ -284,7 +284,7 @@ class OGRGeometry(GDALBase):
         # (decremented) when this geometry's destructor is called.
         if isinstance(srs, SpatialReference):
             srs_ptr = srs.ptr
-        elif isinstance(srs, (int, long, basestring)):
+        elif isinstance(srs, (int, str)):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
         else:
@@ -300,7 +300,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, (int, long)):
+        if isinstance(srid, int):
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -420,7 +420,7 @@ class OGRGeometry(GDALBase):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
             capi.geom_transform_to(self.ptr, coord_trans.ptr)
-        elif isinstance(coord_trans, (int, long, basestring)):
+        elif isinstance(coord_trans, (int, str)):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
@@ -433,7 +433,7 @@ class OGRGeometry(GDALBase):
                 # With geometry collections have to set dimension on
                 # each internal geometry reference, as the collection
                 # dimension isn't affected.
-                for i in xrange(len(self)):
+                for i in range(len(self)):
                     internal_ptr = capi.get_geom_ref(self.ptr, i)
                     if orig_dim != capi.get_coord_dim(internal_ptr):
                         capi.set_coord_dim(internal_ptr, orig_dim)
@@ -584,7 +584,7 @@ class LineString(OGRGeometry):
 
     def __iter__(self):
         "Iterates over each point in the LineString."
-        for i in xrange(self.point_count):
+        for i in range(self.point_count):
             yield self[i]
 
     def __len__(self):
@@ -594,7 +594,7 @@ class LineString(OGRGeometry):
     @property
     def tuple(self):
         "Returns the tuple representation of this LineString."
-        return tuple([self[i] for i in xrange(len(self))])
+        return tuple([self[i] for i in range(len(self))])
     coords = tuple
 
     def _listarr(self, func):
@@ -602,7 +602,7 @@ class LineString(OGRGeometry):
         Internal routine that returns a sequence (list) corresponding with
         the given function.
         """
-        return [func(self.ptr, i) for i in xrange(len(self))]
+        return [func(self.ptr, i) for i in range(len(self))]
 
     @property
     def x(self):
@@ -631,7 +631,7 @@ class Polygon(OGRGeometry):
 
     def __iter__(self):
         "Iterates through each ring in the Polygon."
-        for i in xrange(self.geom_count):
+        for i in range(self.geom_count):
             yield self[i]
 
     def __getitem__(self, index):
@@ -651,14 +651,14 @@ class Polygon(OGRGeometry):
     @property
     def tuple(self):
         "Returns a tuple of LinearRing coordinate tuples."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple([self[i].tuple for i in range(self.geom_count)])
     coords = tuple
 
     @property
     def point_count(self):
         "The number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum([self[i].point_count for i in range(self.geom_count)])
 
     @property
     def centroid(self):
@@ -681,7 +681,7 @@ class GeometryCollection(OGRGeometry):
 
     def __iter__(self):
         "Iterates over each Geometry."
-        for i in xrange(self.geom_count):
+        for i in range(self.geom_count):
             yield self[i]
 
     def __len__(self):
@@ -695,7 +695,7 @@ class GeometryCollection(OGRGeometry):
                 for g in geom: capi.add_geom(self.ptr, g.ptr)
             else:
                 capi.add_geom(self.ptr, geom.ptr)
-        elif isinstance(geom, basestring):
+        elif isinstance(geom, str):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:
@@ -705,12 +705,12 @@ class GeometryCollection(OGRGeometry):
     def point_count(self):
         "The number of Points in this Geometry Collection."
         # Summing up the number of points in each geometry in this collection
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum([self[i].point_count for i in range(self.geom_count)])
 
     @property
     def tuple(self):
         "Returns a tuple representation of this Geometry Collection."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple([self[i].tuple for i in range(self.geom_count)])
     coords = tuple
 
 # Multiple Geometry types.

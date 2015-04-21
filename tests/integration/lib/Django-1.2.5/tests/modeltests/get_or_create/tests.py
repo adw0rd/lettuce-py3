@@ -3,7 +3,7 @@ from datetime import date
 from django.db import IntegrityError
 from django.test import TransactionTestCase
 
-from models import Person, ManualPrimaryKeyTest
+from .models import Person, ManualPrimaryKeyTest
 
 
 class GetOrCreateTests(TransactionTestCase):

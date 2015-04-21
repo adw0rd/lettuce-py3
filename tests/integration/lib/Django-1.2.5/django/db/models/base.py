@@ -1,6 +1,6 @@
 import types
 import sys
-from itertools import izip
+
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
@@ -90,7 +90,7 @@ class ModelBase(type):
             return m
 
         # Add all attributes to the class.
-        for obj_name, obj in attrs.items():
+        for obj_name, obj in list(attrs.items()):
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
@@ -266,8 +266,7 @@ class ModelState(object):
         # This impacts validation only; it has no effect on the actual save.
         self.adding = True
 
-class Model(object):
-    __metaclass__ = ModelBase
+class Model(object, metaclass=ModelBase):
     _deferred = False
 
     def __init__(self, *args, **kwargs):
@@ -291,11 +290,11 @@ class Model(object):
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
-            for val, field in izip(args, fields_iter):
+            for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
-            for val, field in izip(args, fields_iter):
+            for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
                 # Maintain compatibility with existing calls.
@@ -352,23 +351,23 @@ class Model(object):
                 setattr(self, field.attname, val)
 
         if kwargs:
-            for prop in kwargs.keys():
+            for prop in list(kwargs.keys()):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
                         setattr(self, prop, kwargs.pop(prop))
                 except AttributeError:
                     pass
             if kwargs:
-                raise TypeError("'%s' is an invalid keyword argument for this function" % kwargs.keys()[0])
+                raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs.keys())[0])
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 
     def __repr__(self):
         try:
-            u = unicode(self)
+            u = str(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return smart_str(u'<%s: %s>' % (self.__class__.__name__, u))
+        return smart_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
@@ -492,7 +491,7 @@ class Model(object):
                 org = cls
             else:
                 org = None
-            for parent, field in meta.parents.items():
+            for parent, field in list(meta.parents.items()):
                 # At this point, parent's primary key field may be unknown
                 # (for example, from administration form which doesn't fill
                 # this field). If so, fill it.
@@ -642,12 +641,12 @@ class Model(object):
         # traversing to the most remote parent classes -- those with no parents
         # themselves -- and then adding those instances to the collection. That
         # will include all the child instances down to "self".
-        parent_stack = [p for p in self._meta.parents.values() if p is not None]
+        parent_stack = [p for p in list(self._meta.parents.values()) if p is not None]
         while parent_stack:
             link = parent_stack.pop()
             parent_obj = getattr(self, link.name)
             if parent_obj._meta.parents:
-                parent_stack.extend(parent_obj._meta.parents.values())
+                parent_stack.extend(list(parent_obj._meta.parents.values()))
                 continue
             # At this point, parent_obj is base class (no ancestor models). So
             # delete it and all its descendents.
@@ -720,7 +719,7 @@ class Model(object):
         errors = self._perform_unique_checks(unique_checks)
         date_errors = self._perform_date_checks(date_checks)
 
-        for k, v in date_errors.items():
+        for k, v in list(date_errors.items()):
             errors.setdefault(k, []).extend(v)
 
         if errors:
@@ -740,7 +739,7 @@ class Model(object):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
-        for parent_class in self._meta.parents.keys():
+        for parent_class in list(self._meta.parents.keys()):
             if parent_class._meta.unique_together:
                 unique_togethers.append((parent_class, parent_class._meta.unique_together))
 
@@ -760,7 +759,7 @@ class Model(object):
         # the list of checks.
 
         fields_with_class = [(self.__class__, self._meta.local_fields)]
-        for parent_class in self._meta.parents.keys():
+        for parent_class in list(self._meta.parents.keys()):
             fields_with_class.append((parent_class, parent_class._meta.local_fields))
 
         for model_class, fields in fields_with_class:
@@ -798,7 +797,7 @@ class Model(object):
                 lookup_kwargs[str(field_name)] = lookup_value
 
             # some fields were skipped, no reason to do the check
-            if len(unique_check) != len(lookup_kwargs.keys()):
+            if len(unique_check) != len(list(lookup_kwargs.keys())):
                 continue
 
             qs = model_class._default_manager.filter(**lookup_kwargs)
@@ -848,9 +847,9 @@ class Model(object):
 
     def date_error_message(self, lookup_type, field, unique_for):
         opts = self._meta
-        return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
-            'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
-            'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
+        return _("%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
+            'field_name': str(capfirst(opts.get_field(field).verbose_name)),
+            'date_field': str(capfirst(opts.get_field(unique_for).verbose_name)),
             'lookup': lookup_type,
         }
 
@@ -863,17 +862,17 @@ class Model(object):
             field_name = unique_check[0]
             field_label = capfirst(opts.get_field(field_name).verbose_name)
             # Insert the error into the error dict, very sneaky
-            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_label)
+            return _("%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': str(model_name),
+                'field_label': str(field_label)
             }
         # unique_together
         else:
-            field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
+            field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
             field_labels = get_text_list(field_labels, _('and'))
-            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_labels)
+            return _("%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': str(model_name),
+                'field_label': str(field_labels)
             }
 
     def full_clean(self, exclude=None):
@@ -887,23 +886,23 @@ class Model(object):
 
         try:
             self.clean_fields(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             errors = e.update_error_dict(errors)
 
         # Form.clean() is run even if other validation fails, so do the
         # same with Model.clean() for consistency.
         try:
             self.clean()
-        except ValidationError, e:
+        except ValidationError as e:
             errors = e.update_error_dict(errors)
 
         # Run unique checks, but only for fields that passed validation.
-        for name in errors.keys():
+        for name in list(errors.keys()):
             if name != NON_FIELD_ERRORS and name not in exclude:
                 exclude.append(name)
         try:
             self.validate_unique(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             errors = e.update_error_dict(errors)
 
         if errors:
@@ -928,7 +927,7 @@ class Model(object):
                 continue
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
-            except ValidationError, e:
+            except ValidationError as e:
                 errors[f.name] = e.messages
 
         if errors:

@@ -1,8 +1,8 @@
 import datetime
 from django.test import TestCase
 from django import forms
-from models import Category, Writer, Book, DerivedBook, Post, FlexibleDatePost
-from mforms import (ProductForm, PriceForm, BookForm, DerivedBookForm,
+from .models import Category, Writer, Book, DerivedBook, Post, FlexibleDatePost
+from .mforms import (ProductForm, PriceForm, BookForm, DerivedBookForm,
                    ExplicitPKForm, PostForm, DerivedPostForm, CustomWriterForm,
                    FlexDatePostForm)
 
@@ -54,7 +54,7 @@ class UniqueTest(TestCase):
         obj = form.save()
         form = ProductForm({'slug': 'teddy-bear-blue'})
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['slug'], [u'Product with this Slug already exists.'])
+        self.assertEqual(form.errors['slug'], ['Product with this Slug already exists.'])
         form = ProductForm({'slug': 'teddy-bear-blue'}, instance=obj)
         self.assertTrue(form.is_valid())
 
@@ -66,7 +66,7 @@ class UniqueTest(TestCase):
         form = PriceForm({'price': '6.00', 'quantity': '1'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['__all__'], [u'Price with this Price and Quantity already exists.'])
+        self.assertEqual(form.errors['__all__'], ['Price with this Price and Quantity already exists.'])
 
     def test_unique_null(self):
         title = 'I May Be Wrong But I Doubt It'
@@ -76,7 +76,7 @@ class UniqueTest(TestCase):
         form = BookForm({'title': title, 'author': self.writer.pk})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['__all__'], [u'Book with this Title and Author already exists.'])
+        self.assertEqual(form.errors['__all__'], ['Book with this Title and Author already exists.'])
         form = BookForm({'title': title})
         self.assertTrue(form.is_valid())
         form.save()
@@ -86,10 +86,10 @@ class UniqueTest(TestCase):
     def test_inherited_unique(self):
         title = 'Boss'
         Book.objects.create(title=title, author=self.writer, special_id=1)
-        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'special_id': u'1', 'isbn': '12345'})
+        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'special_id': '1', 'isbn': '12345'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['special_id'], [u'Book with this Special id already exists.'])
+        self.assertEqual(form.errors['special_id'], ['Book with this Special id already exists.'])
 
     def test_inherited_unique_together(self):
         title = 'Boss'
@@ -99,7 +99,7 @@ class UniqueTest(TestCase):
         form = DerivedBookForm({'title': title, 'author': self.writer.pk, 'isbn': '12345'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['__all__'], [u'Book with this Title and Author already exists.'])
+        self.assertEqual(form.errors['__all__'], ['Book with this Title and Author already exists.'])
 
     def test_abstract_inherited_unique(self):
         title = 'Boss'
@@ -108,33 +108,33 @@ class UniqueTest(TestCase):
         form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'isbn': isbn})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['isbn'], [u'Derived book with this Isbn already exists.'])
+        self.assertEqual(form.errors['isbn'], ['Derived book with this Isbn already exists.'])
 
     def test_abstract_inherited_unique_together(self):
         title = 'Boss'
         isbn = '12345'
         dbook = DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
-        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'isbn': '9876', 'suffix1': u'0', 'suffix2': u'0'})
+        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'isbn': '9876', 'suffix1': '0', 'suffix2': '0'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['__all__'], [u'Derived book with this Suffix1 and Suffix2 already exists.'])
+        self.assertEqual(form.errors['__all__'], ['Derived book with this Suffix1 and Suffix2 already exists.'])
 
     def test_explicitpk_unspecified(self):
         """Test for primary_key being in the form and failing validation."""
-        form = ExplicitPKForm({'key': u'', 'desc': u'' })
+        form = ExplicitPKForm({'key': '', 'desc': '' })
         self.assertFalse(form.is_valid())
 
     def test_explicitpk_unique(self):
         """Ensure keys and blank character strings are tested for uniqueness."""
-        form = ExplicitPKForm({'key': u'key1', 'desc': u''})
+        form = ExplicitPKForm({'key': 'key1', 'desc': ''})
         self.assertTrue(form.is_valid())
         form.save()
-        form = ExplicitPKForm({'key': u'key1', 'desc': u''})
+        form = ExplicitPKForm({'key': 'key1', 'desc': ''})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 3)
-        self.assertEqual(form.errors['__all__'], [u'Explicit pk with this Key and Desc already exists.'])
-        self.assertEqual(form.errors['desc'], [u'Explicit pk with this Desc already exists.'])
-        self.assertEqual(form.errors['key'], [u'Explicit pk with this Key already exists.'])
+        self.assertEqual(form.errors['__all__'], ['Explicit pk with this Key and Desc already exists.'])
+        self.assertEqual(form.errors['desc'], ['Explicit pk with this Desc already exists.'])
+        self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
 
     def test_unique_for_date(self):
         p = Post.objects.create(title="Django 1.0 is released",
@@ -142,7 +142,7 @@ class UniqueTest(TestCase):
         form = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['title'], [u'Title must be unique for Posted date.'])
+        self.assertEqual(form.errors['title'], ['Title must be unique for Posted date.'])
         form = PostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
         form = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
@@ -150,17 +150,17 @@ class UniqueTest(TestCase):
         form = PostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['slug'], [u'Slug must be unique for Posted year.'])
+        self.assertEqual(form.errors['slug'], ['Slug must be unique for Posted year.'])
         form = PostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['subtitle'], [u'Subtitle must be unique for Posted month.'])
+        self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
         form = PostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
             "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
         self.assertTrue(form.is_valid())
         form = PostForm({'title': "Django 1.0 is released"})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['posted'], [u'This field is required.'])
+        self.assertEqual(form.errors['posted'], ['This field is required.'])
 
     def test_inherited_unique_for_date(self):
         p = Post.objects.create(title="Django 1.0 is released",
@@ -168,7 +168,7 @@ class UniqueTest(TestCase):
         form = DerivedPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['title'], [u'Title must be unique for Posted date.'])
+        self.assertEqual(form.errors['title'], ['Title must be unique for Posted date.'])
         form = DerivedPostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
         form = DerivedPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
@@ -176,10 +176,10 @@ class UniqueTest(TestCase):
         form = DerivedPostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['slug'], [u'Slug must be unique for Posted year.'])
+        self.assertEqual(form.errors['slug'], ['Slug must be unique for Posted year.'])
         form = DerivedPostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['subtitle'], [u'Subtitle must be unique for Posted month.'])
+        self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
         form = DerivedPostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
             "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
         self.assertTrue(form.is_valid())

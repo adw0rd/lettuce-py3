@@ -2,7 +2,7 @@
 Formtools Preview application.
 """
 
-import cPickle as pickle
+import pickle as pickle
 
 from django.conf import settings
 from django.http import Http404

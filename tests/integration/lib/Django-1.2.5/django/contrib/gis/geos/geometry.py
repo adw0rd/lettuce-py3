@@ -53,8 +53,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         The `srid` keyword is used to specify the Source Reference Identifier
         (SRID) number for this Geometry.  If not set, the SRID will be None.
         """
-        if isinstance(geo_input, basestring):
-            if isinstance(geo_input, unicode):
+        if isinstance(geo_input, str):
+            if isinstance(geo_input, str):
                 # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
                 geo_input = geo_input.encode('ascii')
 
@@ -154,7 +154,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Equivalence testing, a Geometry may be compared with another Geometry
         or a WKT representation.
         """
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             return self.wkt == other
         elif isinstance(other, GEOSGeometry):
             return self.equals_exact(other)
@@ -325,7 +325,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Returns true if the elements in the DE-9IM intersection matrix for the
         two Geometries match the elements in pattern.
         """
-        if not isinstance(pattern, basestring) or len(pattern) > 9:
+        if not isinstance(pattern, str) or len(pattern) > 9:
             raise GEOSException('invalid intersection matrix pattern')
         return capi.geos_relatepattern(self.ptr, other.ptr, pattern)
 

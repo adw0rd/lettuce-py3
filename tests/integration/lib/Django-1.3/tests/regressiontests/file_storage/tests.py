@@ -6,9 +6,9 @@ import tempfile
 import time
 from datetime import datetime, timedelta
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 try:
     import threading
@@ -41,7 +41,7 @@ class GetStorageClassTests(unittest.TestCase):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
-        except error, e:
+        except error as e:
             self.assertEqual(message, str(e))
 
     def test_get_filesystem_storage(self):
@@ -249,9 +249,9 @@ class FileStorageTests(unittest.TestCase):
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), set([u'storage_dir_1']))
+        self.assertEqual(set(dirs), set(['storage_dir_1']))
         self.assertEqual(set(files),
-                         set([u'storage_test_1', u'storage_test_2']))
+                         set(['storage_test_1', 'storage_test_2']))
 
         self.storage.delete('storage_test_1')
         self.storage.delete('storage_test_2')
@@ -297,7 +297,7 @@ class UnicodeFileNameTests(unittest.TestCase):
         out the encoding situation between doctest and this file, but the actual
         repr doesn't matter; it just shouldn't return a unicode object.
         """
-        uf = UploadedFile(name=u'¿Cómo?',content_type='text')
+        uf = UploadedFile(name='¿Cómo?',content_type='text')
         self.assertEqual(type(uf.__repr__()), str)
 
 # Tests for a race condition on file saving (#4948).
@@ -333,7 +333,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
         self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
-        settings.FILE_UPLOAD_PERMISSIONS = 0666
+        settings.FILE_UPLOAD_PERMISSIONS = 0o666
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
 
@@ -343,8 +343,8 @@ class FileStoragePermissions(unittest.TestCase):
 
     def test_file_upload_permissions(self):
         name = self.storage.save("the_file", ContentFile("data"))
-        actual_mode = os.stat(self.storage.path(name))[0] & 0777
-        self.assertEqual(actual_mode, 0666)
+        actual_mode = os.stat(self.storage.path(name))[0] & 0o777
+        self.assertEqual(actual_mode, 0o666)
 
 
 class FileStoragePathParsing(unittest.TestCase):

@@ -9,7 +9,7 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 from django.conf import settings
 from django.db import models, transaction, IntegrityError, DEFAULT_DB_ALIAS
 
-from fields import MyAutoField
+from .fields import MyAutoField
 
 class Employee(models.Model):
     employee_code = models.IntegerField(primary_key=True, db_column = 'code')
@@ -19,7 +19,7 @@ class Employee(models.Model):
         ordering = ('last_name', 'first_name')
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 class Business(models.Model):
     name = models.CharField(max_length=20, primary_key=True)

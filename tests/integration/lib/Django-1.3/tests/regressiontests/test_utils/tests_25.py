@@ -1,8 +1,8 @@
-from __future__ import with_statement
+
 
 from django.test import TestCase
 
-from models import Person
+from .models import Person
 
 
 class AssertNumQueriesContextManagerTests(TestCase):

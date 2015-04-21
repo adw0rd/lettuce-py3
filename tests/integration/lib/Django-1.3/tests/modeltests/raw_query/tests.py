@@ -3,7 +3,7 @@ from datetime import date
 from django.db.models.sql.query import InvalidQuery
 from django.test import TestCase
 
-from models import Author, Book, Coffee, Reviewer, FriendlyAuthor
+from .models import Author, Book, Coffee, Reviewer, FriendlyAuthor
 
 
 class RawQueryTests(TestCase):

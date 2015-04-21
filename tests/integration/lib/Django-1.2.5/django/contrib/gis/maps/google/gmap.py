@@ -176,7 +176,7 @@ class GoogleMapSet(GoogleMap):
             self.maps = args
 
         # Generating DOM ids for each of the maps in the set.
-        self.dom_ids = ['map%d' % i for i in xrange(len(self.maps))]
+        self.dom_ids = ['map%d' % i for i in range(len(self.maps))]
 
     def load_map_js(self):
         """

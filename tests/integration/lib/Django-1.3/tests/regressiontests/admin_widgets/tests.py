@@ -17,7 +17,7 @@ from django.utils.html import conditional_escape
 from django.utils.translation import activate, deactivate
 from django.utils.unittest import TestCase
 
-import models
+from . import models
 
 
 class AdminFormfieldForDBFieldTests(TestCase):
@@ -161,7 +161,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         pk = band.pk
         band.delete()
         post_data = {
-            "band": u'%s' % pk,
+            "band": '%s' % pk,
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
@@ -313,10 +313,10 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         self.assertEqual(w._has_changed(None, None), False)
         self.assertEqual(w._has_changed([], None), False)
-        self.assertEqual(w._has_changed(None, [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'2']), False)
-        self.assertEqual(w._has_changed([1, 2], [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'3']), True)
+        self.assertEqual(w._has_changed(None, ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '2']), False)
+        self.assertEqual(w._has_changed([1, 2], ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '3']), True)
 
 class RelatedFieldWidgetWrapperTests(DjangoTestCase):
     def test_no_can_add_related(self):

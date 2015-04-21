@@ -1,12 +1,12 @@
 from django.contrib.localflavor.fr.forms import (FRZipCodeField,
         FRPhoneNumberField, FRDepartmentSelect)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class FRLocalFlavorTests(LocalFlavorTestCase):
     def test_FRZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXXX.']
+        error_format = ['Enter a zip code in the format XXXXX.']
         valid = {
             '75001': '75001',
             '93200': '93200',
@@ -18,7 +18,7 @@ class FRLocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(FRZipCodeField, valid, invalid)
 
     def test_FRPhoneNumberField(self):
-        error_format = [u'Phone numbers must be in 0X XX XX XX XX format.']
+        error_format = ['Phone numbers must be in 0X XX XX XX XX format.']
         valid = {
             '01 55 44 58 64': '01 55 44 58 64',
             '0155445864': '01 55 44 58 64',
@@ -34,7 +34,7 @@ class FRLocalFlavorTests(LocalFlavorTestCase):
 
     def test_FRDepartmentSelect(self):
         f = FRDepartmentSelect()
-        out = u'''<select name="dep">
+        out = '''<select name="dep">
 <option value="01">01 - Ain</option>
 <option value="02">02 - Aisne</option>
 <option value="03">03 - Allier</option>

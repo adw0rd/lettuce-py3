@@ -39,7 +39,7 @@ class Layer(GDALBase):
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
-        if isinstance(index, (int, long)):
+        if isinstance(index, int):
             # An integer index was given -- we cannot do a check based on the
             # number of features because the beginning and ending feature IDs
             # are not guaranteed to be 0 and len(layer)-1, respectively.
@@ -48,7 +48,7 @@ class Layer(GDALBase):
         elif isinstance(index, slice):
             # A slice was given
             start, stop, stride = index.indices(self.num_feat)
-            return [self._make_feature(fid) for fid in xrange(start, stop, stride)]
+            return [self._make_feature(fid) for fid in range(start, stop, stride)]
         else:
             raise TypeError('Integers and slices may only be used when indexing OGR Layers.')
 
@@ -56,7 +56,7 @@ class Layer(GDALBase):
         "Iterates over each Feature in the Layer."
         # ResetReading() must be called before iteration is to begin.
         capi.reset_reading(self._ptr)
-        for i in xrange(self.num_feat):
+        for i in range(self.num_feat):
             yield Feature(capi.get_next_feature(self._ptr), self._ldefn)
 
     def __len__(self):
@@ -132,7 +132,7 @@ class Layer(GDALBase):
         available in this Layer.
         """
         return [capi.get_field_name(capi.get_field_defn(self._ldefn, i)) 
-                for i in xrange(self.num_fields) ]
+                for i in range(self.num_fields) ]
     
     @property
     def field_types(self):
@@ -143,19 +143,19 @@ class Layer(GDALBase):
         fields.
         """
         return [OGRFieldTypes[capi.get_field_type(capi.get_field_defn(self._ldefn, i))]
-                for i in xrange(self.num_fields)]
+                for i in range(self.num_fields)]
 
     @property 
     def field_widths(self):
         "Returns a list of the maximum field widths for the features."
         return [capi.get_field_width(capi.get_field_defn(self._ldefn, i))
-                for i in xrange(self.num_fields)]
+                for i in range(self.num_fields)]
 
     @property 
     def field_precisions(self):
         "Returns the field precisions for the features."
         return [capi.get_field_precision(capi.get_field_defn(self._ldefn, i))
-                for i in xrange(self.num_fields)]
+                for i in range(self.num_fields)]
 
     def _get_spatial_filter(self):
         try:
@@ -171,7 +171,7 @@ class Layer(GDALBase):
                 raise ValueError('Spatial filter list/tuple must have 4 elements.')
             # Map c_double onto params -- if a bad type is passed in it
             # will be caught here.
-            xmin, ymin, xmax, ymax = map(c_double, filter)
+            xmin, ymin, xmax, ymax = list(map(c_double, filter))
             capi.set_spatial_filter_rect(self.ptr, xmin, ymin, xmax, ymax)
         elif filter is None:
             capi.set_spatial_filter(self.ptr, None)

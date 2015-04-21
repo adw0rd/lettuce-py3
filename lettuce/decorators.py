@@ -17,7 +17,7 @@
 from lettuce.core import STEP_REGISTRY
 
 def _is_step_sentence(sentence):
-    return isinstance(sentence, str) or isinstance(sentence, basestring)
+    return isinstance(sentence, str) or isinstance(sentence, str)
 
 def step(step_func_or_sentence):
     """Decorates a function, so that it will become a new step

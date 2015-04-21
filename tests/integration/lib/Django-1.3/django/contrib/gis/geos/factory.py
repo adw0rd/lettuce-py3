@@ -6,7 +6,7 @@ def fromfile(file_h):
     WKT, or HEX.
     """
     # If given a file name, get a real handle.
-    if isinstance(file_h, basestring): 
+    if isinstance(file_h, str): 
         file_h = open(file_h, 'rb')
 
     # Reading in the file's contents,

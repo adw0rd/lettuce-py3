@@ -45,7 +45,7 @@ class CollectedObjects(object):
         self.children = {}
         if previously_seen:
             self.blocked = previously_seen.blocked
-            for cls, seen in previously_seen.data.items():
+            for cls, seen in list(previously_seen.data.items()):
                 self.blocked.setdefault(cls, SortedDict()).update(seen)
         else:
             self.blocked = {}
@@ -86,7 +86,7 @@ class CollectedObjects(object):
     def __getitem__(self, key):
         return self.data[key]
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.data)
 
     def iteritems(self):
@@ -94,7 +94,7 @@ class CollectedObjects(object):
             yield k, self[k]
 
     def items(self):
-        return list(self.iteritems())
+        return list(self.items())
 
     def keys(self):
         return self.ordered_keys()
@@ -106,7 +106,7 @@ class CollectedObjects(object):
         """
         dealt_with = SortedDict()
         # Start with items that have no children
-        models = self.data.keys()
+        models = list(self.data.keys())
         while len(dealt_with) < len(models):
             found = False
             for model in models:
@@ -120,13 +120,13 @@ class CollectedObjects(object):
                 raise CyclicDependency(
                     "There is a cyclic dependency of items to be processed.")
 
-        return dealt_with.keys()
+        return list(dealt_with.keys())
 
     def unordered_keys(self):
         """
         Fallback for the case where is a cyclic dependency but we don't  care.
         """
-        return self.data.keys()
+        return list(self.data.keys())
 
 class QueryWrapper(object):
     """
@@ -150,7 +150,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + kwargs.items())
+        super(Q, self).__init__(children=list(args) + list(kwargs.items()))
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):

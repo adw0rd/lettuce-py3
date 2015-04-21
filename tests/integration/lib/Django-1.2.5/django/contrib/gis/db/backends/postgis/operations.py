@@ -107,7 +107,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                                        'Was the database created from a spatial database '
                                        'template?' % self.connection.settings_dict['NAME']
                                        )
-        except Exception, e:
+        except Exception as e:
             # TODO: Raise helpful exceptions as they become known.
             raise
 
@@ -163,11 +163,11 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             'overlaps' : PostGISFunction(prefix, 'Overlaps'),
             'contains' : PostGISFunction(prefix, 'Contains'),
             'intersects' : PostGISFunction(prefix, 'Intersects'),
-            'relate' : (PostGISRelate, basestring),
+            'relate' : (PostGISRelate, str),
             }
 
         # Valid distance types and substitutions
-        dtypes = (Decimal, Distance, float, int, long)
+        dtypes = (Decimal, Distance, float, int, int)
         def get_dist_ops(operator):
             "Returns operations for both regular and spherical distances."
             return {'cartesian' : PostGISDistance(prefix, operator),
@@ -237,8 +237,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
 
         # Creating a dictionary lookup of all GIS terms for PostGIS.
         gis_terms = ['isnull']
-        gis_terms += self.geometry_operators.keys()
-        gis_terms += self.geometry_functions.keys()
+        gis_terms += list(self.geometry_operators.keys())
+        gis_terms += list(self.geometry_functions.keys())
         self.gis_terms = dict([(term, None) for term in gis_terms])
 
         self.area = prefix + 'Area'
@@ -294,8 +294,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         example: "BOX(-90.0 30.0, -85.0 40.0)".
         """
         ll, ur = box[4:-1].split(',')
-        xmin, ymin = map(float, ll.split())
-        xmax, ymax = map(float, ur.split())
+        xmin, ymin = list(map(float, ll.split()))
+        xmax, ymax = list(map(float, ur.split()))
         return (xmin, ymin, xmax, ymax)
 
     def convert_extent3d(self, box3d):
@@ -305,8 +305,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         example: "BOX3D(-90.0 30.0 1, -85.0 40.0 2)".
         """
         ll, ur = box3d[6:-1].split(',')
-        xmin, ymin, zmin = map(float, ll.split())
-        xmax, ymax, zmax = map(float, ur.split())
+        xmin, ymin, zmin = list(map(float, ll.split()))
+        xmax, ymax, zmax = list(map(float, ur.split()))
         return (xmin, ymin, zmin, xmax, ymax, zmax)
 
     def convert_geom(self, hex, geo_field):

@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import commands
+import subprocess
 from lettuce.fs import FileSystem
 from nose.tools import assert_equals, assert_not_equals
 from tests.util import run_scenario
@@ -92,7 +92,7 @@ def test_use_test_database_setting():
     'Test database is recreated each time if LETTUCE_USE_TEST_DATABASE is set'
 
     for i in range(1, 2):
-        status, out = commands.getstatusoutput(
+        status, out = subprocess.getstatusoutput(
             "python manage.py harvest --settings=testdbsettings " +
             "leaves/features/testdb.feature")
 

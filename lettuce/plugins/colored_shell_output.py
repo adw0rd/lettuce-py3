@@ -28,7 +28,7 @@ from lettuce.terrain import world
 
 
 def wrt(what):
-    if isinstance(what, unicode):
+    if isinstance(what, bytes):
         what = what.encode('utf-8')
     sys.stdout.write(what)
 
@@ -243,7 +243,7 @@ def print_end(total=None):
         'undefined': '\033[0;33m'
     }
 
-    for kind, color in kinds_and_colors.items():
+    for kind, color in list(kinds_and_colors.items()):
         attr = 'steps_%s' % kind
         stotal = getattr(total, attr)
         if stotal:

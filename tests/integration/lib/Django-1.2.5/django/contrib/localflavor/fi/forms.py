@@ -21,7 +21,7 @@ class FIMunicipalitySelect(Select):
     A Select widget that uses a list of Finnish municipalities as its choices.
     """
     def __init__(self, attrs=None):
-        from fi_municipalities import MUNICIPALITY_CHOICES
+        from .fi_municipalities import MUNICIPALITY_CHOICES
         super(FIMunicipalitySelect, self).__init__(attrs, choices=MUNICIPALITY_CHOICES)
 
 class FISocialSecurityNumber(Field):
@@ -32,7 +32,7 @@ class FISocialSecurityNumber(Field):
     def clean(self, value):
         super(FISocialSecurityNumber, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         checkmarks = "0123456789ABCDEFHJKLMNPRSTUVWXY"
         result = re.match(r"""^
@@ -47,5 +47,5 @@ class FISocialSecurityNumber(Field):
         gd = result.groupdict()
         checksum = int(gd['date'] + gd['serial'])
         if checkmarks[checksum % len(checkmarks)] == gd['checksum'].upper():
-            return u'%s' % value.upper()
+            return '%s' % value.upper()
         raise ValidationError(self.error_messages['invalid'])

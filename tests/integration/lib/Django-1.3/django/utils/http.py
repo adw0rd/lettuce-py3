@@ -2,8 +2,8 @@ import calendar
 import datetime
 import re
 import sys
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 from email.Utils import formatdate
 
 from django.utils.encoding import smart_str, force_unicode
@@ -29,9 +29,9 @@ def urlquote(url, safe='/'):
     can safely be used as part of an argument to a subsequent iri_to_uri() call
     without double-quoting occurring.
     """
-    return force_unicode(urllib.quote(smart_str(url), smart_str(safe)))
+    return force_unicode(urllib.parse.quote(smart_str(url), smart_str(safe)))
 
-urlquote = allow_lazy(urlquote, unicode)
+urlquote = allow_lazy(urlquote, str)
 
 def urlquote_plus(url, safe=''):
     """
@@ -40,8 +40,8 @@ def urlquote_plus(url, safe=''):
     returned string can safely be used as part of an argument to a subsequent
     iri_to_uri() call without double-quoting occurring.
     """
-    return force_unicode(urllib.quote_plus(smart_str(url), smart_str(safe)))
-urlquote_plus = allow_lazy(urlquote_plus, unicode)
+    return force_unicode(urllib.parse.quote_plus(smart_str(url), smart_str(safe)))
+urlquote_plus = allow_lazy(urlquote_plus, str)
 
 def urlencode(query, doseq=0):
     """
@@ -50,8 +50,8 @@ def urlencode(query, doseq=0):
     then encoded as per normal.
     """
     if hasattr(query, 'items'):
-        query = query.items()
-    return urllib.urlencode(
+        query = list(query.items())
+    return urllib.parse.urlencode(
         [(smart_str(k),
          isinstance(v, (list,tuple)) and [smart_str(i) for i in v] or smart_str(v))
             for k, v in query],
@@ -143,7 +143,7 @@ def base36_to_int(s):
         raise ValueError("Base36 input too large")
     value = int(s, 36)
     # ... then do a final check that the value will fit into an int.
-    if value > sys.maxint:
+    if value > sys.maxsize:
         raise ValueError("Base36 input too large")
     return value
 
@@ -192,7 +192,7 @@ if sys.version_info >= (2, 6):
         """
         Checks if two URLs are 'same-origin'
         """
-        p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
+        p1, p2 = urllib.parse.urlparse(url1), urllib.parse.urlparse(url2)
         return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
 else:
     # Python 2.4, 2.5 compatibility. This actually works for Python 2.6 and
@@ -202,5 +202,5 @@ else:
         """
         Checks if two URLs are 'same-origin'
         """
-        p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
+        p1, p2 = urllib.parse.urlparse(url1), urllib.parse.urlparse(url2)
         return p1[0:2] == p2[0:2]

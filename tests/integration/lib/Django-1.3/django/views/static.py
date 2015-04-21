@@ -7,7 +7,7 @@ import mimetypes
 import os
 import posixpath
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import loader, Template, Context, TemplateDoesNotExist
@@ -27,7 +27,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     but if you'd like to override it, you can create a template called
     ``static/directory_index.html``.
     """
-    path = posixpath.normpath(urllib.unquote(path))
+    path = posixpath.normpath(urllib.parse.unquote(path))
     path = path.lstrip('/')
     newpath = ''
     for part in path.split('/'):

@@ -26,7 +26,7 @@ class SECountySelect(forms.Select):
     """
 
     def __init__(self, attrs=None):
-        from se_counties import COUNTY_CHOICES
+        from .se_counties import COUNTY_CHOICES
         super(SECountySelect, self).__init__(attrs=attrs,
                                              choices=COUNTY_CHOICES)
 
@@ -54,7 +54,7 @@ class SEOrganisationNumberField(forms.CharField):
         value = super(SEOrganisationNumberField, self).clean(value)
         
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         
         match = SWEDISH_ID_NUMBER.match(value)
         if not match:
@@ -112,7 +112,7 @@ class SEPersonalIdentityNumberField(forms.CharField):
         value = super(SEPersonalIdentityNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
  
         match = SWEDISH_ID_NUMBER.match(value)
         if match is None:

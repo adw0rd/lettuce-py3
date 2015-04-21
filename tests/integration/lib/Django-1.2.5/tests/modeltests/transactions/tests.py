@@ -2,7 +2,7 @@ from django.test import TransactionTestCase
 from django.db import connection, transaction, IntegrityError, DEFAULT_DB_ALIAS
 from django.conf import settings
 
-from models import Reporter
+from .models import Reporter
 
 PGSQL = 'psycopg2' in settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE']
 MYSQL = 'mysql' in settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE']

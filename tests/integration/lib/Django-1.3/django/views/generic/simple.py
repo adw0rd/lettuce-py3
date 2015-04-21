@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanen
 from django.utils.log import getLogger
 
 import warnings
+import collections
 warnings.warn(
     'Function-based generic views have been deprecated; use class-based views instead.',
     PendingDeprecationWarning
@@ -18,8 +19,8 @@ def direct_to_template(request, template, extra_context=None, mimetype=None, **k
     """
     if extra_context is None: extra_context = {}
     dictionary = {'params': kwargs}
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             dictionary[key] = value()
         else:
             dictionary[key] = value

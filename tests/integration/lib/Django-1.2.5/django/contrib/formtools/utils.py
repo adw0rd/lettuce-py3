@@ -1,5 +1,5 @@
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -24,7 +24,7 @@ def security_hash(request, form, *args):
             value = bf.data or ''
         else:
             value = bf.field.clean(bf.data) or ''
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = value.strip()
         data.append((bf.name, value))
         

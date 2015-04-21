@@ -12,6 +12,7 @@ Managed transactions don't do those commits, but will need some kind of manual
 or implicit commits or rollbacks.
 """
 import sys
+import collections
 
 try:
     from functools import wraps
@@ -239,7 +240,7 @@ def _transaction_func(entering, exiting, using):
     # are both allowed forms.
     if using is None:
         using = DEFAULT_DB_ALIAS
-    if callable(using):
+    if isinstance(using, collections.Callable):
         return Transaction(entering, exiting, DEFAULT_DB_ALIAS)(using)
     return Transaction(entering, exiting, using)
 

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.db import transaction, IntegrityError
-from models import Place, Restaurant, Waiter, ManualPrimaryKey, RelatedModel, MultiModel
+from .models import Place, Restaurant, Waiter, ManualPrimaryKey, RelatedModel, MultiModel
 
 class OneToOneTests(TestCase):
 

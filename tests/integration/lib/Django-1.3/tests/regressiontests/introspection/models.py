@@ -7,7 +7,7 @@ class Reporter(models.Model):
     facebook_user_id = models.BigIntegerField()
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)

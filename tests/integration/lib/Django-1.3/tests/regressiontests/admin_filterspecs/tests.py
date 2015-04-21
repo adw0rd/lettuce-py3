@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.utils.encoding import force_unicode
 
-from models import Book, BoolTest
+from .models import Book, BoolTest
 
 def select_by(dictlist, key, value):
     return [x for x in dictlist if x[key] == value][0]
@@ -49,7 +49,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title()), u'year')
+        self.assertEqual(force_unicode(filterspec.title()), 'year')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?year__isnull=True')
@@ -59,7 +59,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title()), u'year')
+        self.assertEqual(force_unicode(filterspec.title()), 'year')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?year=2002')
@@ -77,7 +77,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title()), u'author')
+        self.assertEqual(force_unicode(filterspec.title()), 'author')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?author__isnull=True')
@@ -87,7 +87,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title()), u'author')
+        self.assertEqual(force_unicode(filterspec.title()), 'author')
         # order of choices depends on User model, which has no order
         choice = select_by(filterspec.choices(changelist), "display", "alfred")
         self.assertEqual(choice['selected'], True)
@@ -104,7 +104,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEqual(force_unicode(filterspec.title()), u'user')
+        self.assertEqual(force_unicode(filterspec.title()), 'user')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?contributors__isnull=True')
@@ -114,7 +114,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEqual(force_unicode(filterspec.title()), u'user')
+        self.assertEqual(force_unicode(filterspec.title()), 'user')
         choice = select_by(filterspec.choices(changelist), "display", "bob")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?contributors__id__exact=%d' % self.bob.pk)
@@ -132,7 +132,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), 'book')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?books_authored__isnull=True')
@@ -142,7 +142,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), 'book')
         choice = select_by(filterspec.choices(changelist), "display", self.bio_book.title)
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_authored__id__exact=%d' % self.bio_book.pk)
@@ -156,7 +156,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), 'book')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?books_contributed__isnull=True')
@@ -166,7 +166,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), 'book')
         choice = select_by(filterspec.choices(changelist), "display", self.django_book.title)
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
@@ -184,7 +184,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title()), u'completed')
+        self.assertEqual(force_unicode(filterspec.title()), 'completed')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], False)
         self.assertEqual(choices[-1]['query_string'], '?completed__exact=0')
@@ -194,7 +194,7 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title()), u'completed')
+        self.assertEqual(force_unicode(filterspec.title()), 'completed')
         # order of choices depends on User model, which has no order
         choice = select_by(filterspec.choices(changelist), "display", "Yes")
         self.assertEqual(choice['selected'], True)

@@ -18,7 +18,7 @@ from django.utils.encoding import smart_str, smart_unicode
 
 try:
     import psycopg as Database
-except ImportError, e:
+except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg module: %s" % e)
 
@@ -46,7 +46,7 @@ class UnicodeCursorWrapper(object):
         if isinstance(params, dict):
             result = {}
             charset = self.charset
-            for key, value in params.items():
+            for key, value in list(params.items()):
                 result[smart_str(key, charset)] = smart_str(value, charset)
             return result
         else:
@@ -55,19 +55,19 @@ class UnicodeCursorWrapper(object):
     def execute(self, sql, params=()):
         try:
             return self.cursor.execute(smart_str(sql, self.charset), self.format_params(params))
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+        except Database.IntegrityError as e:
+            raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+        except Database.DatabaseError as e:
+            raise utils.DatabaseError(utils.DatabaseError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
     def executemany(self, sql, param_list):
         try:
             new_param_list = [self.format_params(params) for params in param_list]
             return self.cursor.executemany(sql, new_param_list)
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+        except Database.IntegrityError as e:
+            raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+        except Database.DatabaseError as e:
+            raise utils.DatabaseError(utils.DatabaseError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
@@ -158,8 +158,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.connection is not None:
             try:
                 return self.connection.commit()
-            except Database.IntegrityError, e:
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            except Database.IntegrityError as e:
+                raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
 def typecast_string(s):
     """

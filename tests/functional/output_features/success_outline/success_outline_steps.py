@@ -36,9 +36,9 @@ def and_i_click_done(step):
 @step(r'I see the title of the page is "(.*)"')
 def then_i_see_the_message_message(step, title):
     possible_titles = [
-        u'John | My Website',
-        u'Mary | My Website',
-        u'Foo | My Website',
+        'John | My Website',
+        'Mary | My Website',
+        'Foo | My Website',
     ]
 
     assert title in possible_titles, \

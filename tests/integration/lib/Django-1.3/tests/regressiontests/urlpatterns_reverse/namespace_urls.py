@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from views import view_class_instance
+from .views import view_class_instance
 
 class URLObject(object):
     def __init__(self, app_name, namespace):

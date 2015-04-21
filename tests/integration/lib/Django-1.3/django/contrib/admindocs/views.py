@@ -54,10 +54,10 @@ def template_tag_index(request):
     load_all_installed_template_libraries()
 
     tags = []
-    app_libs = template.libraries.items()
+    app_libs = list(template.libraries.items())
     builtin_libs = [(None, lib) for lib in template.builtins]
     for module_name, library in builtin_libs + app_libs:
-        for tag_name, tag_func in library.tags.items():
+        for tag_name, tag_func in list(library.tags.items()):
             title, body, metadata = utils.parse_docstring(tag_func.__doc__)
             if title:
                 title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
@@ -89,10 +89,10 @@ def template_filter_index(request):
     load_all_installed_template_libraries()
 
     filters = []
-    app_libs = template.libraries.items()
+    app_libs = list(template.libraries.items())
     builtin_libs = [(None, lib) for lib in template.builtins]
     for module_name, library in builtin_libs + app_libs:
-        for filter_name, filter_func in library.filters.items():
+        for filter_name, filter_func in list(library.filters.items()):
             title, body, metadata = utils.parse_docstring(filter_func.__doc__)
             if title:
                 title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
@@ -238,7 +238,7 @@ def model_detail(request, app_label, model_name):
         })
 
     # Gather model methods.
-    for func_name, func in model.__dict__.items():
+    for func_name, func in list(model.__dict__.items()):
         if (inspect.isfunction(func) and len(inspect.getargspec(func)[0]) == 1):
             try:
                 for exclude in MODEL_METHODS_EXCLUDE:
@@ -323,7 +323,7 @@ def load_all_installed_template_libraries():
         for library_name in libraries:
             try:
                 lib = template.get_library(library_name)
-            except template.InvalidTemplateLibrary, e:
+            except template.InvalidTemplateLibrary as e:
                 pass
 
 def get_return_data_type(func_name):

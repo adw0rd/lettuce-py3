@@ -1,4 +1,4 @@
-from settings import *
+from .settings import *
 
 LETTUCE_APPS = (
     'foobar',

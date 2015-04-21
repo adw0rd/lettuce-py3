@@ -29,7 +29,7 @@ current_dir = abspath(dirname(__file__))
 lettuce_dir = abspath(dirname(lettuce.__file__))
 lettuce_path = lambda *x: fs.relpath(join(lettuce_dir, *x))
 
-call_line = StepDefinition.__call__.im_func.func_code.co_firstlineno + 5
+call_line = StepDefinition.__call__.__func__.__code__.co_firstlineno + 5
 
 def path_to_feature(name):
     return join(abspath(dirname(__file__)), 'behave_as_features', name, "%s.feature" % name)

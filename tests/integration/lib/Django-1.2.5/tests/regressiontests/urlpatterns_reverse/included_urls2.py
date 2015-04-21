@@ -6,7 +6,7 @@ argument list.
 """
 
 from django.conf.urls.defaults import *
-from views import empty_view
+from .views import empty_view
 
 urlpatterns = patterns('',
     url(r'^part/(?P<value>\w+)/$', empty_view, name="part"),

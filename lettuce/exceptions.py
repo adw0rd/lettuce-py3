@@ -46,7 +46,7 @@ class ReasonToFail(object):
         else:
             msg = exc.args[0] if exc.args else ''
 
-        if isinstance(msg, basestring):
+        if isinstance(msg, str):
             self.cause = utf8_string(msg)
         self.traceback = utf8_string(traceback.format_exc(exc))
 

@@ -1,13 +1,13 @@
 from django.contrib.localflavor.au.forms import (AUPostCodeField,
         AUPhoneNumberField, AUStateSelect)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class AULocalFlavorTests(LocalFlavorTestCase):
     def test_AUStateSelect(self):
         f = AUStateSelect()
-        out = u'''<select name="state">
+        out = '''<select name="state">
 <option value="ACT">Australian Capital Territory</option>
 <option value="NSW" selected="selected">New South Wales</option>
 <option value="NT">Northern Territory</option>
@@ -20,7 +20,7 @@ class AULocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('state', 'NSW'), out)
 
     def test_AUPostCodeField(self):
-        error_format = [u'Enter a 4 digit post code.']
+        error_format = ['Enter a 4 digit post code.']
         valid = {
             '1234': '1234',
             '2000': '2000',
@@ -32,7 +32,7 @@ class AULocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(AUPostCodeField, valid, invalid)
 
     def test_AUPhoneNumberField(self):
-        error_format = [u'Phone numbers must contain 10 digits.']
+        error_format = ['Phone numbers must contain 10 digits.']
         valid = {
             '1234567890': '1234567890',
             '0213456789': '0213456789',

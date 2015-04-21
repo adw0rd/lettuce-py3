@@ -46,9 +46,9 @@ class StringLookupTests(TestCase):
         A properly configured UTF-8 database can handle this.
         """
 
-        fx = Foo(name='Bjorn', friend=u'François')
+        fx = Foo(name='Bjorn', friend='François')
         fx.save()
-        self.assertEquals(Foo.objects.get(friend__contains=u'\xe7'), fx)
+        self.assertEquals(Foo.objects.get(friend__contains='\xe7'), fx)
 
         # We can also do the above query using UTF-8 strings.
         self.assertEquals(Foo.objects.get(friend__contains='\xc3\xa7'), fx)

@@ -18,12 +18,12 @@ import os
 import sys
 import time
 import socket
-import httplib
-import urlparse
+import http.client
+import urllib.parse
 import tempfile
 import multiprocessing
 
-from StringIO import StringIO
+from io import StringIO
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIHandler
@@ -43,11 +43,11 @@ except ImportError:
 try:
     from django.utils.six.moves import socketserver
 except ImportError:
-    import SocketServer as socketserver
+    import socketserver as socketserver
 
 try:
-    import SocketServer
-    SocketServer.BaseServer.handle_error = lambda *args, **kw: None
+    import socketserver
+    socketserver.BaseServer.handle_error = lambda *args, **kw: None
 except ImportError:
     pass
 
@@ -139,11 +139,11 @@ class ThreadedServer(multiprocessing.Process):
 
         while True:
             time.sleep(0.1)
-            http = httplib.HTTPConnection(address, self.port, timeout=1)
+            conn = http.client.HTTPConnection(address, self.port, timeout=1)
             try:
-                http.request("GET", "/")
+                conn.request("GET", "/")
             except socket.error:
-                http.close()
+                conn.close()
                 continue
             break
 
@@ -178,7 +178,7 @@ class ThreadedServer(multiprocessing.Process):
             finally:
                 os.unlink(pidfile)
 
-        open(pidfile, 'w').write(unicode(os.getpid()))
+        open(pidfile, 'w').write(str(os.getpid()))
 
         self.configure_mail_queue()
 
@@ -242,7 +242,7 @@ class BaseServer(object):
 
     def __init__(self, address='0.0.0.0', port=None, threading=True):
         self.port = int(port or getattr(settings, 'LETTUCE_SERVER_PORT', 8000))
-        self.address = unicode(address)
+        self.address = str(address)
         self.threading = threading
 
     def start(self):
@@ -287,7 +287,7 @@ class DefaultServer(BaseServer):
             if getattr(settings, 'LETTUCE_SERVE_ADMIN_MEDIA', False):
                 msg += ' (as per settings.LETTUCE_SERVE_ADMIN_MEDIA=True)'
 
-            print "%s..." % msg
+            print("%s..." % msg)
 
         self._server.start()
         self._server.wait()
@@ -302,7 +302,7 @@ class DefaultServer(BaseServer):
                 'python manage.py --no-server' % addrport,
             )
 
-        print "Django's builtin server is running at %s:%d" % addrport
+        print("Django's builtin server is running at %s:%d" % addrport)
 
     def stop(self, fail=False):
         pid = self._server.pid
@@ -320,7 +320,7 @@ class DefaultServer(BaseServer):
         if self.port is not 80:
             base_url += ':%d' % self.port
 
-        return urlparse.urljoin(base_url, url)
+        return urllib.parse.urljoin(base_url, url)
 
 
 try:
@@ -341,9 +341,9 @@ try:
                                               port=self.port)
             LiveServerTestCase.setUpClass()
 
-            print "Django's builtin server is running at {address}:{port}".format(
+            print("Django's builtin server is running at {address}:{port}".format(
                 address=self.address,
-                port=self.port)
+                port=self.port))
 
         def stop(self, fail=False):
             LiveServerTestCase.tearDownClass()
@@ -353,7 +353,7 @@ try:
             return 0
 
         def url(self, url=''):
-            return urlparse.urljoin(
+            return urllib.parse.urljoin(
                 'http://{address}:{port}/'.format(address=self.address,
                                                   port=self.port),
                 url)

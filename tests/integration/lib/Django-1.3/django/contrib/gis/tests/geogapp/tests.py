@@ -5,7 +5,7 @@ import os
 from django.contrib.gis import gdal
 from django.contrib.gis.measure import D
 from django.test import TestCase
-from models import City, County, Zipcode
+from .models import City, County, Zipcode
 
 class GeographyTest(TestCase):
 

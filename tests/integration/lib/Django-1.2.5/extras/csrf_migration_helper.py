@@ -148,7 +148,7 @@ def get_template_dirs():
     dirs = set()
     if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS 
         or  'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
-        dirs.update(map(unicode, settings.TEMPLATE_DIRS))
+        dirs.update(list(map(str, settings.TEMPLATE_DIRS)))
 
     if ('django.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS
         or 'django.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
@@ -176,7 +176,7 @@ class Template(object):
             fd = open(self.absolute_filename)
             try:
                 content = fd.read().decode(TEMPLATE_ENCODING)
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError as e:
                 message = '%s in %s' % (
                     e[4], self.absolute_filename.encode('UTF-8', 'ignore'))
                 raise UnicodeDecodeError(*(e.args[:4] + (message,)))
@@ -292,8 +292,8 @@ def search_python(python_code, template_name):
     retval = []
     for fn, content in python_code:
         for ln, line in enumerate(content):
-            if ((u'"%s"' % template_name) in line) or \
-               ((u"'%s'" % template_name) in line):
+            if (('"%s"' % template_name) in line) or \
+               (("'%s'" % template_name) in line):
                 retval.append((fn, ln + 1))
     return retval
 
@@ -312,29 +312,29 @@ def main(pythonpaths):
         found = search_python_list(python_code, to_search)
 
         # Display:
-        print t.absolute_filename
+        print(t.absolute_filename)
         for r in t.relative_filenames:
-            print u"  AKA %s" % r
-        print u"  POST forms: %s" % num_post_forms
-        print u"  With token: %s" % (num_post_forms - len(form_lines_without_token))
+            print("  AKA %s" % r)
+        print("  POST forms: %s" % num_post_forms)
+        print("  With token: %s" % (num_post_forms - len(form_lines_without_token)))
         if form_lines_without_token:
-            print u"  Without token:"
+            print("  Without token:")
             for ln in form_lines_without_token:
-                print "%s:%d:" % (t.absolute_filename, ln)
-        print
-        print u"  Searching for:"
+                print("%s:%d:" % (t.absolute_filename, ln))
+        print()
+        print("  Searching for:")
         for r in to_search:
-            print u"    " + r
-        print
-        print u"  Found:"
+            print("    " + r)
+        print()
+        print("  Found:")
         if len(found) == 0:
-            print "    Nothing"
+            print("    Nothing")
         else:
             for fn, ln in found:
-                print "%s:%d:" % (fn, ln)
+                print("%s:%d:" % (fn, ln))
 
-        print
-        print "----"
+        print()
+        print("----")
 
 
 parser = OptionParser(usage=USAGE)
@@ -349,7 +349,7 @@ if __name__ == '__main__':
     settings = getattr(options, 'settings', None)
     if settings is None:
         if os.environ.get("DJANGO_SETTINGS_MODULE", None) is None:
-            print "You need to set DJANGO_SETTINGS_MODULE or use the '--settings' parameter"
+            print("You need to set DJANGO_SETTINGS_MODULE or use the '--settings' parameter")
             sys.exit(1)
     else:
         os.environ["DJANGO_SETTINGS_MODULE"] = settings

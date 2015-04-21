@@ -7,6 +7,7 @@ from django.utils.translation import ugettext
 from django.contrib.auth.views import redirect_to_login
 from django.views.generic import GenericViewError
 from django.contrib import messages
+import collections
 
 
 def apply_extra_context(extra_context, context):
@@ -14,8 +15,8 @@ def apply_extra_context(extra_context, context):
     Adds items from extra_context dict to context.  If a value in extra_context
     is callable, then it is called and the result is added to context.
     """
-    for key, value in extra_context.iteritems():
-        if callable(value):
+    for key, value in extra_context.items():
+        if isinstance(value, collections.Callable):
             context[key] = value()
         else:
             context[key] = value

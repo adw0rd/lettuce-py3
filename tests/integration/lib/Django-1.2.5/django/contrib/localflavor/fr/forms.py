@@ -34,11 +34,11 @@ class FRPhoneNumberField(Field):
     def clean(self, value):
         super(FRPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\.|\s)', '', smart_unicode(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s %s %s %s %s' % (value[0:2], value[2:4], value[4:6], value[6:8], value[8:10])
+            return '%s %s %s %s %s' % (value[0:2], value[2:4], value[4:6], value[6:8], value[8:10])
         raise ValidationError(self.error_messages['invalid'])
 
 class FRDepartmentSelect(Select):
@@ -46,6 +46,6 @@ class FRDepartmentSelect(Select):
     A Select widget that uses a list of FR departments as its choices.
     """
     def __init__(self, attrs=None):
-        from fr_department import DEPARTMENT_ASCII_CHOICES
+        from .fr_department import DEPARTMENT_ASCII_CHOICES
         super(FRDepartmentSelect, self).__init__(attrs, choices=DEPARTMENT_ASCII_CHOICES)
 

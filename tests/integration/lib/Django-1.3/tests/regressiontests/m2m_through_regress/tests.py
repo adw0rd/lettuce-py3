@@ -1,13 +1,13 @@
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 from django.core import management
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from models import (Person, Group, Membership, UserMembership,
+from .models import (Person, Group, Membership, UserMembership,
                     Car, Driver, CarDriver)
 
 

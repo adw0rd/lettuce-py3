@@ -2,7 +2,7 @@ from operator import attrgetter
 
 from django.test import TestCase
 
-from models import Post, Question, Answer
+from .models import Post, Question, Answer
 
 
 class OrderWithRespectToTests(TestCase):

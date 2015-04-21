@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
-import commands
+import subprocess
 from os.path import dirname, abspath, join, curdir
 from nose.tools import assert_equals, with_setup
 
@@ -26,7 +26,7 @@ def test_imports_terrain_under_path_that_is_run():
 
     os.chdir(join(abspath(dirname(__file__)), 'simple_features', '1st_feature_dir'))
 
-    status, output = commands.getstatusoutput('python -c "from lettuce import world;assert hasattr(world, \'works_fine\'); print \'it passed!\'"')
+    status, output = subprocess.getstatusoutput('python -c "from lettuce import world;assert hasattr(world, \'works_fine\'); print \'it passed!\'"')
 
     assert_equals(status, 0)
     assert_equals(output, "it passed!")

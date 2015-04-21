@@ -21,7 +21,7 @@ class Count(models.Model):
     parent = models.ForeignKey('self', null=True)
 
     def __unicode__(self):
-        return unicode(self.num)
+        return str(self.num)
 
 class Event(models.Model):
     date = models.DateTimeField(auto_now_add=True)

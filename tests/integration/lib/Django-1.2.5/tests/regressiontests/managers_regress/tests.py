@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from models import Child1, Child2, Child3, Child4, Child5, Child6, Child7
+from .models import Child1, Child2, Child3, Child4, Child5, Child6, Child7
 
 
 class ManagersRegressionTests(TestCase):

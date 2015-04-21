@@ -1,5 +1,5 @@
 from django.test import TestCase
-from forms import USPlaceForm
+from .forms import USPlaceForm
 
 class USLocalflavorTests(TestCase):
     def setUp(self):
@@ -15,7 +15,7 @@ class USLocalflavorTests(TestCase):
         """Test that required USStateFields throw appropriate errors."""
         form = USPlaceForm({'state':'GA', 'name':'Place in GA'})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['state_req'], [u'This field is required.'])
+        self.assertEqual(form.errors['state_req'], ['This field is required.'])
 
     def test_field_blank_option(self):
         """Test that the empty option is there."""

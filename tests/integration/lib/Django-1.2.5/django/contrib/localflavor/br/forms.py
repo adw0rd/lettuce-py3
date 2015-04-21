@@ -29,11 +29,11 @@ class BRPhoneNumberField(Field):
     def clean(self, value):
         super(BRPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\(|\)|\s+)', '', smart_unicode(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
+            return '%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
         raise ValidationError(self.error_messages['invalid'])
 
 class BRStateSelect(Select):
@@ -42,7 +42,7 @@ class BRStateSelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from br_states import STATE_CHOICES
+        from .br_states import STATE_CHOICES
         super(BRStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class BRStateChoiceField(Field):
@@ -51,22 +51,22 @@ class BRStateChoiceField(Field):
     """
     widget = Select
     default_error_messages = {
-        'invalid': _(u'Select a valid brazilian state. That state is not one of the available states.'),
+        'invalid': _('Select a valid brazilian state. That state is not one of the available states.'),
     }
 
     def __init__(self, required=True, widget=None, label=None,
                  initial=None, help_text=None):
         super(BRStateChoiceField, self).__init__(required, widget, label,
                                                  initial, help_text)
-        from br_states import STATE_CHOICES
+        from .br_states import STATE_CHOICES
         self.widget.choices = STATE_CHOICES
 
     def clean(self, value):
         value = super(BRStateChoiceField, self).clean(value)
         if value in EMPTY_VALUES:
-            value = u''
+            value = ''
         value = smart_unicode(value)
-        if value == u'':
+        if value == '':
             return value
         valid_values = set([smart_unicode(k) for k, v in self.widget.choices])
         if value not in valid_values:
@@ -102,7 +102,7 @@ class BRCPFField(CharField):
         """
         value = super(BRCPFField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         orig_value = value[:]
         if not value.isdigit():
             value = re.sub("[-\.]", "", value)
@@ -139,7 +139,7 @@ class BRCNPJField(Field):
         """
         value = super(BRCNPJField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         orig_value = value[:]
         if not value.isdigit():
             value = re.sub("[-/\.]", "", value)
@@ -151,10 +151,10 @@ class BRCNPJField(Field):
             raise ValidationError(self.error_messages['max_digits'])
         orig_dv = value[-2:]
 
-        new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(range(5, 1, -1) + range(9, 1, -1))])
+        new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(list(range(5, 1, -1)) + list(range(9, 1, -1)))])
         new_1dv = DV_maker(new_1dv % 11)
         value = value[:-2] + str(new_1dv) + value[-1]
-        new_2dv = sum([i * int(value[idx]) for idx, i in enumerate(range(6, 1, -1) + range(9, 1, -1))])
+        new_2dv = sum([i * int(value[idx]) for idx, i in enumerate(list(range(6, 1, -1)) + list(range(9, 1, -1)))])
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:

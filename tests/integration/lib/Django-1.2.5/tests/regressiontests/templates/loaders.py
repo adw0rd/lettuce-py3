@@ -13,7 +13,7 @@ import unittest
 import sys
 import pkg_resources
 import imp
-import StringIO
+import io
 import os.path
 import warnings
 
@@ -63,8 +63,8 @@ class DeprecatedEggLoaderTest(unittest.TestCase):
 
         self.empty_egg = create_egg("egg_empty", {})
         self.egg_1 = create_egg("egg_1", {
-            os.path.normcase('templates/y.html') : StringIO.StringIO("y"),
-            os.path.normcase('templates/x.txt') : StringIO.StringIO("x"),
+            os.path.normcase('templates/y.html') : io.StringIO("y"),
+            os.path.normcase('templates/x.txt') : io.StringIO("x"),
         })
         self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []
@@ -89,8 +89,8 @@ class EggLoaderTest(unittest.TestCase):
 
         self.empty_egg = create_egg("egg_empty", {})
         self.egg_1 = create_egg("egg_1", {
-            os.path.normcase('templates/y.html') : StringIO.StringIO("y"),
-            os.path.normcase('templates/x.txt') : StringIO.StringIO("x"),
+            os.path.normcase('templates/y.html') : io.StringIO("y"),
+            os.path.normcase('templates/x.txt') : io.StringIO("x"),
         })
         self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []

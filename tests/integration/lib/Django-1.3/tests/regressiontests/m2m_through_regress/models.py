@@ -74,4 +74,4 @@ class CarDriver(models.Model):
     driver = models.ForeignKey('Driver', to_field='name')
 
     def __unicode__(self, ):
-        return u"pk=%s car=%s driver=%s" % (str(self.pk), self.car, self.driver)
+        return "pk=%s car=%s driver=%s" % (str(self.pk), self.car, self.driver)

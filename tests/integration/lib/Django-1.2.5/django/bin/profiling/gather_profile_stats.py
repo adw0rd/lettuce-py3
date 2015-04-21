@@ -23,13 +23,13 @@ def gather_stats(p):
             prof = stats.load(os.path.join(p, f))
         else:
             continue
-        print "Processing %s" % f
+        print("Processing %s" % f)
         if path in profiles:
             profiles[path].add(prof)
         else:
             profiles[path] = prof
         os.unlink(os.path.join(p, f))
-    for (path, prof) in profiles.items():
+    for (path, prof) in list(profiles.items()):
         prof.dump_stats(os.path.join(p, "%s.agg.prof" % path))
     
 if __name__ == '__main__':

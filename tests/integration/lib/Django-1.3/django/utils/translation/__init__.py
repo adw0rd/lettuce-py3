@@ -91,10 +91,10 @@ def npgettext(context, singular, plural, number):
 
 ngettext_lazy = lazy(ngettext, str)
 gettext_lazy = lazy(gettext, str)
-ungettext_lazy = lazy(ungettext, unicode)
-ugettext_lazy = lazy(ugettext, unicode)
-pgettext_lazy = lazy(pgettext, unicode)
-npgettext_lazy = lazy(npgettext, unicode)
+ungettext_lazy = lazy(ungettext, str)
+ugettext_lazy = lazy(ugettext, str)
+pgettext_lazy = lazy(pgettext, str)
+npgettext_lazy = lazy(npgettext, str)
 
 def activate(language):
     return _trans.activate(language)
@@ -134,8 +134,8 @@ def _string_concat(*strings):
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
-    return u''.join([force_unicode(s) for s in strings])
-string_concat = lazy(_string_concat, unicode)
+    return ''.join([force_unicode(s) for s in strings])
+string_concat = lazy(_string_concat, str)
 
 def get_language_info(lang_code):
     from django.conf.locale import LANG_INFO

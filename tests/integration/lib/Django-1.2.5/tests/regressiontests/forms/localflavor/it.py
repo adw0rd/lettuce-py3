@@ -1,13 +1,13 @@
 from django.contrib.localflavor.it.forms import (ITZipCodeField, ITRegionSelect,
     ITSocialSecurityNumberField, ITVatNumberField)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class ITLocalFlavorTests(LocalFlavorTestCase):
     def test_ITRegionSelect(self):
         f = ITRegionSelect()
-        out = u'''<select name="regions">
+        out = '''<select name="regions">
 <option value="ABR">Abruzzo</option>
 <option value="BAS">Basilicata</option>
 <option value="CAL">Calabria</option>
@@ -32,7 +32,7 @@ class ITLocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('regions', 'PMN'), out)
 
     def test_ITZipCodeField(self):
-        error_invalid = [u'Enter a valid zip code.']
+        error_invalid = ['Enter a valid zip code.']
         valid = {
             '00100': '00100',
         }
@@ -42,7 +42,7 @@ class ITLocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(ITZipCodeField, valid, invalid)
     
     def test_ITSocialSecurityNumberField(self):
-        error_invalid = [u'Enter a valid Social Security number.']
+        error_invalid = ['Enter a valid Social Security number.']
         valid = {
             'LVSGDU99T71H501L': 'LVSGDU99T71H501L',
             'LBRRME11A01L736W': 'LBRRME11A01L736W',
@@ -56,7 +56,7 @@ class ITLocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(ITSocialSecurityNumberField, valid, invalid)
     
     def test_ITVatNumberField(self):
-        error_invalid = [u'Enter a valid VAT number.']
+        error_invalid = ['Enter a valid VAT number.']
         valid = {
             '07973780013': '07973780013',
             '7973780013': '07973780013',

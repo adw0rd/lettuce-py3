@@ -1,6 +1,7 @@
 import logging
 import sys
 from django.core import mail
+import collections
 
 # Make sure a NullHandler is available
 # This was added in Python 2.7/3.2
@@ -25,7 +26,7 @@ if sys.version_info < (2, 5):
 
         def __getattr__(self, name):
             val = getattr(self._logger, name)
-            if callable(val):
+            if isinstance(val, collections.Callable):
                 def _wrapper(*args, **kwargs):
                     # Python 2.4 logging module doesn't support 'extra' parameter to
                     # methods of Logger

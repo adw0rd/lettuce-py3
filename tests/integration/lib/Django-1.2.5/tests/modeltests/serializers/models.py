@@ -47,7 +47,7 @@ class AuthorProfile(models.Model):
     date_of_birth = models.DateField()
 
     def __unicode__(self):
-        return u"Profile of %s" % self.author
+        return "Profile of %s" % self.author
 
 
 class Actor(models.Model):
@@ -90,14 +90,12 @@ class Team(object):
         return "%s" % self.title
 
 
-class TeamField(models.CharField):
-    __metaclass__ = models.SubfieldBase
-
+class TeamField(models.CharField, metaclass=models.SubfieldBase):
     def __init__(self):
         super(TeamField, self).__init__(max_length=100)
 
     def get_db_prep_save(self, value):
-        return unicode(value.title)
+        return str(value.title)
 
     def to_python(self, value):
         if isinstance(value, Team):
@@ -114,4 +112,4 @@ class Player(models.Model):
     team = TeamField()
 
     def __unicode__(self):
-        return u'%s (%d) playing for %s' % (self.name, self.rank, self.team.to_string())
+        return '%s (%d) playing for %s' % (self.name, self.rank, self.team.to_string())

@@ -41,10 +41,10 @@ class FilterSpec(object):
     def output(self, cl):
         t = []
         if self.has_output():
-            t.append(_(u'<h3>By %s:</h3>\n<ul>\n') % escape(self.title()))
+            t.append(_('<h3>By %s:</h3>\n<ul>\n') % escape(self.title()))
 
             for choice in self.choices(cl):
-                t.append(u'<li%s><a href="%s">%s</a></li>\n' % \
+                t.append('<li%s><a href="%s">%s</a></li>\n' % \
                     ((choice['selected'] and ' class="selected"' or ''),
                      iri_to_uri(choice['query_string']),
                      choice['display']))
@@ -103,7 +103,7 @@ class DateFieldFilterSpec(FilterSpec):
 
         self.field_generic = '%s__' % self.field.name
 
-        self.date_params = dict([(k, v) for k, v in params.items() if k.startswith(self.field_generic)])
+        self.date_params = dict([(k, v) for k, v in list(params.items()) if k.startswith(self.field_generic)])
 
         today = datetime.date.today()
         one_week_ago = today - datetime.timedelta(days=7)

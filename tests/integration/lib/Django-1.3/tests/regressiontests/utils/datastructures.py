@@ -14,7 +14,7 @@ class DatastructuresTestCase(unittest.TestCase):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
-        except error, e:
+        except error as e:
             self.assertEqual(message, str(e))
 
 
@@ -32,19 +32,19 @@ class SortedDictTests(DatastructuresTestCase):
         self.d2[7] = 'seven'
 
     def test_basic_methods(self):
-        self.assertEqual(self.d1.keys(), [7, 1, 9])
-        self.assertEqual(self.d1.values(), ['seven', 'one', 'nine'])
-        self.assertEqual(self.d1.items(), [(7, 'seven'), (1, 'one'), (9, 'nine')])
+        self.assertEqual(list(self.d1.keys()), [7, 1, 9])
+        self.assertEqual(list(self.d1.values()), ['seven', 'one', 'nine'])
+        self.assertEqual(list(self.d1.items()), [(7, 'seven'), (1, 'one'), (9, 'nine')])
 
     def test_overwrite_ordering(self):
         """ Overwriting an item keeps it's place. """
         self.d1[1] = 'ONE'
-        self.assertEqual(self.d1.values(), ['seven', 'ONE', 'nine'])
+        self.assertEqual(list(self.d1.values()), ['seven', 'ONE', 'nine'])
 
     def test_append_items(self):
         """ New items go to the end. """
         self.d1[0] = 'nil'
-        self.assertEqual(self.d1.keys(), [7, 1, 9, 0])
+        self.assertEqual(list(self.d1.keys()), [7, 1, 9, 0])
 
     def test_delete_and_insert(self):
         """
@@ -52,18 +52,18 @@ class SortedDictTests(DatastructuresTestCase):
         at the end.
         """
         del self.d2[7]
-        self.assertEqual(self.d2.keys(), [1, 9, 0])
+        self.assertEqual(list(self.d2.keys()), [1, 9, 0])
         self.d2[7] = 'lucky number 7'
-        self.assertEqual(self.d2.keys(), [1, 9, 0, 7])
+        self.assertEqual(list(self.d2.keys()), [1, 9, 0, 7])
 
     def test_change_keys(self):
         """
         Changing the keys won't do anything, it's only a copy of the
         keys dict.
         """
-        k = self.d2.keys()
+        k = list(self.d2.keys())
         k.remove(9)
-        self.assertEqual(self.d2.keys(), [1, 9, 0, 7])
+        self.assertEqual(list(self.d2.keys()), [1, 9, 0, 7])
 
     def test_init_keys(self):
         """
@@ -75,18 +75,18 @@ class SortedDictTests(DatastructuresTestCase):
         tuples = ((2, 'two'), (1, 'one'), (2, 'second-two'))
         d = SortedDict(tuples)
 
-        self.assertEqual(d.keys(), [2, 1])
+        self.assertEqual(list(d.keys()), [2, 1])
 
         real_dict = dict(tuples)
         self.assertEqual(sorted(real_dict.values()), ['one', 'second-two'])
 
         # Here the order of SortedDict values *is* what we are testing
-        self.assertEqual(d.values(), ['second-two', 'one'])
+        self.assertEqual(list(d.values()), ['second-two', 'one'])
 
     def test_overwrite(self):
         self.d1[1] = 'not one'
         self.assertEqual(self.d1[1], 'not one')
-        self.assertEqual(self.d1.keys(), self.d1.copy().keys())
+        self.assertEqual(list(self.d1.keys()), list(self.d1.copy().keys()))
 
     def test_append(self):
         self.d1[13] = 'thirteen'
@@ -106,7 +106,7 @@ class SortedDictTests(DatastructuresTestCase):
         self.assertEqual(l - len(self.d1), 1)
 
     def test_dict_equality(self):
-        d = SortedDict((i, i) for i in xrange(3))
+        d = SortedDict((i, i) for i in range(3))
         self.assertEqual(d, {0: 0, 1: 1, 2: 2})
 
     def test_tuple_init(self):
@@ -165,11 +165,11 @@ class MergeDictTests(DatastructuresTestCase):
         self.assertEqual(mm.getlist('undefined'), [])
 
         self.assertEqual(sorted(mm.keys()), ['key1', 'key2', 'key4'])
-        self.assertEqual(len(mm.values()), 3)
+        self.assertEqual(len(list(mm.values())), 3)
 
-        self.assertTrue('value1' in mm.values())
+        self.assertTrue('value1' in list(mm.values()))
 
-        self.assertEqual(sorted(mm.items(), key=lambda k: k[0]),
+        self.assertEqual(sorted(list(mm.items()), key=lambda k: k[0]),
                           [('key1', 'value1'), ('key2', 'value3'),
                            ('key4', 'value6')])
 
@@ -187,7 +187,7 @@ class MultiValueDictTests(DatastructuresTestCase):
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
-        self.assertEqual(list(d.iteritems()),
+        self.assertEqual(list(d.items()),
                           [('position', 'Developer'), ('name', 'Simon')])
 
         self.assertEqual(list(d.iterlists()),
@@ -208,8 +208,8 @@ class MultiValueDictTests(DatastructuresTestCase):
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(d.values(), ['Developer', 'Simon', 'Willison'])
-        self.assertEqual(list(d.itervalues()),
+        self.assertEqual(list(d.values()), ['Developer', 'Simon', 'Willison'])
+        self.assertEqual(list(d.values()),
                           ['Developer', 'Simon', 'Willison'])
 
     def test_copy(self):
@@ -250,7 +250,7 @@ class DotExpandedDictTests(DatastructuresTestCase):
 class ImmutableListTests(DatastructuresTestCase):
 
     def test_sort(self):
-        d = ImmutableList(range(10))
+        d = ImmutableList(list(range(10)))
 
         # AttributeError: ImmutableList object is immutable.
         self.assertRaisesErrorWithMessage(AttributeError,
@@ -259,7 +259,7 @@ class ImmutableListTests(DatastructuresTestCase):
         self.assertEqual(repr(d), '(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)')
 
     def test_custom_warning(self):
-        d = ImmutableList(range(10), warning="Object is immutable!")
+        d = ImmutableList(list(range(10)), warning="Object is immutable!")
 
         self.assertEqual(d[1], 1)
 

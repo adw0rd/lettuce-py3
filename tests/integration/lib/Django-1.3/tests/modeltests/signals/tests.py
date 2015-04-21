@@ -2,7 +2,7 @@ from django.db.models import signals
 from django.dispatch import receiver
 from django.test import TestCase
 
-from models import Person, Car
+from .models import Person, Car
 
 
 # #8285: signals can be any callable
@@ -142,7 +142,7 @@ class SignalTests(TestCase):
             Person.objects.all(), [
                 "James Jones",
             ],
-            unicode
+            str
         )
 
         signals.post_delete.disconnect(post_delete_test)

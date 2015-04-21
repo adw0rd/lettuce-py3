@@ -5,7 +5,7 @@ import sys
 import time
 from datetime import datetime, timedelta
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -18,7 +18,7 @@ if hasattr(random, 'SystemRandom'):
     randrange = random.SystemRandom().randrange
 else:
     randrange = random.randrange
-MAX_SESSION_KEY = 18446744073709551616L     # 2 << 63
+MAX_SESSION_KEY = 18446744073709551616     # 2 << 63
 
 class CreateError(Exception):
     """
@@ -54,10 +54,10 @@ class SessionBase(object):
         self.modified = True
 
     def keys(self):
-        return self._session.keys()
+        return list(self._session.keys())
 
     def items(self):
-        return self._session.items()
+        return list(self._session.items())
 
     def get(self, key, default=None):
         return self._session.get(key, default)
@@ -106,19 +106,19 @@ class SessionBase(object):
         self.modified = True
 
     def has_key(self, key):
-        return self._session.has_key(key)
+        return key in self._session
 
     def values(self):
-        return self._session.values()
+        return list(self._session.values())
 
     def iterkeys(self):
-        return self._session.iterkeys()
+        return iter(self._session.keys())
 
     def itervalues(self):
-        return self._session.itervalues()
+        return iter(self._session.values())
 
     def iteritems(self):
-        return self._session.iteritems()
+        return iter(self._session.items())
 
     def clear(self):
         # To avoid unnecessary persistent storage accesses, we set up the

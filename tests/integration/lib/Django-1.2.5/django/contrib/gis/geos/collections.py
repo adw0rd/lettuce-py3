@@ -41,7 +41,7 @@ class GeometryCollection(GEOSGeometry):
 
     def __iter__(self):
         "Iterates over each Geometry in the Collection."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):

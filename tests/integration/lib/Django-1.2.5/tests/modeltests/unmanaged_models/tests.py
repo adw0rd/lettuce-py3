@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.db import connection
-from models import Unmanaged1, Unmanaged2, Managed1
-from models import A01, A02, B01, B02, C01, C02
+from .models import Unmanaged1, Unmanaged2, Managed1
+from .models import A01, A02, B01, B02, C01, C02
 
 class SimpleTests(TestCase):
 

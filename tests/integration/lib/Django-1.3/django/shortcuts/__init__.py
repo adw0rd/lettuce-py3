@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
+import collections
 
 def render_to_response(*args, **kwargs):
     """
@@ -75,7 +76,7 @@ def redirect(to, *args, **kwargs):
         return redirect_class(urlresolvers.reverse(to, args=args, kwargs=kwargs))
     except urlresolvers.NoReverseMatch:
         # If this is a callable, re-raise.
-        if callable(to):
+        if isinstance(to, collections.Callable):
             raise
         # If this doesn't "feel" like a URL, re-raise.
         if '/' not in to and '.' not in to:

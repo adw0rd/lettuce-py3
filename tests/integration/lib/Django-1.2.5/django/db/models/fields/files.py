@@ -15,6 +15,7 @@ from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django import forms
 from django.db.models.loading import cache
+import collections
 
 class FieldFile(File):
     def __init__(self, instance, field, name):
@@ -181,7 +182,7 @@ class FileDescriptor(object):
         # subclasses might also want to subclass the attribute class]. This
         # object understands how to convert a path to a file, and also how to
         # handle None.
-        if isinstance(file, basestring) or file is None:
+        if isinstance(file, str) or file is None:
             attr = self.field.attr_class(instance, self.field, file)
             instance.__dict__[self.field.name] = attr
 
@@ -226,7 +227,7 @@ class FileField(Field):
 
         self.storage = storage or default_storage
         self.upload_to = upload_to
-        if callable(upload_to):
+        if isinstance(upload_to, collections.Callable):
             self.generate_filename = upload_to
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
@@ -245,7 +246,7 @@ class FileField(Field):
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
             return None
-        return unicode(value)
+        return str(value)
 
     def pre_save(self, model_instance, add):
         "Returns field's value just before saving."

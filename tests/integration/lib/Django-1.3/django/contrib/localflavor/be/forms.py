@@ -59,7 +59,7 @@ class BERegionSelect(Select):
     A Select widget that uses a list of belgium regions as its choices.
     """
     def __init__(self, attrs=None):
-        from be_regions import REGION_CHOICES
+        from .be_regions import REGION_CHOICES
         super(BERegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class BEProvinceSelect(Select):
@@ -67,5 +67,5 @@ class BEProvinceSelect(Select):
     A Select widget that uses a list of belgium provinces as its choices.
     """
     def __init__(self, attrs=None):
-        from be_provinces import PROVINCE_CHOICES
+        from .be_provinces import PROVINCE_CHOICES
         super(BEProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)

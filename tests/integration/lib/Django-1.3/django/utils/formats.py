@@ -128,8 +128,8 @@ def localize(value, use_l10n=None):
     be localized (or not), overriding the value of settings.USE_L10N.
     """
     if isinstance(value, bool):
-        return mark_safe(unicode(value))
-    elif isinstance(value, (decimal.Decimal, float, int, long)):
+        return mark_safe(str(value))
+    elif isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.datetime):
         return date_format(value, 'DATETIME_FORMAT', use_l10n=use_l10n)
@@ -145,7 +145,7 @@ def localize_input(value, default=None):
     Checks if an input value is a localizable type and returns it
     formatted with the appropriate formatting string of the current locale.
     """
-    if isinstance(value, (decimal.Decimal, float, int, long)):
+    if isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
         value = datetime_safe.new_datetime(value)
@@ -167,7 +167,7 @@ def sanitize_separators(value):
     """
     if settings.USE_L10N:
         decimal_separator = get_format('DECIMAL_SEPARATOR')
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             parts = []
             if decimal_separator in value:
                 value, decimals = value.split(decimal_separator, 1)

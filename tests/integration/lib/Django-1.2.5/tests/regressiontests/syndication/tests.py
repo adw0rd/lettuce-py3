@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.utils import tzinfo
 from django.utils.feedgenerator import rfc2822_date, rfc3339_date
-from models import Entry
+from .models import Entry
 from xml.dom import minidom
 
 try:
@@ -21,7 +21,7 @@ class FeedTestCase(TestCase):
         self.assertEqual(actual, expected)
 
     def assertChildNodeContent(self, elem, expected):
-        for k, v in expected.items():
+        for k, v in list(expected.items()):
             self.assertEqual(
                 elem.getElementsByTagName(k)[0].firstChild.wholeText, v)
 
@@ -199,7 +199,7 @@ class SyndicationFeedTest(FeedTestCase):
             link = item.getElementsByTagName('link')[0]
             if link.firstChild.wholeText == 'http://example.com/blog/4/':
                 title = item.getElementsByTagName('title')[0]
-                self.assertEquals(title.firstChild.wholeText, u'A &amp; B &lt; C &gt; D')
+                self.assertEquals(title.firstChild.wholeText, 'A &amp; B &lt; C &gt; D')
 
     def test_naive_datetime_conversion(self):
         """

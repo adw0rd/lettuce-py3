@@ -230,7 +230,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         # Both rings in this geometry are not closed.
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
-        print "\nBEGIN - expecting IllegalArgumentException; safe to ignore.\n"
+        print("\nBEGIN - expecting IllegalArgumentException; safe to ignore.\n")
         try:
             c = poly.centroid
         except OGRException:
@@ -238,7 +238,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             pass
         else:
             self.fail('Should have raised an OGRException!')
-        print "\nEND - expecting IllegalArgumentException; safe to ignore.\n"
+        print("\nEND - expecting IllegalArgumentException; safe to ignore.\n")
 
         # Closing the rings -- doesn't work on GDAL versions 1.4.1 and below:
         # http://trac.osgeo.org/gdal/ticket/1673
@@ -352,7 +352,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test10_difference(self):
         "Testing difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.diff_geoms[i].wkt)
@@ -364,7 +364,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test11_intersection(self):
         "Testing intersects() and intersection()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             i1 = OGRGeometry(self.geometries.intersect_geoms[i].wkt)
@@ -377,7 +377,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test12_symdifference(self):
         "Testing sym_difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.sdiff_geoms[i].wkt)
@@ -389,7 +389,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test13_union(self):
         "Testing union()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             u1 = OGRGeometry(self.geometries.union_geoms[i].wkt)
@@ -446,9 +446,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test17_pickle(self):
         "Testing pickle support."
-        import cPickle
+        import pickle
         g1 = OGRGeometry('LINESTRING(1 1 1,2 2 2,3 3 3)', 'WGS84')
-        g2 = cPickle.loads(cPickle.dumps(g1))
+        g2 = pickle.loads(pickle.dumps(g1))
         self.assertEqual(g1, g2)
         self.assertEqual(4326, g2.srs.srid)
         self.assertEqual(g1.srs.wkt, g2.srs.wkt)

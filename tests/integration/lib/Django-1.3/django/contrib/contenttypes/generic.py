@@ -87,7 +87,7 @@ class GenericForeignKey(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError(u"%s must be accessed via instance" % self.related.opts.object_name)
+            raise AttributeError("%s must be accessed via instance" % self.related.opts.object_name)
 
         ct = None
         fk = None

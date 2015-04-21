@@ -1,12 +1,12 @@
 from django.contrib.localflavor.ie.forms import IECountySelect
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class IELocalFlavorTests(LocalFlavorTestCase):
     def test_IECountySelect(self):
         f = IECountySelect()
-        out = u'''<select name="counties">
+        out = '''<select name="counties">
 <option value="antrim">Antrim</option>
 <option value="armagh">Armagh</option>
 <option value="carlow">Carlow</option>

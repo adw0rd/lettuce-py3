@@ -1,13 +1,13 @@
 from django.contrib.localflavor.cl.forms import CLRutField, CLRegionSelect
 from django.core.exceptions import ValidationError
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class CLLocalFlavorTests(LocalFlavorTestCase):
     def test_CLRegionSelect(self):
         f = CLRegionSelect()
-        out = u'''<select name="foo">
+        out = '''<select name="foo">
 <option value="RM">Regi\xf3n Metropolitana de Santiago</option>
 <option value="I">Regi\xf3n de Tarapac\xe1</option>
 <option value="II">Regi\xf3n de Antofagasta</option>
@@ -27,8 +27,8 @@ class CLLocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('foo', 'bar'), out)
 
     def test_CLRutField(self):
-        error_invalid =  [u'The Chilean RUT is not valid.']
-        error_format = [u'Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.']
+        error_invalid =  ['The Chilean RUT is not valid.']
+        error_format = ['Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.']
         valid = {
             '11-6': '11-6',
             '116': '11-6',

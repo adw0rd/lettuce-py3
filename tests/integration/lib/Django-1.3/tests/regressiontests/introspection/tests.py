@@ -3,7 +3,7 @@ from django.db import connection, DEFAULT_DB_ALIAS
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import functional
 
-from models import Reporter, Article
+from .models import Reporter, Article
 
 #
 # The introspection module is optional, so methods tested here might raise
@@ -28,14 +28,12 @@ def ignore_not_implemented(func):
 
 class IgnoreNotimplementedError(type):
     def __new__(cls, name, bases, attrs):
-        for k,v in attrs.items():
+        for k,v in list(attrs.items()):
             if k.startswith('test'):
                 attrs[k] = ignore_not_implemented(v)
         return type.__new__(cls, name, bases, attrs)
 
-class IntrospectionTests(TestCase):
-    __metaclass__ = IgnoreNotimplementedError
-
+class IntrospectionTests(TestCase, metaclass=IgnoreNotimplementedError):
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertTrue(Reporter._meta.db_table in tl,

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from models import Empty
+from .models import Empty
 
 
 class EmptyModelTests(TestCase):

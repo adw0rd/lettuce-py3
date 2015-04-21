@@ -14,7 +14,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         self.assertEqual(
             feedgenerator.get_tag_uri('http://example.org/foo/bar#headline', datetime.date(2004, 10, 25)),
-            u'tag:example.org,2004-10-25:/foo/bar/headline')
+            'tag:example.org,2004-10-25:/foo/bar/headline')
 
     def test_get_tag_uri_with_port(self):
         """
@@ -23,7 +23,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         self.assertEqual(
             feedgenerator.get_tag_uri('http://www.example.org:8000/2008/11/14/django#headline', datetime.datetime(2008, 11, 14, 13, 37, 0)),
-            u'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
+            'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
 
     def test_rfc2822_date(self):
         """

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from models import RelatedModel, RestrictedModel, OneToOneRestrictedModel
+from .models import RelatedModel, RestrictedModel, OneToOneRestrictedModel
 
 class CustomManagersRegressTestCase(TestCase):
     def test_filtered_default_manager(self):

@@ -4,7 +4,7 @@ from operator import attrgetter
 from django.db.models import Q
 from django.test import TestCase
 
-from models import Article
+from .models import Article
 
 
 class OrLookupsTests(TestCase):
@@ -220,7 +220,7 @@ class OrLookupsTests(TestCase):
         )
 
         self.assertQuerysetEqual(
-            Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye')).values(), [
+            list(Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye')).values()), [
                 {"headline": "Hello and goodbye", "id": self.a3, "pub_date": datetime(2005, 11, 29)},
             ],
             lambda o: o,

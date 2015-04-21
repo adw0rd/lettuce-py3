@@ -2,7 +2,7 @@ from django.contrib.admindocs import views
 from django.db.models import fields as builtin_fields
 from django.utils import unittest
 
-import fields
+from . import fields
 
 
 class TestFieldType(unittest.TestCase):
@@ -17,15 +17,15 @@ class TestFieldType(unittest.TestCase):
     def test_builtin_fields(self):
         self.assertEqual(
             views.get_readable_field_data_type(builtin_fields.BooleanField()),
-            u'Boolean (Either True or False)'
+            'Boolean (Either True or False)'
         )
 
     def test_custom_fields(self):
         self.assertEqual(
             views.get_readable_field_data_type(fields.CustomField()),
-            u'A custom field type'
+            'A custom field type'
         )
         self.assertEqual(
             views.get_readable_field_data_type(fields.DescriptionLackingField()),
-            u'Field of type: DescriptionLackingField'
+            'Field of type: DescriptionLackingField'
         )

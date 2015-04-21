@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import time
-import commands
+import subprocess
 import multiprocessing
 
 from tests.asserts import assert_equals, assert_not_equals
@@ -28,7 +28,7 @@ current_directory = FileSystem.dirname(__file__)
 def test_django_agains_alfaces():
     'running the "harvest" django command with verbosity 3'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3")
     assert_equals(status, 0, out)
 
@@ -66,7 +66,7 @@ def test_django_background_server_running_in_background():
         'python manage.py --no-server'
 
     try:
-        status, out = commands.getstatusoutput(
+        status, out = subprocess.getstatusoutput(
             "python manage.py harvest --verbosity=3")
         assert_equals(out, e)
         assert_not_equals(status, 0)
@@ -105,7 +105,7 @@ def test_django_background_server_running_in_background_with_custom_port():
         'python manage.py --no-server'
 
     try:
-        status, out = commands.getstatusoutput(
+        status, out = subprocess.getstatusoutput(
             "python manage.py harvest --verbosity=3 --port=9889")
         assert_equals(out, e)
         assert_not_equals(status, 0)
@@ -118,7 +118,7 @@ def test_django_background_server_running_in_background_with_custom_port():
 def test_limit_by_app_getting_all_apps_by_comma():
     'running "harvest" with --apps=multiple,apps,separated,by,comma'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 --apps=foobar,donothing")
     assert_equals(status, 0, out)
 
@@ -130,7 +130,7 @@ def test_limit_by_app_getting_all_apps_by_comma():
 def test_limit_by_app_getting_one_app():
     'running "harvest" with --apps=one_app'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 --apps=foobar")
     assert_equals(status, 0, out)
 
@@ -142,7 +142,7 @@ def test_limit_by_app_getting_one_app():
 def test_excluding_apps_separated_by_comma():
     'running "harvest" with --avoid-apps=multiple,apps'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 --avoid-apps=donothing,foobar")
     assert_equals(status, 0, out)
 
@@ -154,7 +154,7 @@ def test_excluding_apps_separated_by_comma():
 def test_excluding_app():
     'running "harvest" with --avoid-apps=one_app'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 --avoid-apps=donothing")
     assert_equals(status, 0, out)
 
@@ -167,7 +167,7 @@ def test_running_only_apps_within_lettuce_apps_setting():
     'running the "harvest" will run only on configured apps if the ' \
              'setting LETTUCE_APPS is set'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --settings=onlyfoobarsettings --verbosity=3")
     assert_equals(status, 0, out)
 
@@ -180,7 +180,7 @@ def test_running_all_apps_but_lettuce_avoid_apps():
     'running the "harvest" will run all apps but those within ' \
              'LETTUCE_AVOID_APPS'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --settings=allbutfoobarsettings " \
         "--verbosity=3")
 
@@ -195,7 +195,7 @@ def test_ignores_settings_avoid_apps_if_apps_argument_is_passed():
     'even if all apps are avoid in settings, it is possible to run a single ' \
           'app by --apps argument'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --settings=avoidallappssettings "
         "--verbosity=3 --apps=foobar,donothing")
     assert_equals(status, 0, out)
@@ -208,7 +208,7 @@ def test_ignores_settings_avoid_apps_if_apps_argument_is_passed():
 def test_no_server():
     '"harvest" --no-server does not start the server'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 --apps=foobar --no-server")
 
     assert_equals(status, 0, out)
@@ -220,7 +220,7 @@ def test_django_specifying_scenarios_to_run():
     'django harvest can run only specified scenarios with ' \
             '--scenarios or -s options'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 --scenarios=2,5 -a foobar")
     assert_equals(status, 0, out)
 
@@ -238,7 +238,7 @@ def test_django_specifying_scenarios_to_run_by_tag():
     'django harvest can run only specified scenarios with ' \
             '--tags or -t options'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 --tag=fast -a foobar")
     assert_equals(status, 0, out)
 
@@ -255,7 +255,7 @@ def test_django_specifying_scenarios_to_run_by_tag():
 def test_running_only_specified_features():
     'it can run only the specified features, passing the file path'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 " \
         "foobar/features/foobar.feature")
 
@@ -269,7 +269,7 @@ def test_running_only_specified_features():
 def test_specifying_features_in_inner_directory():
     'it can run only the specified features from a subdirectory'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=3 " \
         "foobar/features/deeper/deeper/leaf.feature")
 

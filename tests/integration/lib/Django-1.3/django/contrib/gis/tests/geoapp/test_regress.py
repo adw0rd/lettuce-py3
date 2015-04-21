@@ -1,7 +1,7 @@
 import os, unittest
 from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_postgis, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
-from models import City
+from .models import City
 
 class GeoRegressionTests(unittest.TestCase):
 

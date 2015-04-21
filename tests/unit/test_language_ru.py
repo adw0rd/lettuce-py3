@@ -17,7 +17,7 @@
 from nose.tools import assert_equals
 from lettuce.core import Language, Scenario, Feature
 
-SCENARIO = u"""
+SCENARIO = """
 Сценарий: Сохранение базы курсов универитета в текстовый файл
     Пускай имеем в базе университет следующие курсы:
        | Название                | Длительность  |
@@ -28,7 +28,7 @@ SCENARIO = u"""
     И во второй строке файла 'курсы.txt' строку 'Основы программирования:1'
 """
 
-SCENARIO_OUTLINE1 = u'''
+SCENARIO_OUTLINE1 = '''
 Структура сценария: Заполнение пользователей в базу
     Пускай я заполняю в поле "имя" "<имя>"
     И я заполняю в поле "возраст"  "<возраст>"
@@ -41,7 +41,7 @@ SCENARIO_OUTLINE1 = u'''
     | Петя | 30      |
 '''
 
-FEATURE = u'''
+FEATURE = '''
 Функционал: Деление чисел
   Поскольку деление сложный процесс и люди часто допускают ошибки
   Нужно дать им возможность делить на калькуляторе
@@ -59,13 +59,13 @@ def test_language_russian():
     'Language: RU -> Language class supports russian through code "ru"'
     lang = Language('ru')
 
-    assert_equals(lang.code, u'ru')
-    assert_equals(lang.name, u'Russian')
-    assert_equals(lang.native, u'Русский')
-    assert_equals(lang.feature, u'Функционал')
-    assert_equals(lang.scenario, u'Сценарий')
-    assert_equals(lang.examples, u'Примеры|Сценарии')
-    assert_equals(lang.scenario_outline, u'Структура сценария')
+    assert_equals(lang.code, 'ru')
+    assert_equals(lang.name, 'Russian')
+    assert_equals(lang.native, 'Русский')
+    assert_equals(lang.feature, 'Функционал')
+    assert_equals(lang.scenario, 'Сценарий')
+    assert_equals(lang.examples, 'Примеры|Сценарии')
+    assert_equals(lang.scenario_outline, 'Структура сценария')
 
 def test_scenario_ru_from_string():
     'Language: RU -> Scenario.from_string'
@@ -74,13 +74,13 @@ def test_scenario_ru_from_string():
 
     assert_equals(
         scenario.name,
-        u'Сохранение базы курсов универитета в текстовый файл'
+        'Сохранение базы курсов универитета в текстовый файл'
     )
     assert_equals(
         scenario.steps[0].hashes,
         [
-            {u'Название': u'Матан', u'Длительность': u'2 года'},
-            {u'Название': u'Основы программирования', u'Длительность': u'1 год'},
+            {'Название': 'Матан', 'Длительность': '2 года'},
+            {'Название': 'Основы программирования', 'Длительность': '1 год'},
         ]
     )
 
@@ -91,13 +91,13 @@ def test_scenario_outline1_ru_from_string():
 
     assert_equals(
         scenario.name,
-        u'Заполнение пользователей в базу'
+        'Заполнение пользователей в базу'
     )
     assert_equals(
         scenario.outlines,
         [
-            {u'имя': u'Вася', u'возраст': '22'},
-            {u'имя': u'Петя', u'возраст': '30'},
+            {'имя': 'Вася', 'возраст': '22'},
+            {'имя': 'Петя', 'возраст': '30'},
         ]
     )
 
@@ -108,28 +108,28 @@ def test_feature_ptbr_from_string():
 
     assert_equals(
         feature.name,
-        u'Деление чисел'
+        'Деление чисел'
     )
 
     assert_equals(
         feature.description,
-        u"Поскольку деление сложный процесс и люди часто допускают ошибки\n"
-        u"Нужно дать им возможность делить на калькуляторе"
+        "Поскольку деление сложный процесс и люди часто допускают ошибки\n"
+        "Нужно дать им возможность делить на калькуляторе"
     )
 
     (scenario, ) = feature.scenarios
 
     assert_equals(
         scenario.name,
-        u'Целочисленное деление'
+        'Целочисленное деление'
     )
 
     assert_equals(
         scenario.steps[-1].hashes,
         [
-            {u'делимое': '100', u'делитель': '2', u'частное': '50'},
-            {u'делимое': '28', u'делитель': '7', u'частное': '4'},
-            {u'делимое': '0', u'делитель': '5', u'частное': '0'},
+            {'делимое': '100', 'делитель': '2', 'частное': '50'},
+            {'делимое': '28', 'делитель': '7', 'частное': '4'},
+            {'делимое': '0', 'делитель': '5', 'частное': '0'},
         ]
     )
 

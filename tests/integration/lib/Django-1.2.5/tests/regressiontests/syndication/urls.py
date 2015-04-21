@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-import feeds
+from . import feeds
 
 feed_dict = {
     'complex': feeds.DeprecatedComplexFeed,

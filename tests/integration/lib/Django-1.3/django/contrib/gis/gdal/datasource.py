@@ -65,7 +65,7 @@ class DataSource(GDALBase):
         if not capi.get_driver_count():
             capi.register_all()
 
-        if isinstance(ds_input, basestring):
+        if isinstance(ds_input, str):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -93,12 +93,12 @@ class DataSource(GDALBase):
 
     def __iter__(self):
         "Allows for iteration over the layers in a data source."
-        for i in xrange(self.layer_count):
+        for i in range(self.layer_count):
             yield self[i]
 
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
-        if isinstance(index, basestring):
+        if isinstance(index, str):
             l = capi.get_layer_by_name(self.ptr, index)
             if not l: raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):

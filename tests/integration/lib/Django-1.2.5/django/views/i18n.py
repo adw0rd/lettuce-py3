@@ -51,8 +51,8 @@ def get_formats():
         for attr in FORMAT_SETTINGS:
             result[attr] = get_format(attr)
     src = []
-    for k, v in result.items():
-        if isinstance(v, (basestring, int)):
+    for k, v in list(result.items()):
+        if isinstance(v, (str, int)):
             src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_unicode(v))))
         elif isinstance(v, (tuple, list)):
             v = [javascript_quote(smart_unicode(value)) for value in v]
@@ -167,7 +167,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
                 activate(request.GET['language'])
     if packages is None:
         packages = ['django.conf']
-    if isinstance(packages, basestring):
+    if isinstance(packages, str):
         packages = packages.split('+')
     packages = [p for p in packages if p == 'django.conf' or p in settings.INSTALLED_APPS]
     default_locale = to_locale(settings.LANGUAGE_CODE)
@@ -234,10 +234,10 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         src.append(SimplePlural)
     csrc = []
     pdict = {}
-    for k, v in t.items():
+    for k, v in list(t.items()):
         if k == '':
             continue
-        if isinstance(k, basestring):
+        if isinstance(k, str):
             csrc.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(v)))
         elif isinstance(k, tuple):
             if k[0] not in pdict:
@@ -248,7 +248,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         else:
             raise TypeError(k)
     csrc.sort()
-    for k, v in pdict.items():
+    for k, v in list(pdict.items()):
         src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
     src.extend(csrc)
     src.append(LibFoot)

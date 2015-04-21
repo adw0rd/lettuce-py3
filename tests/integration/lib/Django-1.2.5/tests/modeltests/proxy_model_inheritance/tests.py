@@ -21,11 +21,11 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         sys.path.append(os.path.dirname(os.path.abspath(__file__)))
         self.old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = ('app1', 'app2')
-        map(load_app, settings.INSTALLED_APPS)
+        list(map(load_app, settings.INSTALLED_APPS))
         call_command('syncdb', verbosity=0)
         global ProxyModel, NiceModel
-        from app1.models import ProxyModel
-        from app2.models import NiceModel
+        from .app1.models import ProxyModel
+        from .app2.models import NiceModel
 
     def tearDown(self):
         settings.INSTALLED_APPS = self.old_installed_apps

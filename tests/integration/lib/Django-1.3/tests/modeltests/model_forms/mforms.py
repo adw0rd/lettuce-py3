@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from models import (Product, Price, Book, DerivedBook, ExplicitPK, Post,
+from .models import (Product, Price, Book, DerivedBook, ExplicitPK, Post,
         DerivedPost, Writer, FlexibleDatePost)
 
 class ProductForm(ModelForm):

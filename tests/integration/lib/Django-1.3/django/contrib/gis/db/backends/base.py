@@ -89,7 +89,7 @@ class BaseSpatialOperations(object):
 
     # For quoting column values, rather than columns.
     def geo_quote_name(self, name):
-        if isinstance(name, unicode):
+        if isinstance(name, str):
             name = name.encode('ascii')
         return "'%s'" % name
 
@@ -165,13 +165,13 @@ class SpatialRefSysMixin(object):
                 try:
                     self._srs = gdal.SpatialReference(self.wkt)
                     return self.srs
-                except Exception, msg:
+                except Exception as msg:
                     pass
 
                 try:
                     self._srs = gdal.SpatialReference(self.proj4text)
                     return self.srs
-                except Exception, msg:
+                except Exception as msg:
                     pass
 
                 raise Exception('Could not get OSR SpatialReference from WKT: %s\nError:\n%s' % (self.wkt, msg))
@@ -331,6 +331,6 @@ class SpatialRefSysMixin(object):
         it will be 'pretty' OGC WKT.
         """
         try:
-            return unicode(self.srs)
+            return str(self.srs)
         except:
-            return unicode(self.wkt)
+            return str(self.wkt)

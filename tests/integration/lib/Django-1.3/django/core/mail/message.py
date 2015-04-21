@@ -18,9 +18,9 @@ from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import smart_str, force_unicode
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -100,15 +100,15 @@ def forbid_multi_line_headers(name, val, encoding):
 
 
 def sanitize_address(addr, encoding):
-    if isinstance(addr, basestring):
+    if isinstance(addr, str):
         addr = parseaddr(force_unicode(addr))
     nm, addr = addr
     nm = str(Header(nm, encoding))
     try:
         addr = addr.encode('ascii')
     except UnicodeEncodeError:  # IDN
-        if u'@' in addr:
-            localpart, domain = addr.split(u'@', 1)
+        if '@' in addr:
+            localpart, domain = addr.split('@', 1)
             localpart = str(Header(localpart, encoding))
             domain = domain.encode('idna')
             addr = '@'.join([localpart, domain])
@@ -184,17 +184,17 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            assert not isinstance(to, basestring), '"to" argument must be a list or tuple'
+            assert not isinstance(to, str), '"to" argument must be a list or tuple'
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            assert not isinstance(cc, basestring), '"cc" argument must be a list or tuple'
+            assert not isinstance(cc, str), '"cc" argument must be a list or tuple'
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            assert not isinstance(bcc, basestring), '"bcc" argument must be a list or tuple'
+            assert not isinstance(bcc, str), '"bcc" argument must be a list or tuple'
             self.bcc = list(bcc)
         else:
             self.bcc = []
@@ -229,7 +229,7 @@ class EmailMessage(object):
             msg['Date'] = formatdate()
         if 'message-id' not in header_names:
             msg['Message-ID'] = make_msgid()
-        for name, value in self.extra_headers.items():
+        for name, value in list(self.extra_headers.items()):
             if name.lower() == 'from':  # From is already handled
                 continue
             msg[name] = value

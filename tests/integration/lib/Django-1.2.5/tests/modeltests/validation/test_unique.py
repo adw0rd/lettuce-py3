@@ -3,7 +3,7 @@ import datetime
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection
-from models import CustomPKModel, UniqueTogetherModel, UniqueFieldsModel, UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost
+from .models import CustomPKModel, UniqueTogetherModel, UniqueFieldsModel, UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost
 
 
 class GetUniqueCheckTests(unittest.TestCase):
@@ -91,8 +91,8 @@ class PerformUniqueChecksTest(unittest.TestCase):
         p = Post(title="Django 1.0 is released", posted=datetime.date(2008, 9, 3))
         try:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'title': [u'Title must be unique for Posted date.']})
+        except ValidationError as e:
+            self.assertEqual(e.message_dict, {'title': ['Title must be unique for Posted date.']})
         else:
             self.fail('unique_for_date checks should catch this.')
 
@@ -107,24 +107,24 @@ class PerformUniqueChecksTest(unittest.TestCase):
         p = Post(slug="Django 1.0", posted=datetime.datetime(2008, 1, 1))
         try:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'slug': [u'Slug must be unique for Posted year.']})
+        except ValidationError as e:
+            self.assertEqual(e.message_dict, {'slug': ['Slug must be unique for Posted year.']})
         else:
             self.fail('unique_for_year checks should catch this.')
 
         p = Post(subtitle="Finally", posted=datetime.datetime(2008, 9, 30))
         try:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'subtitle': [u'Subtitle must be unique for Posted month.']})
+        except ValidationError as e:
+            self.assertEqual(e.message_dict, {'subtitle': ['Subtitle must be unique for Posted month.']})
         else:
             self.fail('unique_for_month checks should catch this.')
 
         p = Post(title="Django 1.0 is released")
         try:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'posted': [u'This field cannot be null.']})
+        except ValidationError as e:
+            self.assertEqual(e.message_dict, {'posted': ['This field cannot be null.']})
         else:
             self.fail("Model validation shouldn't allow an absent value for a DateField without null=True.")
 
@@ -135,7 +135,7 @@ class PerformUniqueChecksTest(unittest.TestCase):
         p = FlexibleDatePost(title="Django 1.0 is released")
         try:
             p.full_clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.fail("unique_for_date checks shouldn't trigger when the associated DateField is None.")
         except:
             self.fail("unique_for_date checks shouldn't explode when the associated DateField is None.")
@@ -143,7 +143,7 @@ class PerformUniqueChecksTest(unittest.TestCase):
         p = FlexibleDatePost(slug="Django 1.0")
         try:
             p.full_clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.fail("unique_for_year checks shouldn't trigger when the associated DateField is None.")
         except:
             self.fail("unique_for_year checks shouldn't explode when the associated DateField is None.")
@@ -151,7 +151,7 @@ class PerformUniqueChecksTest(unittest.TestCase):
         p = FlexibleDatePost(subtitle="Finally")
         try:
             p.full_clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.fail("unique_for_month checks shouldn't trigger when the associated DateField is None.")
         except:
             self.fail("unique_for_month checks shouldn't explode when the associated DateField is None.")

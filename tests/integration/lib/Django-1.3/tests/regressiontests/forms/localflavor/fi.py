@@ -1,13 +1,13 @@
 from django.contrib.localflavor.fi.forms import (FIZipCodeField,
     FISocialSecurityNumber, FIMunicipalitySelect)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class FILocalFlavorTests(LocalFlavorTestCase):
     def test_FIMunicipalitySelect(self):
         f = FIMunicipalitySelect()
-        out = u'''<select name="municipalities">
+        out = '''<select name="municipalities">
 <option value="akaa">Akaa</option>
 <option value="alajarvi">Alaj\xe4rvi</option>
 <option value="alavieska">Alavieska</option>
@@ -354,7 +354,7 @@ class FILocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('municipalities', 'turku'), out)
 
     def test_FIZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXXX.']
+        error_format = ['Enter a zip code in the format XXXXX.']
         valid = {
             '20540': '20540',
             '20101': '20101',
@@ -366,7 +366,7 @@ class FILocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(FIZipCodeField, valid, invalid)
 
     def test_FISocialSecurityNumber(self):
-        error_invalid = [u'Enter a valid Finnish social security number.']
+        error_invalid = ['Enter a valid Finnish social security number.']
         valid = {
             '010101-0101': '010101-0101',
             '010101+0101': '010101+0101',

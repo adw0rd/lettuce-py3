@@ -18,8 +18,8 @@ def ordinal(value):
         return value
     t = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
-        return u"%d%s" % (value, t[0])
-    return u'%d%s' % (value, t[value % 10])
+        return "%d%s" % (value, t[0])
+    return '%d%s' % (value, t[value % 10])
 ordinal.is_safe = True
 register.filter(ordinal)
 
@@ -93,10 +93,10 @@ def naturalday(value, arg=None):
         return value
     delta = value - date.today()
     if delta.days == 0:
-        return _(u'today')
+        return _('today')
     elif delta.days == 1:
-        return _(u'tomorrow')
+        return _('tomorrow')
     elif delta.days == -1:
-        return _(u'yesterday')
+        return _('yesterday')
     return defaultfilters.date(value, arg)
 register.filter(naturalday)

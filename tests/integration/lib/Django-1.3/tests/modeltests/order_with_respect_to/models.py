@@ -16,7 +16,7 @@ class Answer(models.Model):
         order_with_respect_to = 'question'
 
     def __unicode__(self):
-        return unicode(self.text)
+        return str(self.text)
 
 class Post(models.Model):
     title = models.CharField(max_length=200)

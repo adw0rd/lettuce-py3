@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from models import A, B, C, D, DataPoint, RelatedPoint
+from .models import A, B, C, D, DataPoint, RelatedPoint
 
 
 class SimpleTest(TestCase):
@@ -75,7 +75,7 @@ class AdvancedTests(TestCase):
         resp = DataPoint.objects.filter(value="banana").update(
             value="pineapple")
         self.assertEqual(resp, 2)
-        self.assertEqual(DataPoint.objects.get(name="d2").value, u'pineapple')
+        self.assertEqual(DataPoint.objects.get(name="d2").value, 'pineapple')
 
     def test_update_fk(self):
         """
@@ -95,8 +95,8 @@ class AdvancedTests(TestCase):
             value="fruit", another_value="peach")
         self.assertEqual(resp, 1)
         d = DataPoint.objects.get(name="d0")
-        self.assertEqual(d.value, u'fruit')
-        self.assertEqual(d.another_value, u'peach')
+        self.assertEqual(d.value, 'fruit')
+        self.assertEqual(d.another_value, 'peach')
 
     def test_update_all(self):
         """
@@ -105,7 +105,7 @@ class AdvancedTests(TestCase):
         """
         self.assertEqual(DataPoint.objects.update(value='thing'), 3)
         resp = DataPoint.objects.values('value').distinct()
-        self.assertEqual(list(resp), [{'value': u'thing'}])
+        self.assertEqual(list(resp), [{'value': 'thing'}])
 
     def test_update_slice_fail(self):
         """

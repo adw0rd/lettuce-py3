@@ -2,6 +2,6 @@
 # -*- coding: utf-8 -*-
 from lettuce import step
 
-@step(u'データは以下')
+@step('データは以下')
 def do_nothing_table(step):
     pass

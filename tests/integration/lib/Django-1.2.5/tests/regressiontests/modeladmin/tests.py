@@ -13,7 +13,7 @@ from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
 
-from models import Band, Concert, ValidationTestModel, \
+from .models import Band, Concert, ValidationTestModel, \
     ValidationTestInlineModel
 
 
@@ -37,7 +37,7 @@ class ModelAdminTests(TestCase):
     def test_default_fields(self):
         ma = ModelAdmin(Band, self.site)
 
-        self.assertEquals(ma.get_form(request).base_fields.keys(),
+        self.assertEquals(list(ma.get_form(request).base_fields.keys()),
             ['name', 'bio', 'sign_date'])
 
     def test_default_fieldsets(self):
@@ -80,8 +80,8 @@ class ModelAdminTests(TestCase):
             fields = ['name']
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(), ['name'])
-        self.assertEqual(ma.get_form(request, self.band).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()), ['name'])
+        self.assertEqual(list(ma.get_form(request, self.band).base_fields.keys()),
             ['name'])
 
         # Using `fieldsets`.
@@ -89,8 +89,8 @@ class ModelAdminTests(TestCase):
             fieldsets = [(None, {'fields': ['name']})]
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(), ['name'])
-        self.assertEqual(ma.get_form(request, self.band).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()), ['name'])
+        self.assertEqual(list(ma.get_form(request, self.band).base_fields.keys()),
             ['name'])
 
         # Using `exclude`.
@@ -98,7 +98,7 @@ class ModelAdminTests(TestCase):
             exclude = ['bio']
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()),
             ['name', 'sign_date'])
 
         # You can also pass a tuple to `exclude`.
@@ -106,7 +106,7 @@ class ModelAdminTests(TestCase):
             exclude = ('bio',)
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()),
             ['name', 'sign_date'])
 
         # Using `fields` and `exclude`.
@@ -115,7 +115,7 @@ class ModelAdminTests(TestCase):
             exclude = ['bio']
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()),
             ['name'])
 
     def test_custom_form_validation(self):
@@ -132,7 +132,7 @@ class ModelAdminTests(TestCase):
             form = AdminBandForm
 
         ma = BandAdmin(Band, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()),
             ['name', 'bio', 'sign_date', 'delete'])
 
         self.assertEqual(
@@ -194,13 +194,13 @@ class ModelAdminTests(TestCase):
             Select)
         self.assertEqual(
             list(cmafa.base_fields['main_band'].widget.choices),
-            [(u'', u'---------'), (self.band.id, u'The Doors')])
+            [('', '---------'), (self.band.id, 'The Doors')])
 
         self.assertEqual(
             type(cmafa.base_fields['opening_band'].widget.widget), Select)
         self.assertEqual(
             list(cmafa.base_fields['opening_band'].widget.choices),
-            [(u'', u'---------'), (self.band.id, u'The Doors')])
+            [('', '---------'), (self.band.id, 'The Doors')])
 
         self.assertEqual(type(cmafa.base_fields['day'].widget), Select)
         self.assertEqual(list(cmafa.base_fields['day'].widget.choices),
@@ -234,7 +234,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(cmafa.base_fields['main_band'].widget.attrs,
             {'class': 'radiolist inline'})
         self.assertEqual(list(cmafa.base_fields['main_band'].widget.choices),
-            [(self.band.id, u'The Doors')])
+            [(self.band.id, 'The Doors')])
 
         self.assertEqual(
             type(cmafa.base_fields['opening_band'].widget.widget),
@@ -243,7 +243,7 @@ class ModelAdminTests(TestCase):
             {'class': 'radiolist'})
         self.assertEqual(
             list(cmafa.base_fields['opening_band'].widget.choices),
-            [(u'', u'None'), (self.band.id, u'The Doors')])
+            [('', 'None'), (self.band.id, 'The Doors')])
 
         self.assertEqual(type(cmafa.base_fields['day'].widget),
             AdminRadioSelect)
@@ -257,7 +257,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(cmafa.base_fields['transport'].widget.attrs,
             {'class': 'radiolist inline'})
         self.assertEqual(list(cmafa.base_fields['transport'].widget.choices),
-            [('', u'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
+            [('', 'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
 
         class AdminConcertForm(forms.ModelForm):
             class Meta:
@@ -268,7 +268,7 @@ class ModelAdminTests(TestCase):
             form = AdminConcertForm
 
         ma = ConcertAdmin(Concert, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()),
             ['main_band', 'opening_band', 'day'])
 
         class AdminConcertForm(forms.ModelForm):
@@ -282,7 +282,7 @@ class ModelAdminTests(TestCase):
             form = AdminConcertForm
 
         ma = ConcertAdmin(Concert, self.site)
-        self.assertEqual(ma.get_form(request).base_fields.keys(),
+        self.assertEqual(list(ma.get_form(request).base_fields.keys()),
             ['extra', 'transport'])
 
         class ConcertInline(TabularInline):
@@ -298,7 +298,7 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(
-            list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
+            list(list(ma.get_formsets(request))[0]().forms[0].fields.keys()),
             ['extra', 'transport', 'id', 'DELETE', 'main_band'])
 
 
@@ -307,7 +307,7 @@ class ValidationTests(unittest.TestCase):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
-        except error, e:
+        except error as e:
             self.assertEqual(message, str(e))
 
     def test_validation_only_runs_in_debug(self):

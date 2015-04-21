@@ -2,7 +2,7 @@ import datetime
 
 from django.test import TestCase
 
-from models import Thing
+from .models import Thing
 
 class ReservedNameTests(TestCase):
     def generate(self):

@@ -31,12 +31,12 @@ class ClientTest(TestCase):
         "GET a view"
         # The data is ignored, but let's check it doesn't crash the system
         # anyway.
-        data = {'var': u'\xf2'}
+        data = {'var': '\xf2'}
         response = self.client.get('/test_client/get_view/', data)
 
         # Check some response details
         self.assertContains(response, 'This is a test')
-        self.assertEqual(response.context['var'], u'\xf2')
+        self.assertEqual(response.context['var'], '\xf2')
         self.assertEqual(response.template.name, 'GET Template')
 
     def test_get_post_view(self):

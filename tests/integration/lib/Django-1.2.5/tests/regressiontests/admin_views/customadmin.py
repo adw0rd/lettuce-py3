@@ -5,7 +5,7 @@ from django.conf.urls.defaults import patterns
 from django.contrib import admin
 from django.http import HttpResponse
 
-import models
+from . import models
 
 class Admin2(admin.AdminSite):
     login_template = 'custom_admin/login.html'

@@ -116,7 +116,7 @@ class UserAdmin(admin.ModelAdmin):
         else:
             form = self.change_password_form(user)
 
-        fieldsets = [(None, {'fields': form.base_fields.keys()})]
+        fieldsets = [(None, {'fields': list(form.base_fields.keys())})]
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         return render_to_response(self.change_user_password_template or 'admin/auth/user/change_password.html', {

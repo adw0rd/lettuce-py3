@@ -22,7 +22,7 @@ class SessionStore(SessionBase):
         # because the cache is missing. So we try for a (large) number of times
         # and then raise an exception. That's the risk you shoulder if using
         # cache backing.
-        for i in xrange(10000):
+        for i in range(10000):
             self.session_key = self._get_new_session_key()
             try:
                 self.save(must_create=True)
@@ -43,7 +43,7 @@ class SessionStore(SessionBase):
             raise CreateError
 
     def exists(self, session_key):
-        if self._cache.has_key(session_key):
+        if session_key in self._cache:
             return True
         return False
 

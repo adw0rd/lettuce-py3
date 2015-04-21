@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-from StringIO import StringIO
+from io import StringIO
 from mox import Mox
 from nose.tools import assert_equals
 from nose.tools import assert_raises

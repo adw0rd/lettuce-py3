@@ -125,14 +125,14 @@ def floatformat(text, arg=-1):
         input_val = force_unicode(text)
         d = Decimal(input_val)
     except UnicodeEncodeError:
-        return u''
+        return ''
     except InvalidOperation:
         if input_val in special_floats:
             return input_val
         try:
             d = Decimal(force_unicode(float(text)))
         except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
-            return u''
+            return ''
     try:
         p = int(arg)
     except ValueError:
@@ -144,23 +144,23 @@ def floatformat(text, arg=-1):
         return input_val
 
     if not m and p < 0:
-        return mark_safe(formats.number_format(u'%d' % (int(d)), 0))
+        return mark_safe(formats.number_format('%d' % (int(d)), 0))
 
     if p == 0:
         exp = Decimal(1)
     else:
-        exp = Decimal(u'1.0') / (Decimal(10) ** abs(p))
+        exp = Decimal('1.0') / (Decimal(10) ** abs(p))
     try:
         # Avoid conversion to scientific notation by accessing `sign`, `digits`
         # and `exponent` from `Decimal.as_tuple()` directly.
         sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP).as_tuple()
-        digits = [unicode(digit) for digit in reversed(digits)]
+        digits = [str(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
-            digits.append(u'0')
-        digits.insert(-exponent, u'.')
+            digits.append('0')
+        digits.insert(-exponent, '.')
         if sign:
-            digits.append(u'-')
-        number = u''.join(reversed(digits))
+            digits.append('-')
+        number = ''.join(reversed(digits))
         return mark_safe(formats.number_format(number, abs(p)))
     except InvalidOperation:
         return input_val
@@ -175,17 +175,17 @@ iriencode = stringfilter(iriencode)
 def linenumbers(value, autoescape=None):
     """Displays text with line numbers."""
     from django.utils.html import escape
-    lines = value.split(u'\n')
+    lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = unicode(len(unicode(len(lines))))
+    width = str(len(str(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
-            lines[i] = (u"%0" + width  + u"d. %s") % (i + 1, line)
+            lines[i] = ("%0" + width  + "d. %s") % (i + 1, line)
     else:
         for i, line in enumerate(lines):
-            lines[i] = (u"%0" + width  + u"d. %s") % (i + 1, escape(line))
-    return mark_safe(u'\n'.join(lines))
+            lines[i] = ("%0" + width  + "d. %s") % (i + 1, escape(line))
+    return mark_safe('\n'.join(lines))
 linenumbers.is_safe = True
 linenumbers.needs_autoescape = True
 linenumbers = stringfilter(linenumbers)
@@ -214,7 +214,7 @@ def slugify(value):
     """
     import unicodedata
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = str(re.sub('[^\w\s-]', '', value).strip().lower())
     return mark_safe(re.sub('[-\s]+', '-', value))
 slugify.is_safe = True
 slugify = stringfilter(slugify)
@@ -230,9 +230,9 @@ def stringformat(value, arg):
     of Python string formatting
     """
     try:
-        return (u"%" + unicode(arg)) % value
+        return ("%" + str(arg)) % value
     except (ValueError, TypeError):
-        return u""
+        return ""
 stringformat.is_safe = True
 
 def title(value):
@@ -369,7 +369,7 @@ def cut(value, arg):
     Removes all values of arg from the given string.
     """
     safe = isinstance(value, SafeData)
-    value = value.replace(arg, u'')
+    value = value.replace(arg, '')
     if safe and arg != ';':
         return mark_safe(value)
     return value
@@ -445,11 +445,11 @@ safeseq.is_safe = True
 def removetags(value, tags):
     """Removes a space separated list of [X]HTML tags from the output."""
     tags = [re.escape(tag) for tag in tags.split()]
-    tags_re = u'(%s)' % u'|'.join(tags)
-    starttag_re = re.compile(ur'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
-    endtag_re = re.compile(u'</%s>' % tags_re)
-    value = starttag_re.sub(u'', value)
-    value = endtag_re.sub(u'', value)
+    tags_re = '(%s)' % '|'.join(tags)
+    starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
+    endtag_re = re.compile('</%s>' % tags_re)
+    value = starttag_re.sub('', value)
+    value = endtag_re.sub('', value)
     return value
 removetags.is_safe = True
 removetags = stringfilter(removetags)
@@ -486,14 +486,14 @@ def first(value):
     try:
         return value[0]
     except IndexError:
-        return u''
+        return ''
 first.is_safe = False
 
 def join(value, arg, autoescape=None):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
-    value = map(force_unicode, value)
+    value = list(map(force_unicode, value))
     if autoescape:
         value = [conditional_escape(v) for v in value]
     try:
@@ -509,7 +509,7 @@ def last(value):
     try:
         return value[-1]
     except IndexError:
-        return u''
+        return ''
 last.is_safe = True
 
 def length(value):
@@ -543,7 +543,7 @@ def slice_(value, arg):
     """
     try:
         bits = []
-        for x in arg.split(u':'):
+        for x in arg.split(':'):
             if len(x) == 0:
                 bits.append(None)
             else:
@@ -610,7 +610,7 @@ def unordered_list(value, autoescape=None):
             second_item = new_second_item
         return [first_item, second_item], old_style_list
     def _helper(list_, tabs=1):
-        indent = u'\t' * tabs
+        indent = '\t' * tabs
         output = []
 
         list_length = len(list_)
@@ -685,7 +685,7 @@ def date(value, arg=None):
     """Formats a date according to the given format."""
     from django.utils.dateformat import format
     if not value:
-        return u''
+        return ''
     if arg is None:
         arg = settings.DATE_FORMAT
     try:
@@ -700,8 +700,8 @@ date.is_safe = False
 def time(value, arg=None):
     """Formats a time according to the given format."""
     from django.utils import dateformat
-    if value in (None, u''):
-        return u''
+    if value in (None, ''):
+        return ''
     if arg is None:
         arg = settings.TIME_FORMAT
     try:
@@ -717,24 +717,24 @@ def timesince(value, arg=None):
     """Formats a date as the time since that date (i.e. "4 days, 6 hours")."""
     from django.utils.timesince import timesince
     if not value:
-        return u''
+        return ''
     try:
         if arg:
             return timesince(value, arg)
         return timesince(value)
     except (ValueError, TypeError):
-        return u''
+        return ''
 timesince.is_safe = False
 
 def timeuntil(value, arg=None):
     """Formats a date as the time until that date (i.e. "4 days, 6 hours")."""
     from django.utils.timesince import timeuntil
     if not value:
-        return u''
+        return ''
     try:
         return timeuntil(value, arg)
     except (ValueError, TypeError):
-        return u''
+        return ''
 timeuntil.is_safe = False
 
 ###################
@@ -775,7 +775,7 @@ def yesno(value, arg=None):
     """
     if arg is None:
         arg = ugettext('yes,no,maybe')
-    bits = arg.split(u',')
+    bits = arg.split(',')
     if len(bits) < 2:
         return value # Invalid arg.
     try:
@@ -819,7 +819,7 @@ def filesizeformat(bytes):
     return ugettext("%s PB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024 * 1024))
 filesizeformat.is_safe = True
 
-def pluralize(value, arg=u's'):
+def pluralize(value, arg='s'):
     """
     Returns a plural suffix if the value is not 1. By default, 's' is used as
     the suffix:
@@ -842,11 +842,11 @@ def pluralize(value, arg=u's'):
     * If value is 1, cand{{ value|pluralize:"y,ies" }} displays "1 candy".
     * If value is 2, cand{{ value|pluralize:"y,ies" }} displays "2 candies".
     """
-    if not u',' in arg:
-        arg = u',' + arg
-    bits = arg.split(u',')
+    if not ',' in arg:
+        arg = ',' + arg
+    bits = arg.split(',')
     if len(bits) > 2:
-        return u''
+        return ''
     singular_suffix, plural_suffix = bits[:2]
 
     try:
@@ -874,8 +874,8 @@ def pprint(value):
     from pprint import pformat
     try:
         return pformat(value)
-    except Exception, e:
-        return u"Error in formatting: %s" % force_unicode(e, errors="replace")
+    except Exception as e:
+        return "Error in formatting: %s" % force_unicode(e, errors="replace")
 pprint.is_safe = True
 
 # Syntax: register.filter(name of filter, callback)

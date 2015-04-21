@@ -6,7 +6,7 @@ import re
 import sys
 import warnings
 import gettext as gettext_module
-from cStringIO import StringIO
+from io import StringIO
 from threading import local
 
 from django.utils.importlib import import_module
@@ -26,7 +26,7 @@ _default = None
 _accepted = {}
 
 # magic gettext number to separate context from message
-CONTEXT_SEPARATOR = u"\x04"
+CONTEXT_SEPARATOR = "\x04"
 
 # Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
 accept_language_re = re.compile(r'''
@@ -193,7 +193,7 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
-    if isinstance(language, basestring) and language == 'no':
+    if isinstance(language, str) and language == 'no':
         warnings.warn(
             "The use of the language code 'no' is deprecated. "
             "Please use the 'nb' translation instead.",
@@ -287,7 +287,7 @@ def ugettext(message):
 
 def pgettext(context, message):
     result = do_translate(
-        u"%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
+        "%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
@@ -328,8 +328,8 @@ def ungettext(singular, plural, number):
     return do_ntranslate(singular, plural, number, 'ungettext')
 
 def npgettext(context, singular, plural, number):
-    result = do_ntranslate(u"%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                           u"%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+    result = do_ntranslate("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                           "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
                            number, 'ungettext')
     if CONTEXT_SEPARATOR in result:
         # Translation not found
@@ -447,16 +447,16 @@ def templatize(src, origin=None):
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
-                content = u''.join(comment)
+                content = ''.join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
                     if line.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                         translators_comment_start = lineno
                 for lineno, line in enumerate(content.splitlines(True)):
                     if translators_comment_start is not None and lineno >= translators_comment_start:
-                        out.write(u' # %s' % line)
+                        out.write(' # %s' % line)
                     else:
-                        out.write(u' #\n')
+                        out.write(' #\n')
                 incomment = False
                 comment = []
             else:

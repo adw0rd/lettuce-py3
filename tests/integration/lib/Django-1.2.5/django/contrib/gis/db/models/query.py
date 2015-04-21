@@ -22,7 +22,7 @@ class GeoQuerySet(QuerySet):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (kwargs.keys(),))
+                    % (list(kwargs.keys()),))
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=GeoValuesListQuerySet, setup=True, flat=flat,
@@ -144,7 +144,7 @@ class GeoQuerySet(QuerySet):
         if not backend.geojson:
             raise NotImplementedError('Only PostGIS 1.3.4+ supports GeoJSON serialization.')
 
-        if not isinstance(precision, (int, long)):
+        if not isinstance(precision, int):
             raise TypeError('Precision keyword must be set with an integer.')
 
         # Setting the options flag -- which depends on which version of
@@ -309,7 +309,7 @@ class GeoQuerySet(QuerySet):
           - 2 arguments: X and Y sizes to snap the grid to.
           - 4 arguments: X, Y sizes and the X, Y origins.
         """
-        if False in [isinstance(arg, (float, int, long)) for arg in args]:
+        if False in [isinstance(arg, (float, int)) for arg in args]:
             raise TypeError('Size argument(s) for the grid must be a float or integer values.')
 
         nargs = len(args)
@@ -349,7 +349,7 @@ class GeoQuerySet(QuerySet):
                         digits used in output (defaults to 8).
         """
         relative = int(bool(relative))
-        if not isinstance(precision, (int, long)):
+        if not isinstance(precision, int):
             raise TypeError('SVG precision keyword argument must be an integer.')
         s = {'desc' : 'SVG',
              'procedure_fmt' : '%(geo_col)s,%(rel)s,%(precision)s',
@@ -390,7 +390,7 @@ class GeoQuerySet(QuerySet):
         Transforms the given geometry field to the given SRID.  If no SRID is
         provided, the transformation will default to using 4326 (WGS84).
         """
-        if not isinstance(srid, (int, long)):
+        if not isinstance(srid, int):
             raise TypeError('An integer SRID must be provided.')
         field_name = kwargs.get('field_name', None)
         tmp, geo_field = self._spatial_setup('transform', field_name=field_name)
@@ -528,12 +528,12 @@ class GeoQuerySet(QuerySet):
         if settings.get('setup', True):
             default_args, geo_field = self._spatial_setup(att, desc=settings['desc'], field_name=field_name,
                                                           geo_field_type=settings.get('geo_field_type', None))
-            for k, v in default_args.iteritems(): settings['procedure_args'].setdefault(k, v)
+            for k, v in default_args.items(): settings['procedure_args'].setdefault(k, v)
         else:
             geo_field = settings['geo_field']
 
         # The attribute to attach to the model.
-        if not isinstance(model_att, basestring): model_att = att
+        if not isinstance(model_att, str): model_att = att
 
         # Special handling for any argument that is a geometry.
         for name in settings['geom_args']:

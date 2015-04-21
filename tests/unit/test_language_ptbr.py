@@ -17,7 +17,7 @@
 from nose.tools import assert_equals
 from lettuce.core import Language, Scenario, Feature
 
-SCENARIO = u"""
+SCENARIO = """
 Cenário: Consolidar o banco de dados de cursos universitários em arquivo texto
     Dados os seguintes cursos cadastrados no banco de dados da universidade:
        | Nome                    | Duração  |
@@ -28,7 +28,7 @@ Cenário: Consolidar o banco de dados de cursos universitários em arquivo texto
     E a 2a linha do arquivo 'cursos.txt' contém 'Nutrição:4'
 """
 
-SCENARIO_OUTLINE1 = u'''
+SCENARIO_OUTLINE1 = '''
 Esquema do Cenário: Cadastrar um aluno no banco de dados
     Dado que eu preencho o campo "nome" com "<nome>"
     E que eu preencho o campo "idade" com "<idade>"
@@ -41,7 +41,7 @@ Exemplos:
     | João    | 30    |
 '''
 
-SCENARIO_OUTLINE2 = u'''
+SCENARIO_OUTLINE2 = '''
 Esquema do Cenário: Cadastrar um aluno no banco de dados
     Dado que eu preencho o campo "nome" com "<nome>"
     E que eu preencho o campo "idade" com "<idade>"
@@ -54,7 +54,7 @@ Cenários:
     | João    | 100   |
 '''
 
-FEATURE = u'''
+FEATURE = '''
 Funcionalidade: Pesquisar alunos com matrícula vencida
   Como gerente financeiro
   Eu quero pesquisar alunos com matrícula vencida
@@ -74,13 +74,13 @@ def test_language_portuguese():
     'Language: PT-BR -> Language class supports portuguese through code "pt-br"'
     lang = Language('pt-br')
 
-    assert_equals(lang.code, u'pt-br')
-    assert_equals(lang.name, u'Portuguese')
-    assert_equals(lang.native, u'Português')
-    assert_equals(lang.feature, u'Funcionalidade')
-    assert_equals(lang.scenario, u'Cenário|Cenario')
-    assert_equals(lang.examples, u'Exemplos|Cenários')
-    assert_equals(lang.scenario_outline, u'Esquema do Cenário|Esquema do Cenario')
+    assert_equals(lang.code, 'pt-br')
+    assert_equals(lang.name, 'Portuguese')
+    assert_equals(lang.native, 'Português')
+    assert_equals(lang.feature, 'Funcionalidade')
+    assert_equals(lang.scenario, 'Cenário|Cenario')
+    assert_equals(lang.examples, 'Exemplos|Cenários')
+    assert_equals(lang.scenario_outline, 'Esquema do Cenário|Esquema do Cenario')
 
 def test_scenario_ptbr_from_string():
     'Language: PT-BR -> Scenario.from_string'
@@ -89,13 +89,13 @@ def test_scenario_ptbr_from_string():
 
     assert_equals(
         scenario.name,
-        u'Consolidar o banco de dados de cursos universitários em arquivo texto'
+        'Consolidar o banco de dados de cursos universitários em arquivo texto'
     )
     assert_equals(
         scenario.steps[0].hashes,
         [
-            {'Nome': u'Ciência da Computação', u'Duração': '5 anos'},
-            {'Nome': u'Nutrição', u'Duração': '4 anos'},
+            {'Nome': 'Ciência da Computação', 'Duração': '5 anos'},
+            {'Nome': 'Nutrição', 'Duração': '4 anos'},
         ]
     )
 
@@ -111,8 +111,8 @@ def test_scenario_outline1_ptbr_from_string():
     assert_equals(
         scenario.outlines,
         [
-            {'nome': u'Gabriel', u'idade': '22'},
-            {'nome': u'João', u'idade': '30'},
+            {'nome': 'Gabriel', 'idade': '22'},
+            {'nome': 'João', 'idade': '30'},
         ]
     )
 
@@ -128,8 +128,8 @@ def test_scenario_outline2_ptbr_from_string():
     assert_equals(
         scenario.outlines,
         [
-            {'nome': u'Gabriel', u'idade': '99'},
-            {'nome': u'João', u'idade': '100'},
+            {'nome': 'Gabriel', 'idade': '99'},
+            {'nome': 'João', 'idade': '100'},
         ]
     )
 
@@ -140,14 +140,14 @@ def test_feature_ptbr_from_string():
 
     assert_equals(
         feature.name,
-        u'Pesquisar alunos com matrícula vencida'
+        'Pesquisar alunos com matrícula vencida'
     )
 
     assert_equals(
         feature.description,
-        u"Como gerente financeiro\n"
-        u"Eu quero pesquisar alunos com matrícula vencida\n"
-        u"Para propor um financiamento"
+        "Como gerente financeiro\n"
+        "Eu quero pesquisar alunos com matrícula vencida\n"
+        "Para propor um financiamento"
     )
 
     (scenario, ) = feature.scenarios
@@ -160,9 +160,9 @@ def test_feature_ptbr_from_string():
     assert_equals(
         scenario.steps[-1].hashes,
         [
-            {'nome': u'João', u'valor devido': 'R$ 512,66'},
-            {'nome': u'Maria', u'valor devido': 'R$ 998,41'},
-            {'nome': u'Ana', u'valor devido': 'R$ 231,00'},
+            {'nome': 'João', 'valor devido': 'R$ 512,66'},
+            {'nome': 'Maria', 'valor devido': 'R$ 998,41'},
+            {'nome': 'Ana', 'valor devido': 'R$ 231,00'},
         ]
     )
 

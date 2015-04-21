@@ -65,7 +65,7 @@ class SDORelate(SpatialFunction):
         super(SDORelate, self).__init__(self.relate_func, mask=mask)
 
 # Valid distance types and substitutions
-dtypes = (Decimal, Distance, float, int, long)
+dtypes = (Decimal, Distance, float, int, int)
 
 class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     compiler_module = "django.contrib.gis.db.backends.oracle.compiler"
@@ -120,14 +120,14 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         'exact' : SDOOperation('SDO_EQUAL'),
         'overlaps' : SDOOperation('SDO_OVERLAPS'),
         'same_as' : SDOOperation('SDO_EQUAL'),
-        'relate' : (SDORelate, basestring), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        'relate' : (SDORelate, str), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
         'touches' : SDOOperation('SDO_TOUCH'),
         'within' : SDOOperation('SDO_INSIDE'),
         }
     geometry_functions.update(distance_functions)
 
     gis_terms = ['isnull']
-    gis_terms += geometry_functions.keys()
+    gis_terms += list(geometry_functions.keys())
     gis_terms = dict([(term, None) for term in gis_terms])
 
     truncate_params = {'relate' : None}

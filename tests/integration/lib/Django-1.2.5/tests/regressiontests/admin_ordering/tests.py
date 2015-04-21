@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.admin.options import ModelAdmin
 
-from models import Band
+from .models import Band
 
 class TestAdminOrdering(TestCase):
     """
@@ -25,7 +25,7 @@ class TestAdminOrdering(TestCase):
         """
         ma = ModelAdmin(Band, None)
         names = [b.name for b in ma.queryset(None)]
-        self.assertEqual([u'Aerosmith', u'Radiohead', u'Van Halen'], names)
+        self.assertEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
 
     def test_specified_ordering(self):
         """
@@ -36,4 +36,4 @@ class TestAdminOrdering(TestCase):
             ordering = ('rank',) # default ordering is ('name',)
         ma = BandAdmin(Band, None)
         names = [b.name for b in ma.queryset(None)]
-        self.assertEqual([u'Radiohead', u'Van Halen', u'Aerosmith'], names)
+        self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)

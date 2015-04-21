@@ -4,7 +4,7 @@ from operator import attrgetter
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.test import TestCase
 
-from models import Article
+from .models import Article
 
 
 class CountContainer(object):
@@ -31,7 +31,7 @@ class PaginationTests(TestCase):
     def test_first_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(1)
-        self.assertEqual(u"<Page 1 of 2>", unicode(p))
+        self.assertEqual("<Page 1 of 2>", str(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 1>",
                 "<Article: Article 2>",
@@ -51,7 +51,7 @@ class PaginationTests(TestCase):
     def test_last_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(2)
-        self.assertEqual(u"<Page 2 of 2>", unicode(p))
+        self.assertEqual("<Page 2 of 2>", str(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 6>",
                 "<Article: Article 7>",
@@ -108,7 +108,7 @@ class PaginationTests(TestCase):
         self.assertEqual(2, paginator.num_pages)
         self.assertEqual([1, 2], paginator.page_range)
         p = paginator.page(1)
-        self.assertEqual(u"<Page 1 of 2>", unicode(p))
+        self.assertEqual("<Page 1 of 2>", str(p))
         self.assertEqual([1, 2, 3, 4, 5], p.object_list)
         self.assertTrue(p.has_next())
         self.assertFalse(p.has_previous())

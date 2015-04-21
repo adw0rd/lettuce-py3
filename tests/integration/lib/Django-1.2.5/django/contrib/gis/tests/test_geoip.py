@@ -32,7 +32,7 @@ class GeoIPTest(unittest.TestCase):
         bad_params = (23, 'foo', 15.23)
         for bad in bad_params:
             self.assertRaises(GeoIPException, GeoIP, cache=bad)
-            if isinstance(bad, basestring):
+            if isinstance(bad, str):
                 e = GeoIPException
             else:
                 e = TypeError

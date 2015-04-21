@@ -43,7 +43,7 @@ class SitemapTests(TestCase):
             # Localization should be active
             settings.USE_L10N = True
             activate('fr')
-            self.assertEqual(u'0,3', localize(0.3))
+            self.assertEqual('0,3', localize(0.3))
 
             # Retrieve the sitemap. Check that priorities
             # haven't been rendered in localized format
@@ -78,15 +78,15 @@ class SitemapTests(TestCase):
             from django.contrib.flatpages.models import FlatPage
 
             public = FlatPage.objects.create(
-                url=u'/public/',
-                title=u'Public Page',
+                url='/public/',
+                title='Public Page',
                 enable_comments=True,
                 registration_required=False,
             )
             public.sites.add(settings.SITE_ID)
             private = FlatPage.objects.create(
-                url=u'/private/',
-                title=u'Private Page',
+                url='/private/',
+                title='Private Page',
                 enable_comments=True,
                 registration_required=True
             )

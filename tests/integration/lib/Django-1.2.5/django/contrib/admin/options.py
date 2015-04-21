@@ -25,6 +25,7 @@ from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
 from django.utils.encoding import force_unicode
+import collections
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
@@ -54,9 +55,8 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 
 csrf_protect_m = method_decorator(csrf_protect)
 
-class BaseModelAdmin(object):
+class BaseModelAdmin(object, metaclass=forms.MediaDefiningClass):
     """Functionality common to both ModelAdmin and InlineAdmin."""
-    __metaclass__ = forms.MediaDefiningClass
 
     raw_id_fields = ()
     fields = None
@@ -191,7 +191,7 @@ class BaseModelAdmin(object):
         # ForeignKeyRawIdWidget, on the basis of ForeignKey.limit_choices_to,
         # are allowed to work.
         for l in model._meta.related_fkey_lookups:
-            for k, v in widgets.url_params_from_lookup_dict(l).items():
+            for k, v in list(widgets.url_params_from_lookup_dict(l).items()):
                 if k == lookup and v == value:
                     return True
 
@@ -394,7 +394,7 @@ class ModelAdmin(BaseModelAdmin):
         if self.declared_fieldsets:
             return self.declared_fieldsets
         form = self.get_form(request, obj)
-        fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
+        fields = list(form.base_fields.keys()) + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
     def get_form(self, request, obj=None, **kwargs):
@@ -555,7 +555,7 @@ class ModelAdmin(BaseModelAdmin):
             actions.extend([self.get_action(action) for action in class_actions])
 
         # get_action might have returned None, so filter any of those out.
-        actions = filter(None, actions)
+        actions = [_f for _f in actions if _f]
 
         # Convert the actions into a SortedDict keyed by name
         # and sorted by description.
@@ -573,7 +573,7 @@ class ModelAdmin(BaseModelAdmin):
         tuple (name, description).
         """
         choices = [] + default_choices
-        for func, name, description in self.get_actions(request).itervalues():
+        for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
@@ -585,7 +585,7 @@ class ModelAdmin(BaseModelAdmin):
         (callable, name, description).
         """
         # If the action is a callable, just use it.
-        if callable(action):
+        if isinstance(action, collections.Callable):
             func = action
             action = action.__name__
 
@@ -701,17 +701,17 @@ class ModelAdmin(BaseModelAdmin):
         msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj)}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
-        if request.POST.has_key("_continue"):
+        if "_continue" in request.POST:
             self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if request.POST.has_key("_popup"):
+            if "_popup" in request.POST:
                 post_url_continue += "?_popup=1"
             return HttpResponseRedirect(post_url_continue % pk_value)
 
-        if request.POST.has_key("_popup"):
+        if "_popup" in request.POST:
             return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
                 # escape() calls force_unicode.
                 (escape(pk_value), escapejs(obj)))
-        elif request.POST.has_key("_addanother"):
+        elif "_addanother" in request.POST:
             self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect(request.path)
         else:
@@ -734,17 +734,17 @@ class ModelAdmin(BaseModelAdmin):
         pk_value = obj._get_pk_val()
 
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj)}
-        if request.POST.has_key("_continue"):
+        if "_continue" in request.POST:
             self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if request.REQUEST.has_key('_popup'):
+            if '_popup' in request.REQUEST:
                 return HttpResponseRedirect(request.path + "?_popup=1")
             else:
                 return HttpResponseRedirect(request.path)
-        elif request.POST.has_key("_saveasnew"):
+        elif "_saveasnew" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': obj}
             self.message_user(request, msg)
             return HttpResponseRedirect("../%s/" % pk_value)
-        elif request.POST.has_key("_addanother"):
+        elif "_addanother" in request.POST:
             self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect("../add/")
         else:
@@ -846,7 +846,7 @@ class ModelAdmin(BaseModelAdmin):
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
                 formset = FormSet(data=request.POST, files=request.FILES,
                                   instance=new_object,
-                                  save_as_new=request.POST.has_key("_saveasnew"),
+                                  save_as_new="_saveasnew" in request.POST,
                                   prefix=prefix, queryset=inline.queryset(request))
                 formsets.append(formset)
             if all_valid(formsets) and form_validated:
@@ -860,7 +860,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             # Prepare the dict of initial data from the request.
             # We have to special-case M2Ms as a list of comma-separated PKs.
-            initial = dict(request.GET.items())
+            initial = dict(list(request.GET.items()))
             for k in initial:
                 try:
                     f = opts.get_field(k)
@@ -897,7 +897,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             'title': _('Add %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
-            'is_popup': request.REQUEST.has_key('_popup'),
+            'is_popup': '_popup' in request.REQUEST,
             'show_delete': False,
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
@@ -923,7 +923,7 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
 
-        if request.method == 'POST' and request.POST.has_key("_saveasnew"):
+        if request.method == 'POST' and "_saveasnew" in request.POST:
             return self.add_view(request, form_url='../add/')
 
         ModelForm = self.get_form(request, obj)
@@ -990,7 +990,7 @@ class ModelAdmin(BaseModelAdmin):
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
-            'is_popup': request.REQUEST.has_key('_popup'),
+            'is_popup': '_popup' in request.REQUEST,
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
@@ -1031,7 +1031,7 @@ class ModelAdmin(BaseModelAdmin):
             # and the 'invalid=1' parameter was already in the query string,
             # something is screwed up with the database, so display an error
             # page.
-            if ERROR_FLAG in request.GET.keys():
+            if ERROR_FLAG in list(request.GET.keys()):
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
 
@@ -1325,7 +1325,7 @@ class InlineModelAdmin(BaseModelAdmin):
         if self.declared_fieldsets:
             return self.declared_fieldsets
         form = self.get_formset(request).form
-        fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
+        fields = list(form.base_fields.keys()) + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
     def queryset(self, request):

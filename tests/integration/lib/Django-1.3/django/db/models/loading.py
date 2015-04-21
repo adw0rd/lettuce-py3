@@ -117,7 +117,7 @@ class AppCache(object):
         # Ensure the returned list is always in the same order (with new apps
         # added at the end). This avoids unstable ordering on the admin app
         # list page, for example.
-        apps = [(v, k) for k, v in self.app_store.items()]
+        apps = [(v, k) for k, v in list(self.app_store.items())]
         apps.sort()
         return [elt[1] for elt in apps]
 
@@ -168,11 +168,11 @@ class AppCache(object):
         if app_mod:
             app_list = [self.app_models.get(app_mod.__name__.split('.')[-2], SortedDict())]
         else:
-            app_list = self.app_models.itervalues()
+            app_list = iter(self.app_models.values())
         model_list = []
         for app in app_list:
             model_list.extend(
-                model for model in app.values()
+                model for model in list(app.values())
                 if ((not model._deferred or include_deferred)
                     and (not model._meta.auto_created or include_auto_created))
             )

@@ -1,13 +1,13 @@
 from django.contrib.localflavor.uy.forms import UYDepartamentSelect, UYCIField
 from django.contrib.localflavor.uy.util import get_validation_digit
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class UYLocalFlavorTests(LocalFlavorTestCase):
     def test_UYDepartmentSelect(self):
         f = UYDepartamentSelect()
-        out = u'''<select name="departamentos">
+        out = '''<select name="departamentos">
 <option value="G">Artigas</option>
 <option value="A">Canelones</option>
 <option value="E">Cerro Largo</option>
@@ -31,8 +31,8 @@ class UYLocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('departamentos', 'S'), out)
     
     def test_UYCIField(self):
-        error_format = [u'Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format.']
-        error_invalid = [u'Enter a valid CI number.']
+        error_format = ['Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format.']
+        error_invalid = ['Enter a valid CI number.']
         valid = {
             '4098053': '4098053',
             '409805-3': '409805-3',
@@ -42,9 +42,9 @@ class UYLocalFlavorTests(LocalFlavorTestCase):
             '1.005.411-2': '1.005.411-2',
         }
         invalid = {
-            'foo': [u'Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format.'],
-            '409805-2': [u'Enter a valid CI number.'],
-            '1.005.411-5': [u'Enter a valid CI number.'],
+            'foo': ['Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format.'],
+            '409805-2': ['Enter a valid CI number.'],
+            '1.005.411-5': ['Enter a valid CI number.'],
         }
         self.assertFieldOutput(UYCIField, valid, invalid)
         self.assertEqual(get_validation_digit(409805), 3)

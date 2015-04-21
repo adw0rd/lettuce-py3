@@ -13,7 +13,7 @@ from django.template import RequestContext, Template
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
 def post_form_response():
-    resp = HttpResponse(content=u"""
+    resp = HttpResponse(content="""
 <html><body><h1>\u00a1Unicode!<form method="post"><input type="text" /></form></body></html>
 """, mimetype="text/html")
     return resp
@@ -300,7 +300,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_csrf_cookie_request()
         resp = token_view(req)
-        self.assertEqual(u"", resp.content)
+        self.assertEqual("", resp.content)
 
     def test_token_node_empty_csrf_cookie(self):
         """
@@ -311,7 +311,7 @@ class CsrfMiddlewareTest(TestCase):
         CsrfViewMiddleware().process_view(req, token_view, (), {})
         resp = token_view(req)
 
-        self.assertNotEqual(u"", resp.content)
+        self.assertNotEqual("", resp.content)
 
     def test_token_node_with_csrf_cookie(self):
         """

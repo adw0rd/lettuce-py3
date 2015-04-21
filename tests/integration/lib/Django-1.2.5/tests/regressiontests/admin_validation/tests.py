@@ -4,7 +4,7 @@ from django.contrib.admin.validation import validate, validate_inline, \
                                             ImproperlyConfigured
 from django.test import TestCase
 
-from models import Song, Book, Album, TwoAlbumFKAndAnE
+from .models import Song, Book, Album, TwoAlbumFKAndAnE
 
 class SongForm(forms.ModelForm):
     pass
@@ -21,7 +21,7 @@ class ValidationTestCase(TestCase):
     def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
         try:
             func(*args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(msg, str(e))
             self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
 

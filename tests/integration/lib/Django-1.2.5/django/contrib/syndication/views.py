@@ -7,6 +7,7 @@ from django.template import loader, Template, TemplateDoesNotExist, RequestConte
 from django.utils import feedgenerator, tzinfo
 from django.utils.encoding import force_unicode, iri_to_uri, smart_unicode
 from django.utils.html import escape
+import collections
 
 def add_domain(domain, url, secure=False):
     if not (url.startswith('http://')
@@ -18,7 +19,7 @@ def add_domain(domain, url, secure=False):
             protocol = 'https'
         else:
             protocol = 'http'
-        url = iri_to_uri(u'%s://%s%s' % (protocol, domain, url))
+        url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
 
 class FeedDoesNotExist(ObjectDoesNotExist):
@@ -58,15 +59,15 @@ class Feed(object):
             attr = getattr(self, attname)
         except AttributeError:
             return default
-        if callable(attr):
+        if isinstance(attr, collections.Callable):
             # Check func_code.co_argcount rather than try/excepting the
             # function and catching the TypeError, because something inside
             # the function may raise the TypeError. This technique is more
             # accurate.
             if hasattr(attr, 'func_code'):
-                argcount = attr.func_code.co_argcount
+                argcount = attr.__code__.co_argcount
             else:
-                argcount = attr.__call__.func_code.co_argcount
+                argcount = attr.__call__.__code__.co_argcount
             if argcount == 2: # one argument is 'self'
                 return attr(obj)
             else:

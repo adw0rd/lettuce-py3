@@ -58,18 +58,18 @@ class PasswordResetTokenGenerator(object):
         # invalid as soon as it is used.
         # We limit the hash to 20 chars to keep URL short
         key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
-        value = unicode(user.id) + \
+        value = str(user.id) + \
             user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') + \
-            unicode(timestamp)
+            str(timestamp)
         hash = salted_hmac(key_salt, value).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
     def _make_token_with_timestamp_old(self, user, timestamp):
         # The Django 1.2 method
         ts_b36 = int_to_base36(timestamp)
-        hash = sha_constructor(settings.SECRET_KEY + unicode(user.id) +
+        hash = sha_constructor(settings.SECRET_KEY + str(user.id) +
                                user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') +
-                               unicode(timestamp)).hexdigest()[::2]
+                               str(timestamp)).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
     def _num_days(self, dt):

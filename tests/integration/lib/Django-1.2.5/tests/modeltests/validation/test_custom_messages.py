@@ -1,5 +1,5 @@
 from modeltests.validation import ValidationTestCase
-from models import CustomMessagesModel
+from .models import CustomMessagesModel
 
 
 class CustomMessagesTest(ValidationTestCase):

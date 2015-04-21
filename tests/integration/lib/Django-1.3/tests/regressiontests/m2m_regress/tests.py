@@ -1,7 +1,7 @@
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
+from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
     SelfReferChildSibling, Worksheet)
 
 

@@ -24,7 +24,7 @@ from lettuce.strings import utf8_string
 
 def wrt_output(filename, content):
     f = open(filename, "w")
-    if isinstance(content, unicode):
+    if isinstance(content, str):
         content = content.encode('utf-8')
 
     f.write(content)
@@ -59,7 +59,7 @@ def enable(filename=None):
             return
         
         name = getattr(parent, 'name', 'Background')    # Background sections are nameless
-        classname = u"%s : %s" % (parent.feature.name, name)
+        classname = "%s : %s" % (parent.feature.name, name)
         tc = doc.createElement("testcase")
         tc.setAttribute("classname", classname)
         tc.setAttribute("name", step.sentence)
@@ -94,7 +94,7 @@ def enable(filename=None):
         classname = "%s : %s" % (scenario.feature.name, scenario.name)
         tc = doc.createElement("testcase")
         tc.setAttribute("classname", classname)
-        tc.setAttribute("name", u'| %s |' % u' | '.join(outline.values()))
+        tc.setAttribute("name", '| %s |' % ' | '.join(list(outline.values())))
         tc.setAttribute("time", str(total_seconds((datetime.now() - scenario.outline_started))))
 
         for reason_to_fail in reasons_to_fail:

@@ -3,7 +3,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
-from models import Author, Article, Tag
+from .models import Author, Article, Tag
 
 
 class LookupTests(TestCase):
@@ -125,13 +125,13 @@ class LookupTests(TestCase):
         identity = lambda x:x
         self.assertQuerysetEqual(Article.objects.values('headline'),
             [
-                {'headline': u'Article 5'},
-                {'headline': u'Article 6'},
-                {'headline': u'Article 4'},
-                {'headline': u'Article 2'},
-                {'headline': u'Article 3'},
-                {'headline': u'Article 7'},
-                {'headline': u'Article 1'},
+                {'headline': 'Article 5'},
+                {'headline': 'Article 6'},
+                {'headline': 'Article 4'},
+                {'headline': 'Article 2'},
+                {'headline': 'Article 3'},
+                {'headline': 'Article 7'},
+                {'headline': 'Article 1'},
             ],
             transform=identity)
         self.assertQuerysetEqual(
@@ -153,13 +153,13 @@ class LookupTests(TestCase):
         # because iterator() uses database-level iteration.
         self.assertQuerysetEqual(Article.objects.values('id', 'headline').iterator(),
             [
-                {'headline': u'Article 5', 'id': self.a5.id},
-                {'headline': u'Article 6', 'id': self.a6.id},
-                {'headline': u'Article 4', 'id': self.a4.id},
-                {'headline': u'Article 2', 'id': self.a2.id},
-                {'headline': u'Article 3', 'id': self.a3.id},
-                {'headline': u'Article 7', 'id': self.a7.id},
-                {'headline': u'Article 1', 'id': self.a1.id},
+                {'headline': 'Article 5', 'id': self.a5.id},
+                {'headline': 'Article 6', 'id': self.a6.id},
+                {'headline': 'Article 4', 'id': self.a4.id},
+                {'headline': 'Article 2', 'id': self.a2.id},
+                {'headline': 'Article 3', 'id': self.a3.id},
+                {'headline': 'Article 7', 'id': self.a7.id},
+                {'headline': 'Article 1', 'id': self.a1.id},
             ],
             transform=identity)
         # The values() method works with "extra" fields specified in extra(select).
@@ -186,7 +186,7 @@ class LookupTests(TestCase):
             'id_plus_eight': 'id+8',
         }
         self.assertQuerysetEqual(
-            Article.objects.filter(id=self.a1.id).extra(select=data).values(*data.keys()),
+            Article.objects.filter(id=self.a1.id).extra(select=data).values(*list(data.keys())),
             [{
                 'id_plus_one': self.a1.id + 1,
                 'id_plus_two': self.a1.id + 2,
@@ -240,7 +240,7 @@ class LookupTests(TestCase):
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values,
             'id', 'id_plus_two')
         # If you don't specify field names to values(), all are returned.
-        self.assertQuerysetEqual(Article.objects.filter(id=self.a5.id).values(),
+        self.assertQuerysetEqual(list(Article.objects.filter(id=self.a5.id).values()),
             [{
                 'id': self.a5.id,
                 'author_id': self.au2.id, 
@@ -256,13 +256,13 @@ class LookupTests(TestCase):
         identity = lambda x:x
         self.assertQuerysetEqual(Article.objects.values_list('headline'),
             [
-                (u'Article 5',),
-                (u'Article 6',),
-                (u'Article 4',),
-                (u'Article 2',),
-                (u'Article 3',),
-                (u'Article 7',),
-                (u'Article 1',),
+                ('Article 5',),
+                ('Article 6',),
+                ('Article 4',),
+                ('Article 2',),
+                ('Article 3',),
+                ('Article 7',),
+                ('Article 1',),
             ], transform=identity)
         self.assertQuerysetEqual(Article.objects.values_list('id').order_by('id'),
             [(self.a1.id,), (self.a2.id,), (self.a3.id,), (self.a4.id,), (self.a5.id,), (self.a6.id,), (self.a7.id,)],
@@ -465,13 +465,13 @@ class LookupTests(TestCase):
         try:
             Article.objects.filter(pub_date_year='2005').count()
             self.fail('FieldError not raised')
-        except FieldError, ex:
+        except FieldError as ex:
             self.assertEqual(str(ex), "Cannot resolve keyword 'pub_date_year' "
                              "into field. Choices are: author, headline, id, pub_date, tag")
         try:
             Article.objects.filter(headline__starts='Article')
             self.fail('FieldError not raised')
-        except FieldError, ex:
+        except FieldError as ex:
             self.assertEqual(str(ex), "Join on field 'headline' not permitted. "
                              "Did you misspell 'starts' for the lookup type?")
 

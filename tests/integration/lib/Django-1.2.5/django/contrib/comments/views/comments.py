@@ -1,6 +1,6 @@
 from django import http
 from django.conf import settings
-from utils import next_redirect, confirmation_view
+from .utils import next_redirect, confirmation_view
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.shortcuts import render_to_response
@@ -62,7 +62,7 @@ def post_comment(request, next=None, using=None):
         return CommentPostBadRequest(
             "No object matching content-type %r and object PK %r exists." % \
                 (escape(ctype), escape(object_pk)))
-    except (ValueError, ValidationError), e:
+    except (ValueError, ValidationError) as e:
         return CommentPostBadRequest(
             "Attempting go get content-type %r and object PK %r exists raised %s" % \
                 (escape(ctype), escape(object_pk), e.__class__.__name__))

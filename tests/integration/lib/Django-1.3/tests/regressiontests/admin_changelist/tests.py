@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.template import Context, Template
 from django.test import TransactionTestCase
 
-from models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
+from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
     Membership, ChordsMusician, ChordsBand, Invitation)
 
 

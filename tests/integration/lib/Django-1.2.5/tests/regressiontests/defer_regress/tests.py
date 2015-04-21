@@ -7,7 +7,7 @@ from django.db import connection
 from django.db.models.loading import cache
 from django.test import TestCase
 
-from models import ResolveThis, Item, RelatedItem, Child, Leaf
+from .models import ResolveThis, Item, RelatedItem, Child, Leaf
 
 
 class DeferRegressionTest(TestCase):

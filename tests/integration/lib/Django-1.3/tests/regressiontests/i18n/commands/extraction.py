@@ -78,7 +78,7 @@ class BasicExtractorTests(ExtractorTests):
         try: # TODO: Simplify this try/try block when we drop support for Python 2.4
             try:
                 management.call_command('makemessages', locale=LOCALE, verbosity=0)
-            except SyntaxError, e:
+            except SyntaxError as e:
                 self.assertEqual(str(e), 'Translation blocks must not include other block tags: blocktrans (file templates/template_with_error.html, line 3)')
         finally:
             os.remove('./templates/template_with_error.html')

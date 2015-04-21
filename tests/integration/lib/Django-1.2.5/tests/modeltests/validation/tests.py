@@ -50,11 +50,11 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_wrong_url_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', url='not a url')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'Enter a valid value.'])
+        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', ['Enter a valid value.'])
 
     def test_correct_url_but_nonexisting_gives_404(self):
         mtv = ModelToValidate(number=10, name='Some Name', url='http://google.com/we-love-microsoft.html')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'This URL appears to be a broken link.'])
+        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', ['This URL appears to be a broken link.'])
 
     def test_correct_url_value_passes(self):
         mtv = ModelToValidate(number=10, name='Some Name', url='http://www.djangoproject.com/')
@@ -81,7 +81,7 @@ class ModelFormsTests(TestCase):
             'pub_date': '2010-1-10 14:49:00'
         }
         form = ArticleForm(data)
-        self.assertEqual(form.errors.keys(), [])
+        self.assertEqual(list(form.errors.keys()), [])
         article = form.save(commit=False)
         article.author = self.author
         article.save()
@@ -97,7 +97,7 @@ class ModelFormsTests(TestCase):
         }
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
-        self.assertEqual(form.errors.keys(), [])
+        self.assertEqual(list(form.errors.keys()), [])
         self.assertNotEqual(form.instance.pub_date, None)
         article = form.save()
 
@@ -110,5 +110,5 @@ class ModelFormsTests(TestCase):
         }
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
-        self.assertEqual(form.errors.keys(), ['pub_date'])
+        self.assertEqual(list(form.errors.keys()), ['pub_date'])
 

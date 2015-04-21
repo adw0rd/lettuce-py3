@@ -19,9 +19,7 @@ class MyWrapper(object):
             return self.value == other.value
         return self.value == other
 
-class MyAutoField(models.CharField):
-    __metaclass__ = models.SubfieldBase
-
+class MyAutoField(models.CharField, metaclass=models.SubfieldBase):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 10
         super(MyAutoField, self).__init__(*args, **kwargs)
@@ -44,12 +42,12 @@ class MyAutoField(models.CharField):
         if not value:
             return
         if isinstance(value, MyWrapper):
-            return unicode(value)
+            return str(value)
         return value
 
     def get_db_prep_value(self, value):
         if not value:
             return
         if isinstance(value, MyWrapper):
-            return unicode(value)
+            return str(value)
         return value

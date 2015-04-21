@@ -118,7 +118,7 @@ class _WKTReader(IOBase):
     ptr_type = WKT_READ_PTR
 
     def read(self, wkt):
-        if not isinstance(wkt, basestring): raise TypeError
+        if not isinstance(wkt, str): raise TypeError
         return wkt_reader_read(self.ptr, wkt)
 
 class _WKBReader(IOBase):
@@ -131,7 +131,7 @@ class _WKBReader(IOBase):
         if isinstance(wkb, buffer):
             wkb_s = str(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, basestring):
+        elif isinstance(wkb, str):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
         else:
             raise TypeError

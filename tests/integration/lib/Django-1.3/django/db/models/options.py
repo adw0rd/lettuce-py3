@@ -100,7 +100,7 @@ class Options(object):
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
-                raise TypeError("'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys()))
+                raise TypeError("'class Meta' got invalid attribute(s): %s" % ','.join(list(meta_attrs.keys())))
         else:
             self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
@@ -142,13 +142,13 @@ class Options(object):
         # self.duplicate_targets will map each duplicate field column to the
         # columns it duplicates.
         collections = {}
-        for column, target in self.duplicate_targets.iteritems():
+        for column, target in self.duplicate_targets.items():
             try:
                 collections[target].add(column)
             except KeyError:
                 collections[target] = set([column])
         self.duplicate_targets = {}
-        for elt in collections.itervalues():
+        for elt in collections.values():
             if len(elt) == 1:
                 continue
             for column in elt:
@@ -253,7 +253,7 @@ class Options(object):
             self._m2m_cache
         except AttributeError:
             self._fill_m2m_cache()
-        return self._m2m_cache.keys()
+        return list(self._m2m_cache.keys())
     many_to_many = property(_many_to_many)
 
     def get_m2m_with_model(self):
@@ -264,7 +264,7 @@ class Options(object):
             self._m2m_cache
         except AttributeError:
             self._fill_m2m_cache()
-        return self._m2m_cache.items()
+        return list(self._m2m_cache.items())
 
     def _fill_m2m_cache(self):
         cache = SortedDict()
@@ -321,7 +321,7 @@ class Options(object):
             cache = self._name_map
         except AttributeError:
             cache = self.init_name_map()
-        names = cache.keys()
+        names = list(cache.keys())
         names.sort()
         # Internal-only names end with "+" (symmetrical m2m related names being
         # the main example). Trim them.
@@ -374,8 +374,7 @@ class Options(object):
             predicates.append(lambda k, v: not v)
         if not include_hidden:
             predicates.append(lambda k, v: not k.field.rel.is_hidden())
-        return filter(lambda t: all([p(*t) for p in predicates]),
-                      self._related_objects_cache.items())
+        return [t for t in list(self._related_objects_cache.items()) if all([p(*t) for p in predicates])]
 
     def _fill_related_objects_cache(self):
         cache = SortedDict()
@@ -400,8 +399,8 @@ class Options(object):
         except AttributeError:
             cache = self._fill_related_many_to_many_cache()
         if local_only:
-            return [k for k, v in cache.items() if not v]
-        return cache.keys()
+            return [k for k, v in list(cache.items()) if not v]
+        return list(cache.keys())
 
     def get_all_related_m2m_objects_with_model(self):
         """
@@ -412,7 +411,7 @@ class Options(object):
             cache = self._related_many_to_many_cache
         except AttributeError:
             cache = self._fill_related_many_to_many_cache()
-        return cache.items()
+        return list(cache.items())
 
     def _fill_related_many_to_many_cache(self):
         cache = SortedDict()

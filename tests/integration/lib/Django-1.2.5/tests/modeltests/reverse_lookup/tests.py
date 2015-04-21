@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import FieldError
 
-from models import User, Poll, Choice
+from .models import User, Poll, Choice
 
 class ReverseLookupTests(TestCase):
 

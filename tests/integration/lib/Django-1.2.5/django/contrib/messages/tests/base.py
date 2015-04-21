@@ -155,7 +155,7 @@ class BaseTest(TestCase):
         """
         settings.MESSAGE_LEVEL = constants.DEBUG
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -177,7 +177,7 @@ class BaseTest(TestCase):
         """
         settings.MESSAGE_LEVEL = constants.DEBUG
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         messages = []
@@ -216,7 +216,7 @@ class BaseTest(TestCase):
             'django.contrib.messages.context_processors.messages',
         )
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -250,7 +250,7 @@ class BaseTest(TestCase):
             'django.contrib.messages.context_processors.messages',
         )
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -279,7 +279,7 @@ class BaseTest(TestCase):
             'django.contrib.messages.context_processors.messages',
         )
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
             'fail_silently': True,
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')

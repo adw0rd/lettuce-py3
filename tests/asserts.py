@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 import sys
-from StringIO import StringIO
+from io import StringIO
 from nose.tools import assert_equals, assert_not_equals
 from lettuce import registry
 from difflib import Differ
@@ -39,15 +39,15 @@ def prepare_stderr():
 
 
 def assert_lines(original, expected):
-    original = original.decode('utf-8') if isinstance(original, basestring) else original
+    original = original.decode('utf-8') if isinstance(original, str) else original
     assert_lines_unicode(original, expected)
 
 
 def assert_lines_unicode(original, expected):
-    if isinstance(expected, unicode):
+    if isinstance(expected, str):
         expected = expected.encode('utf-8')
 
-    if isinstance(original, unicode):
+    if isinstance(original, str):
         original = original.encode('utf-8')
 
     expected_lines = expected.splitlines(1)
@@ -55,18 +55,18 @@ def assert_lines_unicode(original, expected):
 
     if original != expected:
         comparison = Differ().compare(expected_lines, original_lines)
-        if isinstance(comparison, unicode):
+        if isinstance(comparison, str):
             expected = expected.encode('utf-8')
 
-        diff = u''.encode('utf-8').join(comparison)
-        msg = (u'Output differed as follows:\n{0}\n'
+        diff = ''.encode('utf-8').join(comparison)
+        msg = ('Output differed as follows:\n{0}\n'
                'Output was:\n{1}\nExpected was:\n{2}'.encode('utf-8'))
 
         raise AssertionError(repr(msg.format(diff, original, expected)).replace(r'\n', '\n'))
 
     assert_equals(
         len(expected), len(original),
-        u'Output appears equal, but of different lengths.')
+        'Output appears equal, but of different lengths.')
 
 
 def assert_lines_with_traceback(one, other):
@@ -90,9 +90,9 @@ def assert_lines_with_traceback(one, other):
 
 
 def assert_unicode_equals(original, expected):
-    if isinstance(original, basestring):
+    if isinstance(original, str):
         original = original.decode('utf-8')
-    assert_equals.im_class.maxDiff = None
+    assert_equals.__self__.__class__.maxDiff = None
     assert_equals(original, expected)
 
 def assert_stderr(expected):

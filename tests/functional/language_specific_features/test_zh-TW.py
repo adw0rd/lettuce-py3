@@ -32,16 +32,16 @@ def test_output_with_success_colorless():
     runner.run()
 
     assert_stdout_lines(
-        u"\n"
-        u"特性: 簡單測試           # tests/functional/language_specific_features/zh-TW/success/dumb.feature:3\n"
-        u"  什麽都不做應該運行成功 # tests/functional/language_specific_features/zh-TW/success/dumb.feature:4\n"
-        u"\n"
-        u"  場景: 什麽都不做       # tests/functional/language_specific_features/zh-TW/success/dumb.feature:6\n"
-        u"    如果 什麽都不做      # tests/functional/language_specific_features/zh-TW/success/dumb_steps.py:6\n"
-        u"\n"
-        u"1 feature (1 passed)\n"
-        u"1 scenario (1 passed)\n"
-        u"1 step (1 passed)\n"
+        "\n"
+        "特性: 簡單測試           # tests/functional/language_specific_features/zh-TW/success/dumb.feature:3\n"
+        "  什麽都不做應該運行成功 # tests/functional/language_specific_features/zh-TW/success/dumb.feature:4\n"
+        "\n"
+        "  場景: 什麽都不做       # tests/functional/language_specific_features/zh-TW/success/dumb.feature:6\n"
+        "    如果 什麽都不做      # tests/functional/language_specific_features/zh-TW/success/dumb_steps.py:6\n"
+        "\n"
+        "1 feature (1 passed)\n"
+        "1 scenario (1 passed)\n"
+        "1 step (1 passed)\n"
     )
 
 @with_setup(prepare_stdout)
@@ -52,19 +52,19 @@ def test_output_of_table_with_success_colorless():
     runner.run()
 
     assert_stdout_lines(
-        u"\n"
-        u"特性: 步驟中包含表格             # tests/functional/language_specific_features/zh-TW/success/table.feature:3\n"
-        u"  繁體中文表格步驟的成功測試     # tests/functional/language_specific_features/zh-TW/success/table.feature:4\n"
-        u"\n"
-        u"  場景: 什麽都不做的表格步驟測試 # tests/functional/language_specific_features/zh-TW/success/table.feature:6\n"
-        u"    如果 輸入數據如下:           # tests/functional/language_specific_features/zh-TW/success/table_steps.py:6\n"
-        u"      | id | 名稱   |\n"
-        u"      | 12 | 名稱一 |\n"
-        u"      | 64 | 名稱二 |\n"
-        u"\n"
-        u"1 feature (1 passed)\n"
-        u"1 scenario (1 passed)\n"
-        u"1 step (1 passed)\n"
+        "\n"
+        "特性: 步驟中包含表格             # tests/functional/language_specific_features/zh-TW/success/table.feature:3\n"
+        "  繁體中文表格步驟的成功測試     # tests/functional/language_specific_features/zh-TW/success/table.feature:4\n"
+        "\n"
+        "  場景: 什麽都不做的表格步驟測試 # tests/functional/language_specific_features/zh-TW/success/table.feature:6\n"
+        "    如果 輸入數據如下:           # tests/functional/language_specific_features/zh-TW/success/table_steps.py:6\n"
+        "      | id | 名稱   |\n"
+        "      | 12 | 名稱一 |\n"
+        "      | 64 | 名稱二 |\n"
+        "\n"
+        "1 feature (1 passed)\n"
+        "1 scenario (1 passed)\n"
+        "1 step (1 passed)\n"
     )
 
 @with_setup(prepare_stdout)
@@ -75,24 +75,24 @@ def test_output_outlines_success_colorless():
     runner.run()
 
     assert_stdout_lines(
-        u"\n"
-        u"特性: 中文場景模板           # tests/functional/language_specific_features/zh-TW/success/outlines.feature:3\n"
-        u"  中文場景模板圖表測試       # tests/functional/language_specific_features/zh-TW/success/outlines.feature:4\n"
-        u"\n"
-        u"  場景模板: 用表格描述場景   # tests/functional/language_specific_features/zh-TW/success/outlines.feature:6\n"
-        u"    如果 輸入是<輸入>        # tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:13\n"
-        u"    當 執行<處理>時          # tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:22\n"
-        u"    那麽 得到<結果>          # tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:31\n"
-        u"\n"
-        u"  例如:\n"
-        u"    | 輸入 | 處理 | 結果         |\n"
-        u"    | 什麽 | 這個 | 功能         |\n"
-        u"    | 其他 | 這裏 | 一樣         |\n"
-        u"    | 數據 | 動作 | unicode輸出! |\n"
-        u"\n"
-        u"1 feature (1 passed)\n"
-        u"3 scenarios (3 passed)\n"
-        u"9 steps (9 passed)\n"
+        "\n"
+        "特性: 中文場景模板           # tests/functional/language_specific_features/zh-TW/success/outlines.feature:3\n"
+        "  中文場景模板圖表測試       # tests/functional/language_specific_features/zh-TW/success/outlines.feature:4\n"
+        "\n"
+        "  場景模板: 用表格描述場景   # tests/functional/language_specific_features/zh-TW/success/outlines.feature:6\n"
+        "    如果 輸入是<輸入>        # tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:13\n"
+        "    當 執行<處理>時          # tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:22\n"
+        "    那麽 得到<結果>          # tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:31\n"
+        "\n"
+        "  例如:\n"
+        "    | 輸入 | 處理 | 結果         |\n"
+        "    | 什麽 | 這個 | 功能         |\n"
+        "    | 其他 | 這裏 | 一樣         |\n"
+        "    | 數據 | 動作 | unicode輸出! |\n"
+        "\n"
+        "1 feature (1 passed)\n"
+        "3 scenarios (3 passed)\n"
+        "9 steps (9 passed)\n"
     )
 
 @with_setup(prepare_stdout)
@@ -103,23 +103,23 @@ def test_output_outlines_success_colorful():
     runner.run()
 
     assert_stdout_lines(
-        u'\n'
-        u"\033[1;37m特性: 中文場景模板           \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines.feature:3\033[0m\n"
-        u"\033[1;37m  中文場景模板圖表測試       \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines.feature:4\033[0m\n"
-        u'\n'
-        u"\033[1;37m  場景模板: 用表格描述場景   \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines.feature:6\033[0m\n"
-        u"\033[0;36m    如果 輸入是<輸入>        \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:13\033[0m\n"
-        u"\033[0;36m    當 執行<處理>時          \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:22\033[0m\n"
-        u"\033[0;36m    那麽 得到<結果>          \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:31\033[0m\n"
-        u'\n'
-        u"\033[1;37m  例如:\033[0m\n"
-        u"\033[0;36m   \033[1;37m |\033[0;36m 輸入\033[1;37m |\033[0;36m 處理\033[1;37m |\033[0;36m 結果        \033[1;37m |\033[0;36m\033[0m\n"
-        u"\033[1;32m   \033[1;37m |\033[1;32m 什麽\033[1;37m |\033[1;32m 這個\033[1;37m |\033[1;32m 功能        \033[1;37m |\033[1;32m\033[0m\n"
-        u"\033[1;32m   \033[1;37m |\033[1;32m 其他\033[1;37m |\033[1;32m 這裏\033[1;37m |\033[1;32m 一樣        \033[1;37m |\033[1;32m\033[0m\n"
-        u"\033[1;32m   \033[1;37m |\033[1;32m 數據\033[1;37m |\033[1;32m 動作\033[1;37m |\033[1;32m unicode輸出!\033[1;37m |\033[1;32m\033[0m\n"
-        u'\n'
-        u"\033[1;37m1 feature (\033[1;32m1 passed\033[1;37m)\033[0m\n"
-        u"\033[1;37m3 scenarios (\033[1;32m3 passed\033[1;37m)\033[0m\n"
-        u"\033[1;37m9 steps (\033[1;32m9 passed\033[1;37m)\033[0m\n"
+        '\n'
+        "\033[1;37m特性: 中文場景模板           \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines.feature:3\033[0m\n"
+        "\033[1;37m  中文場景模板圖表測試       \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines.feature:4\033[0m\n"
+        '\n'
+        "\033[1;37m  場景模板: 用表格描述場景   \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines.feature:6\033[0m\n"
+        "\033[0;36m    如果 輸入是<輸入>        \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:13\033[0m\n"
+        "\033[0;36m    當 執行<處理>時          \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:22\033[0m\n"
+        "\033[0;36m    那麽 得到<結果>          \033[1;30m# tests/functional/language_specific_features/zh-TW/success/outlines_steps.py:31\033[0m\n"
+        '\n'
+        "\033[1;37m  例如:\033[0m\n"
+        "\033[0;36m   \033[1;37m |\033[0;36m 輸入\033[1;37m |\033[0;36m 處理\033[1;37m |\033[0;36m 結果        \033[1;37m |\033[0;36m\033[0m\n"
+        "\033[1;32m   \033[1;37m |\033[1;32m 什麽\033[1;37m |\033[1;32m 這個\033[1;37m |\033[1;32m 功能        \033[1;37m |\033[1;32m\033[0m\n"
+        "\033[1;32m   \033[1;37m |\033[1;32m 其他\033[1;37m |\033[1;32m 這裏\033[1;37m |\033[1;32m 一樣        \033[1;37m |\033[1;32m\033[0m\n"
+        "\033[1;32m   \033[1;37m |\033[1;32m 數據\033[1;37m |\033[1;32m 動作\033[1;37m |\033[1;32m unicode輸出!\033[1;37m |\033[1;32m\033[0m\n"
+        '\n'
+        "\033[1;37m1 feature (\033[1;32m1 passed\033[1;37m)\033[0m\n"
+        "\033[1;37m3 scenarios (\033[1;32m3 passed\033[1;37m)\033[0m\n"
+        "\033[1;37m9 steps (\033[1;32m9 passed\033[1;37m)\033[0m\n"
     )
 

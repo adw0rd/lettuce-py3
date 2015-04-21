@@ -9,10 +9,10 @@ from django.contrib.gis.tests.utils import \
     mysql, oracle, postgis, spatialite
 from django.test import TestCase
 
-from models import Country, City, PennsylvaniaCity, State, Track
+from .models import Country, City, PennsylvaniaCity, State, Track
 
 if not spatialite:
-    from models import Feature, MinusOneSRID
+    from .models import Feature, MinusOneSRID
 
 class GeoModelTest(TestCase):
 
@@ -655,9 +655,9 @@ class GeoModelTest(TestCase):
     def test27_snap_to_grid(self):
         "Testing GeoQuerySet.snap_to_grid()."
         # Let's try and break snap_to_grid() with bad combinations of arguments.
-        for bad_args in ((), range(3), range(5)):
+        for bad_args in ((), list(range(3)), list(range(5))):
             self.assertRaises(ValueError, Country.objects.snap_to_grid, *bad_args)
-        for bad_args in (('1.0',), (1.0, None), tuple(map(unicode, range(4)))):
+        for bad_args in (('1.0',), (1.0, None), tuple(map(str, list(range(4))))):
             self.assertRaises(TypeError, Country.objects.snap_to_grid, *bad_args)
 
         # Boundary for San Marino, courtesy of Bjorn Sandvik of thematicmapping.org
@@ -730,6 +730,6 @@ class GeoModelTest(TestCase):
         self.assertEqual(ref_hash, h1.geohash)
         self.assertEqual(ref_hash[:5], h2.geohash)
 
-from test_feeds import GeoFeedTest
-from test_regress import GeoRegressionTests
-from test_sitemaps import GeoSitemapTest
+from .test_feeds import GeoFeedTest
+from .test_regress import GeoRegressionTests
+from .test_sitemaps import GeoSitemapTest

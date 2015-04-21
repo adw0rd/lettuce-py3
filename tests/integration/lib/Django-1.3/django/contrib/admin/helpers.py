@@ -11,6 +11,7 @@ from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape, conditional_escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+import collections
 
 
 ACTION_CHECKBOX_NAME = '_selected_action'
@@ -28,7 +29,7 @@ class AdminForm(object):
         self.prepopulated_fields = [{
             'field': form[field_name],
             'dependencies': [form[f] for f in dependencies]
-        } for field_name, dependencies in prepopulated_fields.items()]
+        } for field_name, dependencies in list(prepopulated_fields.items())]
         self.model_admin = model_admin
         if readonly_fields is None:
             readonly_fields = ()
@@ -46,13 +47,13 @@ class AdminForm(object):
         try:
             fieldset_name, fieldset_options = self.fieldsets[0]
             field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, basestring):
+            if not isinstance(field_name, str):
                 field_name = field_name[0]
             return self.form[field_name]
         except (KeyError, IndexError):
             pass
         try:
-            return iter(self.form).next()
+            return next(iter(self.form))
         except StopIteration:
             return None
 
@@ -68,7 +69,7 @@ class Fieldset(object):
       description=None, model_admin=None):
         self.form = form
         self.name, self.fields = name, fields
-        self.classes = u' '.join(classes)
+        self.classes = ' '.join(classes)
         self.description = description
         self.model_admin = model_admin
         self.readonly_fields = readonly_fields
@@ -105,7 +106,7 @@ class Fieldline(object):
                 yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return mark_safe(u'\n'.join([self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields]).strip('\n'))
+        return mark_safe('\n'.join([self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields]).strip('\n'))
 
 class AdminField(object):
     def __init__(self, form, field, is_first):
@@ -116,15 +117,15 @@ class AdminField(object):
     def label_tag(self):
         classes = []
         if self.is_checkbox:
-            classes.append(u'vCheckboxLabel')
+            classes.append('vCheckboxLabel')
             contents = force_unicode(escape(self.field.label))
         else:
-            contents = force_unicode(escape(self.field.label)) + u':'
+            contents = force_unicode(escape(self.field.label)) + ':'
         if self.field.field.required:
-            classes.append(u'required')
+            classes.append('required')
         if not self.is_first:
-            classes.append(u'inline')
-        attrs = classes and {'class': u' '.join(classes)} or {}
+            classes.append('inline')
+        attrs = classes and {'class': ' '.join(classes)} or {}
         return self.field.label_tag(contents=contents, attrs=attrs)
 
     def errors(self):
@@ -136,7 +137,7 @@ class AdminReadonlyField(object):
         # Make self.field look a little bit like a field. This means that
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
-        if callable(field):
+        if isinstance(field, collections.Callable):
             class_name = field.__name__ != '<lambda>' and field.__name__ or ''
         else:
             class_name = field
@@ -157,7 +158,7 @@ class AdminReadonlyField(object):
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        contents = capfirst(force_unicode(escape(label))) + u":"
+        contents = capfirst(force_unicode(escape(label))) + ":"
         return mark_safe('<label%(attrs)s>%(contents)s</label>' % {
             "attrs": flatatt(attrs),
             "contents": contents,
@@ -184,7 +185,7 @@ class AdminReadonlyField(object):
                 if value is None:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 elif isinstance(f.rel, ManyToManyRel):
-                    result_repr = ", ".join(map(unicode, value.all()))
+                    result_repr = ", ".join(map(str, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
         return conditional_escape(result_repr)
@@ -316,11 +317,11 @@ class AdminErrorList(forms.util.ErrorList):
     """
     def __init__(self, form, inline_formsets):
         if form.is_bound:
-            self.extend(form.errors.values())
+            self.extend(list(form.errors.values()))
             for inline_formset in inline_formsets:
                 self.extend(inline_formset.non_form_errors())
                 for errors_in_inline_form in inline_formset.errors:
-                    self.extend(errors_in_inline_form.values())
+                    self.extend(list(errors_in_inline_form.values()))
 
 def normalize_fieldsets(fieldsets):
     """
@@ -337,7 +338,7 @@ def normalize_dictionary(data_dict):
     Converts all the keys in "data_dict" to strings. The keys must be
     convertible using str().
     """
-    for key, value in data_dict.items():
+    for key, value in list(data_dict.items()):
         if not isinstance(key, str):
             del data_dict[key]
             data_dict[str(key)] = value

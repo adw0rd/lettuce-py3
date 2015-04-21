@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib import admin
 
-from models import Person, Place, Location
+from .models import Person, Place, Location
 
 class NameAdmin(admin.ModelAdmin):
     list_display = ['name']

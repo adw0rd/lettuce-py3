@@ -1,13 +1,13 @@
 from django.contrib.localflavor.de.forms import (DEZipCodeField, DEStateSelect,
     DEIdentityCardNumberField)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class DELocalFlavorTests(LocalFlavorTestCase):
     def test_DEStateSelect(self):
         f = DEStateSelect()
-        out = u'''<select name="states">
+        out = '''<select name="states">
 <option value="BW">Baden-Wuerttemberg</option>
 <option value="BY">Bavaria</option>
 <option value="BE">Berlin</option>
@@ -28,7 +28,7 @@ class DELocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('states', 'TH'), out)
 
     def test_DEZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXXX.']
+        error_format = ['Enter a zip code in the format XXXXX.']
         valid = {
             '99423': '99423',
         }
@@ -38,7 +38,7 @@ class DELocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(DEZipCodeField, valid, invalid)
 
     def test_DEIdentityCardNumberField(self):
-        error_format = [u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.']
+        error_format = ['Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.']
         valid = {
             '7549313035D-6004103-0903042-0': '7549313035D-6004103-0903042-0',
             '9786324830D 6104243 0910271 2': '9786324830D-6104243-0910271-2',

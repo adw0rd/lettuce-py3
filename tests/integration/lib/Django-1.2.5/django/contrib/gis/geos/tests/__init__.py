@@ -2,7 +2,7 @@
 GEOS Testing module.
 """
 from unittest import TestSuite, TextTestRunner
-import test_geos, test_io, test_geos_mutation, test_mutable_list
+from . import test_geos, test_io, test_geos_mutation, test_mutable_list
 
 test_suites = [
     test_geos.suite(),
@@ -14,7 +14,7 @@ test_suites = [
 def suite():
     "Builds a test suite for the GEOS tests."
     s = TestSuite()
-    map(s.addTest, test_suites)
+    list(map(s.addTest, test_suites))
     return s
 
 def run(verbosity=1):

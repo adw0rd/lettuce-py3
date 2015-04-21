@@ -77,7 +77,7 @@ def gdal_release_date(date=False):
     """
     from datetime import date as date_type
     rel = _version_info('RELEASE_DATE')
-    yy, mm, dd = map(int, (rel[0:4], rel[4:6], rel[6:8]))
+    yy, mm, dd = list(map(int, (rel[0:4], rel[4:6], rel[6:8])))
     d = date_type(yy, mm, dd)
     if date: return d
     else: return d.strftime('%Y/%m/%d')

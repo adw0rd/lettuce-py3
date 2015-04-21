@@ -2,8 +2,8 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.test import TestCase
 
-from models.publication import Publication
-from models.article import Article
+from .models.publication import Publication
+from .models.article import Article
 
 
 class Advertisment(models.Model):

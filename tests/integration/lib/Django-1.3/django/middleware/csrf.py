@@ -30,7 +30,7 @@ if hasattr(random, 'SystemRandom'):
     randrange = random.SystemRandom().randrange
 else:
     randrange = random.randrange
-_MAX_CSRF_KEY = 18446744073709551616L     # 2 << 63
+_MAX_CSRF_KEY = 18446744073709551616     # 2 << 63
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match %s."
@@ -279,7 +279,7 @@ class CsrfResponseMiddleware(object):
             def add_csrf_field(match):
                 """Returns the matched <form> tag plus the added <input> element"""
                 return mark_safe(match.group() + "<div style='display:none;'>" + \
-                "<input type='hidden' " + idattributes.next() + \
+                "<input type='hidden' " + next(idattributes) + \
                 " name='csrfmiddlewaretoken' value='" + csrf_token + \
                 "' /></div>")
 

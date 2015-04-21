@@ -11,13 +11,13 @@ class DeletionTests(TestCase):
         poet = Poet.objects.create(name='test')
         poem = poet.poem_set.create(name='test poem')
         data = {
-            'poem_set-TOTAL_FORMS': u'1',
-            'poem_set-INITIAL_FORMS': u'1',
-            'poem_set-MAX_NUM_FORMS': u'0',
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '1',
+            'poem_set-MAX_NUM_FORMS': '0',
             'poem_set-0-id': str(poem.pk),
             'poem_set-0-poet': str(poet.pk),
-            'poem_set-0-name': u'test',
-            'poem_set-0-DELETE': u'on',
+            'poem_set-0-name': 'test',
+            'poem_set-0-DELETE': 'on',
         }
         formset = PoemFormSet(data, instance=poet)
         formset.save()
@@ -32,12 +32,12 @@ class DeletionTests(TestCase):
         PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True)
         poet = Poet.objects.create(name='test')
         data = {
-            'poem_set-TOTAL_FORMS': u'1',
-            'poem_set-INITIAL_FORMS': u'0',
-            'poem_set-MAX_NUM_FORMS': u'0',
-            'poem_set-0-id': u'',
-            'poem_set-0-poem': u'1',
-            'poem_set-0-name': u'x' * 1000,
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '0',
+            'poem_set-MAX_NUM_FORMS': '0',
+            'poem_set-0-id': '',
+            'poem_set-0-poem': '1',
+            'poem_set-0-name': 'x' * 1000,
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
@@ -61,12 +61,12 @@ class DeletionTests(TestCase):
         poet = Poet.objects.create(name='test')
         poet.poem_set.create(name='test poem')
         data = {
-            'poem_set-TOTAL_FORMS': u'1',
-            'poem_set-INITIAL_FORMS': u'1',
-            'poem_set-MAX_NUM_FORMS': u'0',
-            'poem_set-0-id': u'1',
-            'poem_set-0-poem': u'1',
-            'poem_set-0-name': u'x' * 1000,
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '1',
+            'poem_set-MAX_NUM_FORMS': '0',
+            'poem_set-0-id': '1',
+            'poem_set-0-poem': '1',
+            'poem_set-0-name': 'x' * 1000,
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
@@ -88,14 +88,14 @@ class DeletionTests(TestCase):
         """
         # exclude some required field from the forms
         ChildFormSet = inlineformset_factory(School, Child, exclude=['father', 'mother'])
-        school = School.objects.create(name=u'test')
-        mother = Parent.objects.create(name=u'mother')
-        father = Parent.objects.create(name=u'father')
+        school = School.objects.create(name='test')
+        mother = Parent.objects.create(name='mother')
+        father = Parent.objects.create(name='father')
         data = {
-            'child_set-TOTAL_FORMS': u'1',
-            'child_set-INITIAL_FORMS': u'0',
-            'child_set-MAX_NUM_FORMS': u'0',
-            'child_set-0-name': u'child',
+            'child_set-TOTAL_FORMS': '1',
+            'child_set-INITIAL_FORMS': '0',
+            'child_set-MAX_NUM_FORMS': '0',
+            'child_set-0-name': 'child',
         }
         formset = ChildFormSet(data, instance=school)
         self.assertEqual(formset.is_valid(), True)
@@ -112,7 +112,7 @@ class InlineFormsetFactoryTest(TestCase):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
-        except error, e:
+        except error as e:
             self.assertEqual(message, str(e))
 
     def test_inline_formset_factory(self):

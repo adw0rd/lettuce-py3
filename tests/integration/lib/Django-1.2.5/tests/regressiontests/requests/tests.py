@@ -11,16 +11,16 @@ class RequestsTests(unittest.TestCase):
 
     def test_httprequest(self):
         request = HttpRequest()
-        self.assertEqual(request.GET.keys(), [])
-        self.assertEqual(request.POST.keys(), [])
-        self.assertEqual(request.COOKIES.keys(), [])
-        self.assertEqual(request.META.keys(), [])
+        self.assertEqual(list(request.GET.keys()), [])
+        self.assertEqual(list(request.POST.keys()), [])
+        self.assertEqual(list(request.COOKIES.keys()), [])
+        self.assertEqual(list(request.META.keys()), [])
 
     def test_wsgirequest(self):
         request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus'})
-        self.assertEqual(request.GET.keys(), [])
-        self.assertEqual(request.POST.keys(), [])
-        self.assertEqual(request.COOKIES.keys(), [])
+        self.assertEqual(list(request.GET.keys()), [])
+        self.assertEqual(list(request.POST.keys()), [])
+        self.assertEqual(list(request.COOKIES.keys()), [])
         self.assertEqual(set(request.META.keys()), set(['PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME']))
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
@@ -40,10 +40,10 @@ class RequestsTests(unittest.TestCase):
         req.uri = 'bogus'
         request = FakeModPythonRequest(req)
         self.assertEqual(request.path, 'bogus')
-        self.assertEqual(request.GET.keys(), [])
-        self.assertEqual(request.POST.keys(), [])
-        self.assertEqual(request.COOKIES.keys(), [])
-        self.assertEqual(request.META.keys(), [])
+        self.assertEqual(list(request.GET.keys()), [])
+        self.assertEqual(list(request.POST.keys()), [])
+        self.assertEqual(list(request.COOKIES.keys()), [])
+        self.assertEqual(list(request.META.keys()), [])
 
     def test_parse_cookie(self):
         self.assertEqual(parse_cookie('invalid:key=true'), {})

@@ -18,7 +18,7 @@ class UKPostcodeField(CharField):
     The value is uppercased and a space added in the correct place, if required.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid postcode.'),
+        'invalid': _('Enter a valid postcode.'),
     }
     outcode_pattern = '[A-PR-UWYZ]([0-9]{1,2}|([A-HIK-Y][0-9](|[0-9]|[ABEHMNPRVWXY]))|[0-9][A-HJKSTUW])'
     incode_pattern = '[0-9][ABD-HJLNP-UW-Z]{2}'
@@ -27,7 +27,7 @@ class UKPostcodeField(CharField):
 
     def clean(self, value):
         value = super(UKPostcodeField, self).clean(value)
-        if value == u'':
+        if value == '':
             return value
         postcode = value.upper().strip()
         # Put a single space before the incode (second part).
@@ -41,7 +41,7 @@ class UKCountySelect(Select):
     A Select widget that uses a list of UK Counties/Regions as its choices.
     """
     def __init__(self, attrs=None):
-        from uk_regions import UK_REGION_CHOICES
+        from .uk_regions import UK_REGION_CHOICES
         super(UKCountySelect, self).__init__(attrs, choices=UK_REGION_CHOICES)
 
 class UKNationSelect(Select):
@@ -49,5 +49,5 @@ class UKNationSelect(Select):
     A Select widget that uses a list of UK Nations as its choices.
     """
     def __init__(self, attrs=None):
-        from uk_regions import UK_NATIONS_CHOICES
+        from .uk_regions import UK_NATIONS_CHOICES
         super(UKNationSelect, self).__init__(attrs, choices=UK_NATIONS_CHOICES)

@@ -23,7 +23,7 @@ class NOMunicipalitySelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from no_municipalities import MUNICIPALITY_CHOICES
+        from .no_municipalities import MUNICIPALITY_CHOICES
         super(NOMunicipalitySelect, self).__init__(attrs, choices=MUNICIPALITY_CHOICES)
 
 class NOSocialSecurityNumber(Field):
@@ -31,13 +31,13 @@ class NOSocialSecurityNumber(Field):
     Algorithm is documented at http://no.wikipedia.org/wiki/Personnummer
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid Norwegian social security number.'),
+        'invalid': _('Enter a valid Norwegian social security number.'),
     }
 
     def clean(self, value):
         super(NOSocialSecurityNumber, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         if not re.match(r'^\d{11}$', value):
             raise ValidationError(self.error_messages['invalid'])
@@ -66,7 +66,7 @@ class NOSocialSecurityNumber(Field):
         else:
             self.gender = 'M'
 
-        digits = map(int, list(value))
+        digits = list(map(int, list(value)))
         weight_1 = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0]
         weight_2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1]
 

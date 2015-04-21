@@ -11,7 +11,7 @@ class Bug8245Test(TestCase):
         # The first time autodiscover is called, we should get our real error.
         try:
             admin.autodiscover()
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(str(e), "Bad admin module")
         else:
             self.fail(
@@ -21,7 +21,7 @@ class Bug8245Test(TestCase):
         # the first time, not an AlreadyRegistered error.
         try:
             admin.autodiscover()
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(str(e), "Bad admin module")
         else:
             self.fail(

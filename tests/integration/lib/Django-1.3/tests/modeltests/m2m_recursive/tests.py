@@ -2,7 +2,7 @@ from operator import attrgetter
 
 from django.test import TestCase
 
-from models import Person
+from .models import Person
 
 
 class RecursiveM2MTests(TestCase):

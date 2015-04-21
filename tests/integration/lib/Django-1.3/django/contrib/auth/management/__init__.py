@@ -7,13 +7,13 @@ from django.db.models import get_models, signals
 
 
 def _get_permission_codename(action, opts):
-    return u'%s_%s' % (action, opts.object_name.lower())
+    return '%s_%s' % (action, opts.object_name.lower())
 
 def _get_all_permissions(opts):
     "Returns (codename, name) for all permissions in the given opts."
     perms = []
     for action in ('add', 'change', 'delete'):
-        perms.append((_get_permission_codename(action, opts), u'Can %s %s' % (action, opts.verbose_name_raw)))
+        perms.append((_get_permission_codename(action, opts), 'Can %s %s' % (action, opts.verbose_name_raw)))
     return perms + list(opts.permissions)
 
 def create_permissions(app, created_models, verbosity, **kwargs):
@@ -51,7 +51,7 @@ def create_permissions(app, created_models, verbosity, **kwargs):
             content_type=ctype
         )
         if verbosity >= 2:
-            print "Adding permission '%s'" % p
+            print("Adding permission '%s'" % p)
 
 
 def create_superuser(app, created_models, verbosity, **kwargs):
@@ -61,10 +61,10 @@ def create_superuser(app, created_models, verbosity, **kwargs):
         msg = ("\nYou just installed Django's auth system, which means you "
             "don't have any superusers defined.\nWould you like to create one "
             "now? (yes/no): ")
-        confirm = raw_input(msg)
+        confirm = input(msg)
         while 1:
             if confirm not in ('yes', 'no'):
-                confirm = raw_input('Please enter either "yes" or "no": ')
+                confirm = input('Please enter either "yes" or "no": ')
                 continue
             if confirm == 'yes':
                 call_command("createsuperuser", interactive=True)

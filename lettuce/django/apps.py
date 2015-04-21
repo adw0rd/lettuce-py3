@@ -50,7 +50,7 @@ def _filter_configured_avoids(module):
 
 
 def get_apps():
-    return map(import_module, settings.INSTALLED_APPS)
+    return list(map(import_module, settings.INSTALLED_APPS))
 
 
 def harvest_lettuces(only_the_apps=None, avoid_apps=None, path="features"):
@@ -64,18 +64,18 @@ def harvest_lettuces(only_the_apps=None, avoid_apps=None, path="features"):
 
         def _filter_only_specified(module):
             return module.__name__ in only_the_apps
-        apps = filter(_filter_only_specified, apps)
+        apps = list(filter(_filter_only_specified, apps))
     else:
-        apps = filter(_filter_bultins, apps)
-        apps = filter(_filter_configured_apps, apps)
-        apps = filter(_filter_configured_avoids, apps)
+        apps = list(filter(_filter_bultins, apps))
+        apps = list(filter(_filter_configured_apps, apps))
+        apps = list(filter(_filter_configured_avoids, apps))
 
     if isinstance(avoid_apps, tuple) and any(avoid_apps):
 
         def _filter_avoid(module):
             return module.__name__ not in avoid_apps
 
-        apps = filter(_filter_avoid, apps)
+        apps = list(filter(_filter_avoid, apps))
 
     joinpath = lambda app: (join(dirname(app.__file__), path), app)
-    return map(joinpath, apps)
+    return list(map(joinpath, apps))

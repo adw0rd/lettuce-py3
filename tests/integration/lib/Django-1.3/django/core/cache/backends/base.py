@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
 from django.utils.encoding import smart_str
 from django.utils.importlib import import_module
+import collections
 
 class InvalidCacheBackendError(ImproperlyConfigured):
     pass
@@ -33,7 +34,7 @@ def get_key_func(key_func):
     Defaults to ``default_key_func``.
     """
     if key_func is not None:
-        if callable(key_func):
+        if isinstance(key_func, collections.Callable):
             return key_func
         else:
             key_func_module_path, key_func_name = key_func.rsplit('.', 1)
@@ -158,7 +159,7 @@ class BaseCache(object):
         # This is a separate method, rather than just a copy of has_key(),
         # so that it always has the same functionality as has_key(), even
         # if a subclass overrides it.
-        return self.has_key(key)
+        return key in self
 
     def set_many(self, data, timeout=None, version=None):
         """
@@ -169,7 +170,7 @@ class BaseCache(object):
         If timeout is given, that timeout will be used for the key; otherwise
         the default cache timeout will be used.
         """
-        for key, value in data.items():
+        for key, value in list(data.items()):
             self.set(key, value, timeout=timeout, version=version)
 
     def delete_many(self, keys, version=None):

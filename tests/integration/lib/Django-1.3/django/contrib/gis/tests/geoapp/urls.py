@@ -1,11 +1,11 @@
 from django.conf.urls.defaults import *
-from feeds import feed_dict
+from .feeds import feed_dict
 
 urlpatterns = patterns('',
     (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feed_dict}),
 )
 
-from sitemaps import sitemaps
+from .sitemaps import sitemaps
 urlpatterns += patterns('django.contrib.gis.sitemaps.views',
     (r'^sitemap.xml$', 'index', {'sitemaps' : sitemaps}),
     (r'^sitemaps/(?P<section>\w+)\.xml$', 'sitemap', {'sitemaps' : sitemaps}),

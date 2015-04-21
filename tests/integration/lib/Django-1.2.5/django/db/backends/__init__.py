@@ -211,7 +211,7 @@ class BaseDatabaseOperations(object):
         if isinstance(params, (list, tuple)):
             u_params = tuple([to_unicode(val) for val in params])
         else:
-            u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in params.items()])
+            u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in list(params.items())])
 
         return smart_unicode(sql) % u_params
 
@@ -397,7 +397,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return str(value)
 
     def value_to_db_time(self, value):
         """
@@ -406,7 +406,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return str(value)
 
     def value_to_db_decimal(self, value, max_digits, decimal_places):
         """
@@ -535,7 +535,7 @@ class BaseDatabaseIntrospection(object):
                 if router.allow_syncdb(self.connection.alias, model):
                     all_models.append(model)
         return set([m for m in all_models
-            if self.table_name_converter(m._meta.db_table) in map(self.table_name_converter, tables)
+            if self.table_name_converter(m._meta.db_table) in list(map(self.table_name_converter, tables))
         ])
 
     def sequence_list(self):

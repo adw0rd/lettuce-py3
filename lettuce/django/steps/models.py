@@ -23,8 +23,8 @@ def _models_generator():
     Build a hash of model verbose names to models
     """
     for model in get_models():
-        yield (unicode(model._meta.verbose_name), model)
-        yield (unicode(model._meta.verbose_name_plural), model)
+        yield (str(model._meta.verbose_name), model)
+        yield (str(model._meta.verbose_name_plural), model)
 
 
 MODELS = dict(_models_generator())
@@ -90,8 +90,8 @@ def hash_data(hash_):
     Convert strings from a Lettuce hash to appropriate types
     """
     res = {}
-    for key, value in hash_.items():
-        if type(value) in (str, unicode):
+    for key, value in list(hash_.items()):
+        if type(value) in (str, str):
             if value == "true":
                 value = True
             elif value == "false":
@@ -163,7 +163,7 @@ def write_models(model, data, field=None):
             model_kwargs = {field: hash_[field]}
             model_obj = model.objects.get(**model_kwargs)
 
-            for to_set, val in hash_.items():
+            for to_set, val in list(hash_.items()):
                 setattr(model_obj, to_set, val)
 
             model_obj.save()
@@ -183,20 +183,20 @@ def _dump_model(model, attrs=None):
     """
 
     for field in model._meta.fields:
-        print '%s=%s,' % (field.name, str(getattr(model, field.name))),
+        print('%s=%s,' % (field.name, str(getattr(model, field.name))), end=' ')
 
     if attrs is not None:
         for attr in attrs:
-            print '%s=%s,' % (attr, str(getattr(model, attr))),
+            print('%s=%s,' % (attr, str(getattr(model, attr))), end=' ')
 
     for field in model._meta.many_to_many:
         vals = getattr(model, field.name)
-        print '%s=%s (%i),' % (
+        print('%s=%s (%i),' % (
             field.name,
             ', '.join(map(str, vals.all())),
-            vals.count()),
+            vals.count()), end=' ')
 
-    print
+    print()
 
 
 def models_exist(model, data, queryset=None):
@@ -215,7 +215,7 @@ def models_exist(model, data, queryset=None):
         for hash_ in data:
             fields = {}
             extra_attrs = {}
-            for k, v in hash_.iteritems():
+            for k, v in hash_.items():
                 if k.startswith('@'):
                     # this is an attribute
                     extra_attrs[k[1:]] = v
@@ -228,7 +228,7 @@ def models_exist(model, data, queryset=None):
             if filtered.exists():
                 for obj in filtered.all():
                     if all(getattr(obj, k) == v
-                            for k, v in extra_attrs.iteritems()):
+                            for k, v in extra_attrs.items()):
                         match = True
                         break
 
@@ -237,13 +237,13 @@ def models_exist(model, data, queryset=None):
                 model.__name__, hash_, filtered.query)
 
     except AssertionError as exc:
-        print exc
+        print(exc)
         failed += 1
 
     if failed:
-        print "Rows in DB are:"
+        print("Rows in DB are:")
         for model in queryset.all():
-            _dump_model(model, extra_attrs.keys())
+            _dump_model(model, list(extra_attrs.keys()))
 
         raise AssertionError("%i rows missing" % failed)
 

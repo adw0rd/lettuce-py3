@@ -26,12 +26,12 @@ class SitesFrameworkTests(TestCase):
         # After updating a Site object (e.g. via the admin), we shouldn't return a
         # bogus value from the SITE_CACHE.
         site = Site.objects.get_current()
-        self.assertEqual(u"example.com", site.name)
+        self.assertEqual("example.com", site.name)
         s2 = Site.objects.get(id=settings.SITE_ID)
         s2.name = "Example site"
         s2.save()
         site = Site.objects.get_current()
-        self.assertEqual(u"Example site", site.name)
+        self.assertEqual("Example site", site.name)
 
     def test_get_current_site(self):
         # Test that the correct Site object is returned
@@ -53,4 +53,4 @@ class SitesFrameworkTests(TestCase):
         Site._meta.installed = False
         site = get_current_site(request)
         self.assertTrue(isinstance(site, RequestSite))
-        self.assertEqual(site.name, u"example.com")
+        self.assertEqual(site.name, "example.com")

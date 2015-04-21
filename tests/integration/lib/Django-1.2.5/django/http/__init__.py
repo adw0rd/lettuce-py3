@@ -1,9 +1,9 @@
 import os
 import re
-from Cookie import BaseCookie, SimpleCookie, CookieError
+from http.cookies import BaseCookie, SimpleCookie, CookieError
 from pprint import pformat
-from urllib import urlencode
-from urlparse import urljoin
+from urllib.parse import urlencode
+from urllib.parse import urljoin
 try:
     # The mod_python version is more efficient, so try importing it first.
     from mod_python.util import parse_qsl
@@ -15,7 +15,7 @@ from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.http.multipartparser import MultiPartParser
 from django.conf import settings
 from django.core.files import uploadhandler
-from utils import *
+from .utils import *
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
@@ -216,7 +216,7 @@ class QueryDict(MultiValueDict):
                 for value in valuelist:
                     MultiValueDict.update(self, {f(key): f(value)})
         else:
-            d = dict([(f(k), f(v)) for k, v in other_dict.items()])
+            d = dict([(f(k), f(v)) for k, v in list(other_dict.items())])
             MultiValueDict.update(self, d)
 
     def pop(self, key, *args):
@@ -289,7 +289,7 @@ def parse_cookie(cookie):
     else:
         c = cookie
     cookiedict = {}
-    for key in c.keys():
+    for key in list(c.keys()):
         cookiedict[key] = c.get(key).value
     return cookiedict
 
@@ -313,7 +313,7 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
-        if not isinstance(content, basestring) and hasattr(content, '__iter__'):
+        if not isinstance(content, str) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
         else:
@@ -328,16 +328,16 @@ class HttpResponse(object):
     def __str__(self):
         """Full HTTP message, including headers."""
         return '\n'.join(['%s: %s' % (key, value)
-            for key, value in self._headers.values()]) \
+            for key, value in list(self._headers.values())]) \
             + '\n\n' + self.content
 
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
         for value in values:
-            if isinstance(value, unicode):
+            if isinstance(value, str):
                 try:
                     value = value.encode('us-ascii')
-                except UnicodeError, e:
+                except UnicodeError as e:
                     e.reason += ', HTTP response headers must be in US-ASCII format'
                     raise
             else:
@@ -361,12 +361,12 @@ class HttpResponse(object):
 
     def has_header(self, header):
         """Case-insensitive check for a header."""
-        return self._headers.has_key(header.lower())
+        return header.lower() in self._headers
 
     __contains__ = has_header
 
     def items(self):
-        return self._headers.values()
+        return list(self._headers.values())
 
     def get(self, header, alternate):
         return self._headers.get(header.lower(), (None, alternate))[1]
@@ -404,9 +404,9 @@ class HttpResponse(object):
         self._iterator = iter(self._container)
         return self
 
-    def next(self):
-        chunk = self._iterator.next()
-        if isinstance(chunk, unicode):
+    def __next__(self):
+        chunk = next(self._iterator)
+        if isinstance(chunk, str):
             chunk = chunk.encode(self._charset)
         return str(chunk)
 
@@ -485,12 +485,12 @@ def str_to_unicode(s, encoding):
     """
     Converts basestring objects to unicode, using the given encoding. Illegally
     encoded input characters are replaced with Unicode "unknown" codepoint
-    (\ufffd).
+    (\\ufffd).
 
     Returns any non-basestring objects without change.
     """
     if isinstance(s, str):
-        return unicode(s, encoding, 'replace')
+        return str(s, encoding, 'replace')
     else:
         return s
 

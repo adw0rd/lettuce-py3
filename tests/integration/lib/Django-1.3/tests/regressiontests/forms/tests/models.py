@@ -34,7 +34,7 @@ class ModelFormCallableModelDefault(TestCase):
 
         choices = list(ChoiceFieldForm().fields['choice'].choices)
         self.assertEqual(len(choices), 1)
-        self.assertEqual(choices[0], (option.pk, unicode(option)))
+        self.assertEqual(choices[0], (option.pk, str(option)))
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"
@@ -104,7 +104,7 @@ class FormsModelTestCase(TestCase):
         self.assertTrue(f.is_valid())
         self.assertTrue('file1' in f.cleaned_data)
         m = FileModel.objects.create(file=f.cleaned_data['file1'])
-        self.assertEqual(m.file.name, u'tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt')
+        self.assertEqual(m.file.name, 'tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt')
         m.delete()
 
     def test_boundary_conditions(self):
@@ -128,7 +128,7 @@ class FormsModelTestCase(TestCase):
             class Meta:
                 model = Defaults
 
-        self.assertEqual(DefaultsForm().fields['name'].initial, u'class default value')
+        self.assertEqual(DefaultsForm().fields['name'].initial, 'class default value')
         self.assertEqual(DefaultsForm().fields['def_date'].initial, datetime.date(1980, 1, 1))
         self.assertEqual(DefaultsForm().fields['value'].initial, 42)
         r1 = DefaultsForm()['callable_default'].as_widget()
@@ -137,9 +137,9 @@ class FormsModelTestCase(TestCase):
 
         # In a ModelForm that is passed an instance, the initial values come from the
         # instance's values, not the model's defaults.
-        foo_instance = Defaults(name=u'instance value', def_date=datetime.date(1969, 4, 4), value=12)
+        foo_instance = Defaults(name='instance value', def_date=datetime.date(1969, 4, 4), value=12)
         instance_form = DefaultsForm(instance=foo_instance)
-        self.assertEqual(instance_form.initial['name'], u'instance value')
+        self.assertEqual(instance_form.initial['name'], 'instance value')
         self.assertEqual(instance_form.initial['def_date'], datetime.date(1969, 4, 4))
         self.assertEqual(instance_form.initial['value'], 12)
 
@@ -152,10 +152,10 @@ class FormsModelTestCase(TestCase):
                 model = Defaults
                 exclude = ['name', 'callable_default']
 
-        f = ExcludingForm({'name': u'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
+        f = ExcludingForm({'name': 'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['name'], u'Hello')
+        self.assertEqual(f.cleaned_data['name'], 'Hello')
         obj = f.save()
-        self.assertEqual(obj.name, u'class default value')
+        self.assertEqual(obj.name, 'class default value')
         self.assertEqual(obj.value, 99)
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))

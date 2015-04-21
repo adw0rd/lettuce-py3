@@ -5,7 +5,7 @@ import posixpath
 import shutil
 import sys
 import tempfile
-from StringIO import StringIO
+from io import StringIO
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
@@ -66,10 +66,10 @@ class StaticFilesTestCase(TestCase):
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
         self._nonascii_filepath = os.path.join(
-            TEST_ROOT, 'apps', 'test', 'static', 'test', u'fi\u015fier.txt')
+            TEST_ROOT, 'apps', 'test', 'static', 'test', 'fi\u015fier.txt')
         f = codecs.open(self._nonascii_filepath, 'w', 'utf-8')
         try:
-            f.write(u"fi\u015fier in the app dir")
+            f.write("fi\u015fier in the app dir")
         finally:
             f.close()
 
@@ -88,7 +88,7 @@ class StaticFilesTestCase(TestCase):
 
     def assertFileContains(self, filepath, text):
         self.assertTrue(text in self._get_file(smart_unicode(filepath)),
-                        u"'%s' not in '%s'" % (text, filepath))
+                        "'%s' not in '%s'" % (text, filepath))
 
     def assertFileNotFound(self, filepath):
         self.assertRaises(IOError, self._get_file, filepath)
@@ -163,13 +163,13 @@ class TestDefaults(object):
         """
         Can find a file with non-ASCII character in an app static/ directory.
         """
-        self.assertFileContains(u'test/fişier.txt', u'fişier in the app dir')
+        self.assertFileContains('test/fişier.txt', 'fişier in the app dir')
 
     def test_camelcase_filenames(self):
         """
         Can find a file with capital letters.
         """
-        self.assertFileContains(u'test/camelCase.txt', u'camelCase')
+        self.assertFileContains('test/camelCase.txt', 'camelCase')
 
 
 class TestFindStatic(BuildStaticTestCase, TestDefaults):

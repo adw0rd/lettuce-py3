@@ -61,7 +61,7 @@ class ModelDatabrowse(object):
 
     def main_view(self, request):
         easy_model = EasyModel(self.site, self.model)
-        html_snippets = mark_safe(u'\n'.join([p.model_index_html(request, self.model, self.site) for p in self.plugins.values()]))
+        html_snippets = mark_safe('\n'.join([p.model_index_html(request, self.model, self.site) for p in list(self.plugins.values())]))
         return render_to_response('databrowse/model_detail.html', {
             'model': easy_model,
             'root_url': self.site.root_url,
@@ -122,7 +122,7 @@ class DatabrowseSite(object):
         raise http.Http404('The requested databrowse page does not exist.')
 
     def index(self, request):
-        m_list = [EasyModel(self, m) for m in self.registry.keys()]
+        m_list = [EasyModel(self, m) for m in list(self.registry.keys())]
         return render_to_response('databrowse/homepage.html', {'model_list': m_list, 'root_url': self.root_url})
 
     def model_page(self, request, app_label, model_name, rest_of_url=None):

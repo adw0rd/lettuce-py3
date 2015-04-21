@@ -7,7 +7,7 @@ from django.db import models
 
 class DefaultRepr(object):
     def __repr__(self):
-        return u"<%s: %s>" % (self.__class__.__name__, self.__dict__)
+        return "<%s: %s>" % (self.__class__.__name__, self.__dict__)
 
 class A(DefaultRepr, models.Model):
     pass

@@ -7,7 +7,7 @@ class Reporter(object):
         self.scenarios_and_its_fails = {}
 
     def wrt(self, what):
-        if isinstance(what, unicode):
+        if isinstance(what, str):
             what = what.encode('utf-8')
         sys.stdout.write(what)
 
@@ -28,7 +28,7 @@ class Reporter(object):
             self.wrt("\n")
             for scenario in self.failed_scenarios:
                 reason = self.scenarios_and_its_fails[scenario]
-                self.wrt(unicode(reason.step))
+                self.wrt(str(reason.step))
                 self.wrt("\n")
                 self.wrt(reason.traceback)
 

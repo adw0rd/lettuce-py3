@@ -15,7 +15,7 @@ class Issue(models.Model):
     client = models.ForeignKey(User, related_name='test_issue_client')
 
     def __unicode__(self):
-        return unicode(self.num)
+        return str(self.num)
 
     class Meta:
         ordering = ('num',)

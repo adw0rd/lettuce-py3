@@ -22,6 +22,7 @@ from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
     ExtraWhere, AND, OR)
 from django.core.exceptions import FieldError
+import collections
 
 __all__ = ['Query', 'RawQuery']
 
@@ -207,7 +208,7 @@ class Query(object):
             connection = connections[using]
 
         # Check that the compiler will be able to execute the query
-        for alias, aggregate in self.aggregate_select.items():
+        for alias, aggregate in list(self.aggregate_select.items()):
             connection.ops.check_aggregate_support(aggregate)
 
         return connection.ops.compiler(self.compiler)(self, connection, using)
@@ -339,7 +340,7 @@ class Query(object):
 
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
-            for alias, aggregate in self.aggregate_select.items():
+            for alias, aggregate in list(self.aggregate_select.items()):
                 if aggregate.is_summary:
                     query.aggregate_select[alias] = aggregate
                     del obj.aggregate_select[alias]
@@ -366,12 +367,12 @@ class Query(object):
 
         result = query.get_compiler(using).execute_sql(SINGLE)
         if result is None:
-            result = [None for q in query.aggregate_select.items()]
+            result = [None for q in list(query.aggregate_select.items())]
 
         return dict([
             (alias, self.resolve_aggregate(val, aggregate, connection=connections[using]))
             for (alias, aggregate), val
-            in zip(query.aggregate_select.items(), result)
+            in zip(list(query.aggregate_select.items()), result)
         ])
 
     def get_count(self, using):
@@ -570,22 +571,22 @@ class Query(object):
             # slight complexity here is handling fields that exist on parent
             # models.
             workset = {}
-            for model, values in seen.iteritems():
+            for model, values in seen.items():
                 for field, m in model._meta.get_fields_with_model():
                     if field in values:
                         continue
                     add_to_dict(workset, m or model, field)
-            for model, values in must_include.iteritems():
+            for model, values in must_include.items():
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
                 # empty set means "include all fields". That's why there's no
                 # "else" branch here.
                 if model in workset:
                     workset[model].update(values)
-            for model, values in workset.iteritems():
+            for model, values in workset.items():
                 callback(target, model, values)
         else:
-            for model, values in must_include.iteritems():
+            for model, values in must_include.items():
                 if model in seen:
                     seen[model].update(values)
                 else:
@@ -599,7 +600,7 @@ class Query(object):
             for model in orig_opts.get_parent_list():
                 if model not in seen:
                     seen[model] = set()
-            for model, values in seen.iteritems():
+            for model, values in seen.items():
                 callback(target, model, values)
 
 
@@ -718,7 +719,7 @@ class Query(object):
                 else:
                     col.relabel_aliases(change_map)
         for mapping in [self.aggregates]:
-            for key, col in mapping.items():
+            for key, col in list(mapping.items()):
                 if isinstance(col, (list, tuple)):
                     old_alias = col[0]
                     mapping[key] = (change_map.get(old_alias, old_alias), col[1])
@@ -726,7 +727,7 @@ class Query(object):
                     col.relabel_aliases(change_map)
 
         # 2. Rename the alias in the internal table/alias datastructures.
-        for old_alias, new_alias in change_map.iteritems():
+        for old_alias, new_alias in change_map.items():
             alias_data = list(self.alias_map[old_alias])
             alias_data[RHS_ALIAS] = new_alias
 
@@ -750,12 +751,12 @@ class Query(object):
                 if alias == old_alias:
                     self.tables[pos] = new_alias
                     break
-        for key, alias in self.included_inherited_models.items():
+        for key, alias in list(self.included_inherited_models.items()):
             if alias in change_map:
                 self.included_inherited_models[key] = change_map[alias]
 
         # 3. Update any joins that refer to the old alias.
-        for alias, data in self.alias_map.iteritems():
+        for alias, data in self.alias_map.items():
             lhs = data[LHS_ALIAS]
             if lhs in change_map:
                 data = list(data)
@@ -805,7 +806,7 @@ class Query(object):
         Returns the number of tables in this query with a non-zero reference
         count.
         """
-        return len([1 for count in self.alias_refcount.itervalues() if count])
+        return len([1 for count in self.alias_refcount.values() if count])
 
     def join(self, connection, always_create=False, exclusions=(),
             promote=False, outer_if_first=False, nullable=False, reuse=None):
@@ -919,7 +920,7 @@ class Query(object):
         Undoes the effects of setup_inherited_models(). Should be called
         whenever select columns (self.select) are set explicitly.
         """
-        for key, alias in self.included_inherited_models.items():
+        for key, alias in list(self.included_inherited_models.items()):
             if key:
                 self.unref_alias(alias)
         self.included_inherited_models = {}
@@ -1034,7 +1035,7 @@ class Query(object):
                 raise ValueError("Cannot use None as a query value")
             lookup_type = 'isnull'
             value = True
-        elif callable(value):
+        elif isinstance(value, collections.Callable):
             value = value()
         elif hasattr(value, 'evaluate'):
             # If value is a query expression, evaluate it
@@ -1058,7 +1059,7 @@ class Query(object):
             field, target, opts, join_list, last, extra_filters = self.setup_joins(
                     parts, opts, alias, True, allow_many, can_reuse=can_reuse,
                     negate=negate, process_extras=process_extras)
-        except MultiJoin, e:
+        except MultiJoin as e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                     can_reuse)
             return
@@ -1082,11 +1083,11 @@ class Query(object):
             # join list) an outer join.
             join_it = iter(join_list)
             table_it = iter(self.tables)
-            join_it.next(), table_it.next()
+            next(join_it), next(table_it)
             table_promote = False
             join_promote = False
             for join in join_it:
-                table = table_it.next()
+                table = next(table_it)
                 if join == table and self.alias_refcount[join] > 1:
                     continue
                 join_promote = self.promote_alias(join)
@@ -1233,7 +1234,7 @@ class Query(object):
                         field, model, direct, m2m = opts.get_field_by_name(f.name)
                         break
                 else:
-                    names = opts.get_all_field_names() + self.aggregate_select.keys()
+                    names = opts.get_all_field_names() + list(self.aggregate_select.keys())
                     raise FieldError("Cannot resolve keyword %r into field. "
                             "Choices are: %s" % (name, ", ".join(names)))
 
@@ -1495,7 +1496,7 @@ class Query(object):
         # Tag.objects.exclude(parent__parent__name='t1'), a tag with no parent
         # would otherwise be overlooked).
         active_positions = [pos for (pos, count) in
-                enumerate(query.alias_refcount.itervalues()) if count]
+                enumerate(query.alias_refcount.values()) if count]
         if active_positions[-1] > 1:
             self.add_filter(('%s__isnull' % prefix, False), negate=True,
                     trim=True, can_reuse=can_reuse)
@@ -1572,7 +1573,7 @@ class Query(object):
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
-            names = opts.get_all_field_names() + self.extra.keys() + self.aggregate_select.keys()
+            names = opts.get_all_field_names() + list(self.extra.keys()) + list(self.aggregate_select.keys())
             names.sort()
             raise FieldError("Cannot resolve keyword %r into field. "
                     "Choices are: %s" % (name, ", ".join(names)))
@@ -1686,12 +1687,12 @@ class Query(object):
                 param_iter = iter(select_params)
             else:
                 param_iter = iter([])
-            for name, entry in select.items():
+            for name, entry in list(select.items()):
                 entry = force_unicode(entry)
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:
-                    entry_params.append(param_iter.next())
+                    entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
             # This is order preserving, since self.extra_select is a SortedDict.
@@ -1797,7 +1798,7 @@ class Query(object):
             return self._aggregate_select_cache
         elif self.aggregate_select_mask is not None:
             self._aggregate_select_cache = SortedDict([
-                (k,v) for k,v in self.aggregates.items()
+                (k,v) for k,v in list(self.aggregates.items())
                 if k in self.aggregate_select_mask
             ])
             return self._aggregate_select_cache
@@ -1810,7 +1811,7 @@ class Query(object):
             return self._extra_select_cache
         elif self.extra_select_mask is not None:
             self._extra_select_cache = SortedDict([
-                (k,v) for k,v in self.extra.items()
+                (k,v) for k,v in list(self.extra.items())
                 if k in self.extra_select_mask
             ])
             return self._extra_select_cache

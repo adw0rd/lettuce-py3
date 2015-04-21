@@ -1,6 +1,6 @@
 import os
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
@@ -219,7 +219,7 @@ class LoginTest(AuthViewsTestCase):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'bad_url': urllib.quote(bad_url)
+                'bad_url': urllib.parse.quote(bad_url)
             }
             response = self.client.post(nasty_url, {
                 'username': 'testclient',
@@ -242,7 +242,7 @@ class LoginTest(AuthViewsTestCase):
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'good_url': urllib.quote(good_url)
+                'good_url': urllib.parse.quote(good_url)
             }
             response = self.client.post(safe_url, {
                     'username': 'testclient',
@@ -382,7 +382,7 @@ class LogoutTest(AuthViewsTestCase):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
                 'url': logout_url,
                 'next': REDIRECT_FIELD_NAME,
-                'bad_url': urllib.quote(bad_url)
+                'bad_url': urllib.parse.quote(bad_url)
             }
             self.login()
             response = self.client.get(nasty_url)
@@ -403,7 +403,7 @@ class LogoutTest(AuthViewsTestCase):
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': logout_url,
                 'next': REDIRECT_FIELD_NAME,
-                'good_url': urllib.quote(good_url)
+                'good_url': urllib.parse.quote(good_url)
             }
             self.login()
             response = self.client.get(safe_url)

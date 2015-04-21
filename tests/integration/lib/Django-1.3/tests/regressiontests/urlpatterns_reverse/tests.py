@@ -11,10 +11,10 @@ from django.shortcuts import redirect
 from django.test import TestCase
 from django.utils import unittest
 
-import urlconf_outer
-import urlconf_inner
-import middleware
-import views
+from . import urlconf_outer
+from . import urlconf_inner
+from . import middleware
+from . import views
 
 resolve_test_data = (
     # These entries are in the format: (path, url_name, app_name, namespace, view_func, args, kwargs)
@@ -138,7 +138,7 @@ class NoURLPatternsTests(TestCase):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
-        except error, e:
+        except error as e:
             self.assertEqual(message, str(e))
 
     def test_no_urls_exception(self):
@@ -158,7 +158,7 @@ class URLPatternReverse(TestCase):
         for name, expected, args, kwargs in test_data:
             try:
                 got = reverse(name, args=args, kwargs=kwargs)
-            except NoReverseMatch, e:
+            except NoReverseMatch as e:
                 self.assertEqual(expected, NoReverseMatch)
             else:
                 self.assertEqual(got, expected)
@@ -204,7 +204,7 @@ class ResolverTests(unittest.TestCase):
         try:
             resolve('/included/non-existent-url', urlconf=urls)
             self.fail('resolve did not raise a 404')
-        except Resolver404, e:
+        except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
             self.assertTrue('tried' in e.args[0])
             tried = e.args[0]['tried']
@@ -251,7 +251,7 @@ class ReverseShortcutTests(TestCase):
         self.assertEqual(res['Location'], 'http://example.com/')
 
     def test_redirect_view_object(self):
-        from views import absolute_kwargs_view
+        from .views import absolute_kwargs_view
         res = redirect(absolute_kwargs_view)
         self.assertEqual(res['Location'], '/absolute_arg_view/')
         self.assertRaises(NoReverseMatch, redirect, absolute_kwargs_view, wrong_argument=None)
@@ -390,13 +390,13 @@ class ErrorHandlerResolutionTests(TestCase):
         self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
 
     def test_named_handlers(self):
-        from views import empty_view
+        from .views import empty_view
         handler = (empty_view, {})
         self.assertEqual(self.resolver.resolve404(), handler)
         self.assertEqual(self.resolver.resolve500(), handler)
 
     def test_callable_handers(self):
-        from views import empty_view
+        from .views import empty_view
         handler = (empty_view, {})
         self.assertEqual(self.callable_resolver.resolve404(), handler)
         self.assertEqual(self.callable_resolver.resolve500(), handler)

@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS, transaction, IntegrityError
 from django.test import TestCase
 
-from models import Employee, Business, Bar, Foo
+from .models import Employee, Business, Bar, Foo
 
 
 class CustomPKTests(TestCase):
@@ -15,7 +15,7 @@ class CustomPKTests(TestCase):
             Employee.objects.all(), [
                 "Dan Jones",
             ],
-            unicode
+            str
         )
 
         fran = Employee.objects.create(
@@ -26,7 +26,7 @@ class CustomPKTests(TestCase):
                 "Fran Bones",
                 "Dan Jones",
             ],
-            unicode
+            str
         )
 
         self.assertEqual(Employee.objects.get(pk=123), dan)
@@ -44,7 +44,7 @@ class CustomPKTests(TestCase):
                 "Fran Bones",
                 "Dan Jones",
             ],
-            unicode
+            str
         )
         # The primary key can be accessed via the pk property on the model.
         e = Employee.objects.get(pk=123)
@@ -62,7 +62,7 @@ class CustomPKTests(TestCase):
                 "Dan Jones",
                 "Fran Jones",
             ],
-            unicode
+            str
         )
 
         emps = Employee.objects.in_bulk([123, 456])
@@ -75,7 +75,7 @@ class CustomPKTests(TestCase):
                 "Dan Jones",
                 "Fran Jones",
             ],
-            unicode
+            str
         )
         self.assertQuerysetEqual(
             fran.business_set.all(), [
@@ -107,14 +107,14 @@ class CustomPKTests(TestCase):
                 "Dan Jones",
                 "Fran Jones",
             ],
-            unicode,
+            str,
         )
         self.assertQuerysetEqual(
             Employee.objects.filter(business__pk="Sears"), [
                 "Dan Jones",
                 "Fran Jones",
             ],
-            unicode,
+            str,
         )
 
         self.assertQuerysetEqual(
@@ -139,7 +139,7 @@ class CustomPKTests(TestCase):
 
     def test_unicode_pk(self):
         # Primary key may be unicode string
-        bus = Business.objects.create(name=u'jaźń')
+        bus = Business.objects.create(name='jaźń')
 
     def test_unique_pk(self):
         # The primary key must also obviously be unique, so trying to create a

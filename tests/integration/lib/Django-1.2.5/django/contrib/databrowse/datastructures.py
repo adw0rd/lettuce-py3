@@ -17,7 +17,7 @@ class EasyModel(object):
     def __init__(self, site, model):
         self.site = site
         self.model = model
-        self.model_list = site.registry.keys()
+        self.model_list = list(site.registry.keys())
         self.verbose_name = model._meta.verbose_name
         self.verbose_name_plural = model._meta.verbose_name_plural
 
@@ -61,7 +61,7 @@ class EasyField(object):
         self.model, self.field = easy_model, field
 
     def __repr__(self):
-        return smart_str(u'<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def choices(self):
         for value, label in self.field.choices:
@@ -79,7 +79,7 @@ class EasyChoice(object):
         self.value, self.label = value, label
 
     def __repr__(self):
-        return smart_str(u'<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def url(self):
         return mark_safe('%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, iri_to_uri(self.value)))
@@ -89,12 +89,12 @@ class EasyInstance(object):
         self.model, self.instance = easy_model, instance
 
     def __repr__(self):
-        return smart_str(u'<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
+        return smart_str('<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
 
     def __unicode__(self):
         val = smart_unicode(self.instance)
         if len(val) > DISPLAY_SIZE:
-            return val[:DISPLAY_SIZE] + u'...'
+            return val[:DISPLAY_SIZE] + '...'
         return val
 
     def __str__(self):
@@ -136,7 +136,7 @@ class EasyInstanceField(object):
         self.raw_value = getattr(instance.instance, field.name)
 
     def __repr__(self):
-        return smart_str(u'<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def values(self):
         """
@@ -173,31 +173,31 @@ class EasyInstanceField(object):
         "Returns a list of (value, URL) tuples."
         # First, check the urls() method for each plugin.
         plugin_urls = []
-        for plugin_name, plugin in self.model.model_databrowse().plugins.items():
+        for plugin_name, plugin in list(self.model.model_databrowse().plugins.items()):
             urls = plugin.urls(plugin_name, self)
             if urls is not None:
                 #plugin_urls.append(urls)
-                values = self.values()
-                return zip(self.values(), urls)
+                values = list(self.values())
+                return list(zip(list(self.values()), urls))
         if self.field.rel:
             m = EasyModel(self.model.site, self.field.rel.to)
             if self.field.rel.to in self.model.model_list:
                 lst = []
-                for value in self.values():
+                for value in list(self.values()):
                     url = mark_safe('%s%s/%s/objects/%s/' % (self.model.site.root_url, m.model._meta.app_label, m.model._meta.module_name, iri_to_uri(value._get_pk_val())))
                     lst.append((smart_unicode(value), url))
             else:
-                lst = [(value, None) for value in self.values()]
+                lst = [(value, None) for value in list(self.values())]
         elif self.field.choices:
             lst = []
-            for value in self.values():
+            for value in list(self.values()):
                 url = mark_safe('%s%s/%s/fields/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.name, iri_to_uri(self.raw_value)))
                 lst.append((value, url))
         elif isinstance(self.field, models.URLField):
-            val = self.values()[0]
+            val = list(self.values())[0]
             lst = [(val, iri_to_uri(val))]
         else:
-            lst = [(self.values()[0], None)]
+            lst = [(list(self.values())[0], None)]
         return lst
 
 class EasyQuerySet(QuerySet):

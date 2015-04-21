@@ -24,11 +24,11 @@ def paginator_number(cl,i):
     Generates an individual page index link in a paginated list.
     """
     if i == DOT:
-        return u'... '
+        return '... '
     elif i == cl.page_num:
-        return mark_safe(u'<span class="this-page">%d</span> ' % (i+1))
+        return mark_safe('<span class="this-page">%d</span> ' % (i+1))
     else:
-        return mark_safe(u'<a href="%s"%s>%d</a> ' % (escape(cl.get_query_string({PAGE_VAR: i})), (i == cl.paginator.num_pages-1 and ' class="end"' or ''), i+1))
+        return mark_safe('<a href="%s"%s>%d</a> ' % (escape(cl.get_query_string({PAGE_VAR: i})), (i == cl.paginator.num_pages-1 and ' class="end"' or ''), i+1))
 paginator_number = register.simple_tag(paginator_number)
 
 def pagination(cl):
@@ -47,24 +47,24 @@ def pagination(cl):
         # If there are 10 or fewer pages, display links to every page.
         # Otherwise, do some fancy
         if paginator.num_pages <= 10:
-            page_range = range(paginator.num_pages)
+            page_range = list(range(paginator.num_pages))
         else:
             # Insert "smart" pagination links, so that there are always ON_ENDS
             # links at either end of the list of pages, and there are always
             # ON_EACH_SIDE links at either end of the "current page" link.
             page_range = []
             if page_num > (ON_EACH_SIDE + ON_ENDS):
-                page_range.extend(range(0, ON_EACH_SIDE - 1))
+                page_range.extend(list(range(0, ON_EACH_SIDE - 1)))
                 page_range.append(DOT)
-                page_range.extend(range(page_num - ON_EACH_SIDE, page_num + 1))
+                page_range.extend(list(range(page_num - ON_EACH_SIDE, page_num + 1)))
             else:
-                page_range.extend(range(0, page_num + 1))
+                page_range.extend(list(range(0, page_num + 1)))
             if page_num < (paginator.num_pages - ON_EACH_SIDE - ON_ENDS - 1):
-                page_range.extend(range(page_num + 1, page_num + ON_EACH_SIDE + 1))
+                page_range.extend(list(range(page_num + 1, page_num + ON_EACH_SIDE + 1)))
                 page_range.append(DOT)
-                page_range.extend(range(paginator.num_pages - ON_ENDS, paginator.num_pages))
+                page_range.extend(list(range(paginator.num_pages - ON_ENDS, paginator.num_pages)))
             else:
-                page_range.extend(range(page_num + 1, paginator.num_pages))
+                page_range.extend(list(range(page_num + 1, paginator.num_pages)))
 
     need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
     return {
@@ -123,7 +123,7 @@ def result_headers(cl):
 
 def _boolean_icon(field_val):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val))
+    return mark_safe('<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val))
 
 def items_for_result(cl, result, form):
     """
@@ -139,7 +139,7 @@ def items_for_result(cl, result, form):
             result_repr = EMPTY_CHANGELIST_VALUE
         else:
             if f is None:
-                if field_name == u'action_checkbox':
+                if field_name == 'action_checkbox':
                     row_class = ' class="action-checkbox"'
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
@@ -182,7 +182,7 @@ def items_for_result(cl, result, form):
                 attr = pk
             value = result.serializable_value(attr)
             result_id = repr(force_unicode(value))[1:]
-            yield mark_safe(u'<%s%s><a href="%s"%s>%s</a></%s>' % \
+            yield mark_safe('<%s%s><a href="%s"%s>%s</a></%s>' % \
                 (table_tag, row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %s); return false;"' % result_id or ''), conditional_escape(result_repr), table_tag))
         else:
             # By default the fields come from ModelAdmin.list_editable, but if we pull
@@ -195,9 +195,9 @@ def items_for_result(cl, result, form):
                 result_repr = mark_safe(force_unicode(bf.errors) + force_unicode(bf))
             else:
                 result_repr = conditional_escape(result_repr)
-            yield mark_safe(u'<td%s>%s</td>' % (row_class, result_repr))
+            yield mark_safe('<td%s>%s</td>' % (row_class, result_repr))
     if form and not form[cl.model._meta.pk.name].is_hidden:
-        yield mark_safe(u'<td>%s</td>' % force_unicode(form[cl.model._meta.pk.name]))
+        yield mark_safe('<td>%s</td>' % force_unicode(form[cl.model._meta.pk.name]))
 
 class ResultList(list):
     # Wrapper class used to return items in a list_editable

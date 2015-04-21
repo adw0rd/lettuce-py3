@@ -1,8 +1,8 @@
 from django.core import serializers
 from django.test import TestCase
 
-from fields import Small
-from models import DataModel, MyModel, OtherModel
+from .fields import Small
+from .models import DataModel, MyModel, OtherModel
 
 
 class CustomField(TestCase):

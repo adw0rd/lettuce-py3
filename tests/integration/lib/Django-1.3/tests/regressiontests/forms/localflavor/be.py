@@ -1,15 +1,15 @@
 from django.contrib.localflavor.be.forms import (BEPostalCodeField,
     BEPhoneNumberField, BERegionSelect, BEProvinceSelect)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class BELocalFlavorTests(LocalFlavorTestCase):
     def test_BEPostalCodeField(self):
-        error_format = [u'Enter a valid postal code in the range and format 1XXX - 9XXX.']
+        error_format = ['Enter a valid postal code in the range and format 1XXX - 9XXX.']
         valid = {
-            u'1451': '1451',
-            u'2540': '2540',
+            '1451': '1451',
+            '2540': '2540',
         }
         invalid = {
             '0287': error_format,
@@ -28,17 +28,17 @@ class BELocalFlavorTests(LocalFlavorTestCase):
                 '0xxxxxxxx or 04xxxxxxxx.')
         ]
         valid = {
-            u'01 234 56 78': '01 234 56 78',
-            u'01/234.56.78': '01/234.56.78',
-            u'01.234.56.78': '01.234.56.78',
-            u'012 34 56 78': '012 34 56 78',
-            u'012/34.56.78': '012/34.56.78',
-            u'012.34.56.78': '012.34.56.78',
-            u'0412 34 56 78': '0412 34 56 78',
-            u'0412/34.56.78': '0412/34.56.78',
-            u'0412.34.56.78': '0412.34.56.78',
-            u'012345678': '012345678',
-            u'0412345678': '0412345678',
+            '01 234 56 78': '01 234 56 78',
+            '01/234.56.78': '01/234.56.78',
+            '01.234.56.78': '01.234.56.78',
+            '012 34 56 78': '012 34 56 78',
+            '012/34.56.78': '012/34.56.78',
+            '012.34.56.78': '012.34.56.78',
+            '0412 34 56 78': '0412 34 56 78',
+            '0412/34.56.78': '0412/34.56.78',
+            '0412.34.56.78': '0412.34.56.78',
+            '012345678': '012345678',
+            '0412345678': '0412345678',
         }
         invalid = {
             '01234567': error_format,
@@ -54,7 +54,7 @@ class BELocalFlavorTests(LocalFlavorTestCase):
 
     def test_BERegionSelect(self):
         f = BERegionSelect()
-        out = u'''<select name="regions">
+        out = '''<select name="regions">
 <option value="BRU">Brussels Capital Region</option>
 <option value="VLG" selected="selected">Flemish Region</option>
 <option value="WAL">Wallonia</option>
@@ -63,7 +63,7 @@ class BELocalFlavorTests(LocalFlavorTestCase):
 
     def test_BEProvinceSelect(self):
         f = BEProvinceSelect()
-        out = u'''<select name="provinces">
+        out = '''<select name="provinces">
 <option value="VAN">Antwerp</option>
 <option value="BRU">Brussels</option>
 <option value="VOV">East Flanders</option>

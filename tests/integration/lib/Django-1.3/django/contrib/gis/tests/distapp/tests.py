@@ -8,7 +8,7 @@ from django.contrib.gis.measure import D # alias for Distance
 from django.contrib.gis.tests.utils import oracle, postgis, spatialite, no_oracle, no_spatialite
 from django.test import TestCase
 
-from models import AustraliaCity, Interstate, SouthTexasInterstate, \
+from .models import AustraliaCity, Interstate, SouthTexasInterstate, \
     SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode
 
 class DistanceTest(TestCase):

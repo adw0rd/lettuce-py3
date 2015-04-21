@@ -1,5 +1,5 @@
 from django.test import TestCase
-from models import Article, Publication
+from .models import Article, Publication
 
 class ManyToManyTests(TestCase):
 

@@ -46,7 +46,7 @@ class CursorDebugWrapper(object):
 ###############################################
 
 def typecast_date(s):
-    return s and datetime.date(*map(int, s.split('-'))) or None # returns None if s is null
+    return s and datetime.date(*list(map(int, s.split('-')))) or None # returns None if s is null
 
 def typecast_time(s): # does NOT store time zone information
     if not s: return None
@@ -123,6 +123,6 @@ def format_number(value, max_digits, decimal_places):
     if isinstance(value, decimal.Decimal):
         context = decimal.getcontext().copy()
         context.prec = max_digits
-        return u'%s' % str(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
+        return '%s' % str(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
     else:
-        return u"%.*f" % (decimal_places, value)
+        return "%.*f" % (decimal_places, value)

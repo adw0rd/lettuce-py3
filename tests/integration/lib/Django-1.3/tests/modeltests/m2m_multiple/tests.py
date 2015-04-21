@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from models import Article, Category
+from .models import Article, Category
 
 
 class M2MMultipleTests(TestCase):

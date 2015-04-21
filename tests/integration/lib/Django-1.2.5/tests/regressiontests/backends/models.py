@@ -12,7 +12,7 @@ class Person(models.Model):
     last_name = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return u'%s %s' % (self.first_name, self.last_name)
+        return '%s %s' % (self.first_name, self.last_name)
 
 class SchoolClass(models.Model):
     year = models.PositiveIntegerField()
@@ -25,7 +25,7 @@ class Reporter(models.Model):
     last_name = models.CharField(max_length=30)
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 
 class Article(models.Model):

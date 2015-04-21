@@ -1,7 +1,7 @@
 """
 Utils for testing
 """
-import commands
+import subprocess
 
 
 def run_scenario(application='', feature='', scenario='', **opts):
@@ -18,7 +18,7 @@ def run_scenario(application='', feature='', scenario='', **opts):
         scenario = ' -s {0:d}'.format(scenario)
 
     opts_string = ''
-    for opt, val in opts.iteritems():
+    for opt, val in opts.items():
         if not val:
             val = ''
 
@@ -29,4 +29,4 @@ def run_scenario(application='', feature='', scenario='', **opts):
                                                                  feature,
                                                                  scenario,
                                                                  )
-    return commands.getstatusoutput(cmd)
+    return subprocess.getstatusoutput(cmd)

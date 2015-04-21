@@ -3,7 +3,7 @@ from operator import attrgetter
 
 from django.test import TestCase
 
-from models import Article
+from .models import Article
 
 
 class OrderingTests(TestCase):

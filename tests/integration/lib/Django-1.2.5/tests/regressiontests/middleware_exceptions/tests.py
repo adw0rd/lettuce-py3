@@ -27,13 +27,13 @@ class MiddlewareExceptionTest(TestCase):
         self.client.handler._request_middleware.insert(0, TestMiddleware().process_request)
         try:
             response = self.client.get('/')
-        except TestException, e:
+        except TestException as e:
             # Test client indefinitely re-raises any exceptions being raised
             # during request handling. Hence actual testing that exception was
             # properly handled is done by relying on got_request_exception
             # signal being sent.
             pass
-        except Exception, e:
+        except Exception as e:
             self.fail("Unexpected exception: %s" % e)
         self.assertEquals(len(self.exceptions), 1)
         exception, value, tb = self.exceptions[0]

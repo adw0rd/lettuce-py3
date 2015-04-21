@@ -2,7 +2,7 @@
 The main QuerySet implementation. This provides the public API for the ORM.
 """
 
-from itertools import izip
+
 
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
@@ -45,7 +45,7 @@ class QuerySet(object):
         Deep copy of a QuerySet doesn't populate the cache
         """
         obj = self.__class__()
-        for k,v in self.__dict__.items():
+        for k,v in list(self.__dict__.items()):
             if k in ('_iter','_result_cache'):
                 obj.__dict__[k] = None
             else:
@@ -104,11 +104,11 @@ class QuerySet(object):
             if len(self._result_cache) <= pos:
                 self._fill_cache()
 
-    def __nonzero__(self):
+    def __bool__(self):
         if self._result_cache is not None:
             return bool(self._result_cache)
         try:
-            iter(self).next()
+            next(iter(self))
         except StopIteration:
             return False
         return True
@@ -147,7 +147,7 @@ class QuerySet(object):
         """
         Retrieves an item or slice from the set of results.
         """
-        if not isinstance(k, (slice, int, long)):
+        if not isinstance(k, (slice, int)):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0))
                 or (isinstance(k, slice) and (k.start is None or k.start >= 0)
@@ -186,7 +186,7 @@ class QuerySet(object):
             qs = self._clone()
             qs.query.set_limits(k, k + 1)
             return list(qs)[0]
-        except self.model.DoesNotExist, e:
+        except self.model.DoesNotExist as e:
             raise IndexError(e.args)
 
     def __and__(self, other):
@@ -221,8 +221,8 @@ class QuerySet(object):
             requested = None
         max_depth = self.query.max_depth
 
-        extra_select = self.query.extra_select.keys()
-        aggregate_select = self.query.aggregate_select.keys()
+        extra_select = list(self.query.extra_select.keys())
+        aggregate_select = list(self.query.aggregate_select.keys())
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
@@ -278,7 +278,7 @@ class QuerySet(object):
                 if skip:
                     row_data = row[index_start:aggregate_start]
                     pk_val = row_data[pk_idx]
-                    obj = model_cls(**dict(zip(init_list, row_data)))
+                    obj = model_cls(**dict(list(zip(init_list, row_data))))
                 else:
                     # Omit aggregates in object creation.
                     obj = model(*row[index_start:aggregate_start])
@@ -312,7 +312,7 @@ class QuerySet(object):
 
         query = self.query.clone()
 
-        for (alias, aggregate_expr) in kwargs.items():
+        for (alias, aggregate_expr) in list(kwargs.items()):
             query.add_aggregate(aggregate_expr, self.model, alias,
                 is_summary=True)
 
@@ -376,14 +376,14 @@ class QuerySet(object):
             return self.get(**lookup), False
         except self.model.DoesNotExist:
             try:
-                params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
+                params = dict([(k, v) for k, v in list(kwargs.items()) if '__' not in k])
                 params.update(defaults)
                 obj = self.model(**params)
                 sid = transaction.savepoint(using=self.db)
                 obj.save(force_insert=True, using=self.db)
                 transaction.savepoint_commit(sid, using=self.db)
                 return obj, True
-            except IntegrityError, e:
+            except IntegrityError as e:
                 transaction.savepoint_rollback(sid, using=self.db)
                 try:
                     return self.get(**lookup), False
@@ -448,7 +448,7 @@ class QuerySet(object):
             # The chunking *isn't* done by slicing the del_query because we
             # need to maintain the query cache on del_query (see #12328)
             seen_objs = CollectedObjects(seen_objs)
-            for i, obj in izip(xrange(CHUNK_SIZE), del_itr):
+            for i, obj in zip(range(CHUNK_SIZE), del_itr):
                 obj._collect_sub_objects(seen_objs)
 
             if not seen_objs:
@@ -518,7 +518,7 @@ class QuerySet(object):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (kwargs.keys(),))
+                    % (list(kwargs.keys()),))
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
@@ -606,7 +606,7 @@ class QuerySet(object):
         depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
-                    % (kwargs.keys(),))
+                    % (list(kwargs.keys()),))
         obj = self._clone()
         if fields:
             if depth:
@@ -647,10 +647,10 @@ class QuerySet(object):
 
         obj = self._clone()
 
-        obj._setup_aggregate_query(kwargs.keys())
+        obj._setup_aggregate_query(list(kwargs.keys()))
 
         # Add the aggregates to the query
-        for (alias, aggregate_expr) in kwargs.items():
+        for (alias, aggregate_expr) in list(kwargs.items()):
             obj.query.add_aggregate(aggregate_expr, self.model, alias,
                 is_summary=False)
 
@@ -780,7 +780,7 @@ class QuerySet(object):
         if self._iter:
             try:
                 for i in range(num or ITER_CHUNK_SIZE):
-                    self._result_cache.append(self._iter.next())
+                    self._result_cache.append(next(self._iter))
             except StopIteration:
                 self._iter = None
 
@@ -843,14 +843,14 @@ class ValuesQuerySet(QuerySet):
 
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
-        extra_names = self.query.extra_select.keys()
+        extra_names = list(self.query.extra_select.keys())
         field_names = self.field_names
-        aggregate_names = self.query.aggregate_select.keys()
+        aggregate_names = list(self.query.aggregate_select.keys())
 
         names = extra_names + field_names + aggregate_names
 
         for row in self.query.get_compiler(self.db).results_iter():
-            yield dict(zip(names, row))
+            yield dict(list(zip(names, row)))
 
     def _setup_query(self):
         """
@@ -877,9 +877,9 @@ class ValuesQuerySet(QuerySet):
                     # we inspect the full extra_select list since we might
                     # be adding back an extra select item that we hadn't
                     # had selected previously.
-                    if self.query.extra.has_key(f):
+                    if f in self.query.extra:
                         self.extra_names.append(f)
-                    elif self.query.aggregate_select.has_key(f):
+                    elif f in self.query.aggregate_select:
                         self.aggregate_names.append(f)
                     else:
                         self.field_names.append(f)
@@ -973,21 +973,21 @@ class ValuesListQuerySet(ValuesQuerySet):
             # When extra(select=...) or an annotation is involved, the extra
             # cols are always at the start of the row, and we need to reorder
             # the fields to match the order in self._fields.
-            extra_names = self.query.extra_select.keys()
+            extra_names = list(self.query.extra_select.keys())
             field_names = self.field_names
-            aggregate_names = self.query.aggregate_select.keys()
+            aggregate_names = list(self.query.aggregate_select.keys())
 
             names = extra_names + field_names + aggregate_names
 
             # If a field list has been specified, use it. Otherwise, use the
             # full list of fields, including extras and aggregates.
             if self._fields:
-                fields = list(self._fields) + filter(lambda f: f not in self._fields, aggregate_names)
+                fields = list(self._fields) + [f for f in aggregate_names if f not in self._fields]
             else:
                 fields = names
 
             for row in self.query.get_compiler(self.db).results_iter():
-                data = dict(zip(names, row))
+                data = dict(list(zip(names, row)))
                 yield tuple([data[f] for f in fields])
 
     def _clone(self, *args, **kwargs):
@@ -1053,7 +1053,7 @@ class EmptyQuerySet(QuerySet):
     def iterator(self):
         # This slightly odd construction is because we need an empty generator
         # (it raises StopIteration immediately).
-        yield iter([]).next()
+        yield next(iter([]))
 
     def all(self):
         """
@@ -1211,7 +1211,7 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
             obj = None
         elif skip:
             klass = deferred_class_factory(klass, skip)
-            obj = klass(**dict(zip(init_list, fields)))
+            obj = klass(**dict(list(zip(init_list, fields))))
         else:
             obj = klass(*fields)
 
@@ -1229,7 +1229,7 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
         if fields == (None,) * field_count:
             obj = None
         else:
-            obj = klass(**dict(zip(field_names, fields)))
+            obj = klass(**dict(list(zip(field_names, fields))))
 
     # If an object was retrieved, set the database state.
     if obj:
@@ -1318,7 +1318,7 @@ def delete_objects(seen_objs, using):
     else:
         forced_managed = False
     try:
-        ordered_classes = seen_objs.keys()
+        ordered_classes = list(seen_objs.keys())
     except CyclicDependency:
         # If there is a cyclic dependency, we cannot in general delete the
         # objects.  However, if an appropriate transaction is set up, or if the
@@ -1329,7 +1329,7 @@ def delete_objects(seen_objs, using):
     obj_pairs = {}
     try:
         for cls in ordered_classes:
-            items = seen_objs[cls].items()
+            items = list(seen_objs[cls].items())
             items.sort()
             obj_pairs[cls] = items
 
@@ -1343,8 +1343,7 @@ def delete_objects(seen_objs, using):
             update_query = sql.UpdateQuery(cls)
             for field, model in cls._meta.get_fields_with_model():
                 if (field.rel and field.null and field.rel.to in seen_objs and
-                        filter(lambda f: f.column == field.rel.get_related_field().column,
-                        field.rel.to._meta.fields)):
+                        [f for f in field.rel.to._meta.fields if f.column == field.rel.get_related_field().column]):
                     if model:
                         sql.UpdateQuery(model).clear_related(field, pk_list, using=using)
                     else:
@@ -1445,7 +1444,7 @@ class RawQuerySet(object):
             # Associate fields to values
             if skip:
                 model_init_kwargs = {}
-                for attname, pos in model_init_field_names.iteritems():
+                for attname, pos in model_init_field_names.items():
                     model_init_kwargs[attname] = values[pos]
                 instance = model_cls(**model_init_kwargs)
             else:
@@ -1490,7 +1489,7 @@ class RawQuerySet(object):
             self._columns = self.query.get_columns()
 
             # Adjust any column names which don't match field names
-            for (query_name, model_name) in self.translations.items():
+            for (query_name, model_name) in list(self.translations.items()):
                 try:
                     index = self._columns.index(query_name)
                     self._columns[index] = model_name

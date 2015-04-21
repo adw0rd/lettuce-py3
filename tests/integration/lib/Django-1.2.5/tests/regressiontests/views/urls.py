@@ -3,8 +3,8 @@ from os import path
 
 from django.conf.urls.defaults import *
 
-from models import *
-import views
+from .models import *
+from . import views
 
 
 base_dir = path.dirname(path.abspath(__file__))
@@ -59,8 +59,8 @@ urlpatterns = patterns('',
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': media_dir}),
 
     # Special URLs for particular regression cases.
-    url(u'^中文/$', 'regressiontests.views.views.redirect'),
-    url(u'^中文/target/$', 'regressiontests.views.views.index_page'),
+    url('^中文/$', 'regressiontests.views.views.redirect'),
+    url('^中文/target/$', 'regressiontests.views.views.index_page'),
 )
 
 # Date-based generic views.
@@ -120,9 +120,9 @@ urlpatterns += patterns('',
 # rediriects, both temporary and permanent, with non-ASCII targets
 urlpatterns += patterns('django.views.generic.simple',
     ('^nonascii_redirect/$', 'redirect_to',
-        {'url': u'/views/中文/target/', 'permanent': False}),
+        {'url': '/views/中文/target/', 'permanent': False}),
     ('^permanent_nonascii_redirect/$', 'redirect_to',
-        {'url': u'/views/中文/target/', 'permanent': True}),
+        {'url': '/views/中文/target/', 'permanent': True}),
 )
 
 urlpatterns += patterns('regressiontests.views.views',

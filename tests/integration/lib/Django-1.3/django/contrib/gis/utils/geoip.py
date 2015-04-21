@@ -189,7 +189,7 @@ class GeoIP(object):
         if not path:
             path = GEOIP_SETTINGS.get('GEOIP_PATH', None)
             if not path: raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
-        if not isinstance(path, basestring):
+        if not isinstance(path, str):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
         if os.path.isdir(path):
@@ -232,7 +232,7 @@ class GeoIP(object):
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Helper routine for checking the query and database availability."
         # Making sure a string was passed in for the query.
-        if not isinstance(query, basestring):
+        if not isinstance(query, str):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)
 
         # Extra checks for the existence of country and city databases.

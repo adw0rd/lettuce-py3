@@ -1,5 +1,5 @@
 from django.test import TestCase
-from models import Reporter, Article
+from .models import Reporter, Article
 
 class ManyToOneNullTests(TestCase):
 

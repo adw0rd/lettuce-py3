@@ -241,7 +241,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
         self.info(bold("writing templatebuiltins.js..."))
         try:
             # Sphinx < 1.0
-            xrefs = self.env.reftargets.items()
+            xrefs = list(self.env.reftargets.items())
             templatebuiltins = dict([('ttags', [n for ((t,n),(l,a)) in xrefs
                                                 if t == 'ttag' and
                                                 l == 'ref/templates/builtins']),
@@ -251,10 +251,10 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
         except AttributeError:
             # Sphinx >= 1.0
             xrefs = self.env.domaindata["std"]["objects"]
-            templatebuiltins = dict([('ttags', [n for ((t,n), (l,a)) in xrefs.items()
+            templatebuiltins = dict([('ttags', [n for ((t,n), (l,a)) in list(xrefs.items())
                                                 if t == 'templatetag' and
                                                 l == 'ref/templates/builtins' ]),
-                                     ('tfilters', [n for ((t,n), (l,a)) in xrefs.items()
+                                     ('tfilters', [n for ((t,n), (l,a)) in list(xrefs.items())
                                                    if t == 'templatefilter' and
                                                    t == 'ref/templates/builtins'])])
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")

@@ -159,7 +159,7 @@ class GeometryField(Field):
         # from the given string input.
         if isinstance(geom, Geometry):
             pass
-        elif isinstance(geom, basestring) or hasattr(geom, '__geo_interface__'):
+        elif isinstance(geom, str) or hasattr(geom, '__geo_interface__'):
             try:
                 geom = Geometry(geom)
             except GeometryException:

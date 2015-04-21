@@ -7,11 +7,11 @@ from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel
+from .models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel
 
 # If PIL available, do these tests.
 if Image:
-    from imagefield import \
+    from .imagefield import \
             ImageFieldTests, \
             ImageFieldTwoDimensionsTests, \
             ImageFieldNoDimensionsTests, \
@@ -44,7 +44,7 @@ class BasicFieldTests(django.test.TestCase):
         nullboolean = NullBooleanModel(nbfield=None)
         try:
             nullboolean.full_clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
 
 class DecimalFieldTests(django.test.TestCase):
@@ -60,8 +60,8 @@ class DecimalFieldTests(django.test.TestCase):
 
     def test_format(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f._format(f.to_python(2)), u'2.0')
-        self.assertEqual(f._format(f.to_python('2.6')), u'2.6')
+        self.assertEqual(f._format(f.to_python(2)), '2.0')
+        self.assertEqual(f._format(f.to_python('2.6')), '2.6')
         self.assertEqual(f._format(None), None)
 
     def test_get_db_prep_lookup(self):
@@ -74,7 +74,7 @@ class DecimalFieldTests(django.test.TestCase):
         We should be able to filter decimal fields using strings (#8023)
         """
         Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
-        self.assertEqual(list(Foo.objects.filter(d=u'1.23')), [])
+        self.assertEqual(list(Foo.objects.filter(d='1.23')), [])
 
     def test_save_without_float_conversion(self):
         """
@@ -150,7 +150,7 @@ class BooleanFieldTests(unittest.TestCase):
         Test that BooleanField with choices and defaults doesn't generate a
         formfield with the blank option (#9640, #10549).
         """
-        choices = [(1, u'Si'), (2, 'No')]
+        choices = [(1, 'Si'), (2, 'No')]
         f = models.BooleanField(choices=choices, default=1, null=True)
         self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
 
@@ -287,11 +287,11 @@ class BigIntegerFieldTests(django.test.TestCase):
 
     def test_types(self):
         b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, int))
         b.save()
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, int))
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, int))
 
     def test_coercing(self):
         BigInt.objects.create(value ='10')

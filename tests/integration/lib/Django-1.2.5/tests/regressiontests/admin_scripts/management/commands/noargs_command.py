@@ -6,4 +6,4 @@ class Command(NoArgsCommand):
 
 
     def handle_noargs(self, **options):
-        print 'EXECUTE:NoArgsCommand options=%s' % sorted(options.items())
+        print('EXECUTE:NoArgsCommand options=%s' % sorted(options.items()))

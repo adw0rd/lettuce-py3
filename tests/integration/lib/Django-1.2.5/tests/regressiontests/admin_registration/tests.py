@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from django.contrib import admin
 
-from models import Person, Place
+from .models import Person, Place
 
 class NameAdmin(admin.ModelAdmin):
     list_display = ['name']

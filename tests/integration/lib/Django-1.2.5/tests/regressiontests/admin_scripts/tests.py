@@ -41,7 +41,7 @@ class AdminScriptTestCase(unittest.TestCase):
             settings_file.write("INSTALLED_APPS = %s\n" % apps)
 
         if sdict:
-            for k, v in sdict.items():
+            for k, v in list(sdict.items()):
                 settings_file.write("%s = %s\n" % (k, v))
 
         settings_file.close()
@@ -72,7 +72,7 @@ class AdminScriptTestCase(unittest.TestCase):
         """
         paths = []
         first_package_re = re.compile(r'(^[^\.]+)\.')
-        for backend in settings.DATABASES.values():
+        for backend in list(settings.DATABASES.values()):
             result = first_package_re.findall(backend['ENGINE'])
             if result and result != 'django':
                 backend_pkg = __import__(result[0])

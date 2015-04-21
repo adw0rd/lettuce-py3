@@ -6,11 +6,11 @@ from django.core.exceptions import FieldError
 
 from django.contrib.contenttypes.models import ContentType
 
-from models import MyPerson, Person, StatusPerson, LowerStatusPerson
-from models import MyPersonProxy, Abstract, OtherPerson, User, UserProxy
-from models import UserProxyProxy, Country, State, StateProxy, TrackerUser
-from models import BaseUser, Bug, ProxyTrackerUser, Improvement, ProxyProxyBug
-from models import ProxyBug, ProxyImprovement
+from .models import MyPerson, Person, StatusPerson, LowerStatusPerson
+from .models import MyPersonProxy, Abstract, OtherPerson, User, UserProxy
+from .models import UserProxyProxy, Country, State, StateProxy, TrackerUser
+from .models import BaseUser, Bug, ProxyTrackerUser, Improvement, ProxyProxyBug
+from .models import ProxyBug, ProxyImprovement
 
 class ProxyModelTests(TestCase):
     def test_same_manager_queries(self):
@@ -187,7 +187,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h3, sender=Person)
         signals.post_save.connect(h4, sender=Person)
 
-        dino = MyPerson.objects.create(name=u"dino")
+        dino = MyPerson.objects.create(name="dino")
         self.assertEqual(output, [
             'MyPerson pre save',
             'MyPerson post save'
@@ -201,7 +201,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h5, sender=MyPersonProxy)
         signals.post_save.connect(h6, sender=MyPersonProxy)
 
-        dino = MyPersonProxy.objects.create(name=u"pebbles")
+        dino = MyPersonProxy.objects.create(name="pebbles")
 
         self.assertEqual(output, [
             'MyPersonProxy pre save',

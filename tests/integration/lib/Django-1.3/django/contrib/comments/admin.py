@@ -62,8 +62,8 @@ class CommentsAdmin(admin.ModelAdmin):
             action(request, comment)
             n_comments += 1
 
-        msg = ungettext(u'1 comment was successfully %(action)s.',
-                        u'%(count)s comments were successfully %(action)s.',
+        msg = ungettext('1 comment was successfully %(action)s.',
+                        '%(count)s comments were successfully %(action)s.',
                         n_comments)
         self.message_user(request, msg % {'count': n_comments, 'action': done_message(n_comments)})
 

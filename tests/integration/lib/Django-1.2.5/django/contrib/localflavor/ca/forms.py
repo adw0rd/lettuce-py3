@@ -22,7 +22,7 @@ class CAPostalCodeField(RegexField):
     http://www.canadapost.ca/tools/pg/manual/PGaddress-e.asp#1402170
     """
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXX XXX.'),
+        'invalid': _('Enter a postal code in the format XXX XXX.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -32,7 +32,7 @@ class CAPostalCodeField(RegexField):
 class CAPhoneNumberField(Field):
     """Canadian phone number field."""
     default_error_messages = {
-        'invalid': u'Phone numbers must be in XXX-XXX-XXXX format.',
+        'invalid': 'Phone numbers must be in XXX-XXX-XXXX format.',
     }
 
     def clean(self, value):
@@ -40,11 +40,11 @@ class CAPhoneNumberField(Field):
         """
         super(CAPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\(|\)|\s+)', '', smart_unicode(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
+            return '%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
         raise ValidationError(self.error_messages['invalid'])
 
 class CAProvinceField(Field):
@@ -54,14 +54,14 @@ class CAProvinceField(Field):
     abbreviation for the given province.
     """
     default_error_messages = {
-        'invalid': u'Enter a Canadian province or territory.',
+        'invalid': 'Enter a Canadian province or territory.',
     }
 
     def clean(self, value):
-        from ca_provinces import PROVINCES_NORMALIZED
+        from .ca_provinces import PROVINCES_NORMALIZED
         super(CAProvinceField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         try:
             value = value.strip().lower()
         except AttributeError:
@@ -79,7 +79,7 @@ class CAProvinceSelect(Select):
     territories as its choices.
     """
     def __init__(self, attrs=None):
-        from ca_provinces import PROVINCE_CHOICES # relative import
+        from .ca_provinces import PROVINCE_CHOICES # relative import
         super(CAProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class CASocialInsuranceNumberField(Field):
@@ -99,14 +99,14 @@ class CASocialInsuranceNumberField(Field):
     def clean(self, value):
         super(CASocialInsuranceNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = re.match(sin_re, value)
         if not match:
             raise ValidationError(self.error_messages['invalid'])
 
-        number = u'%s-%s-%s' % (match.group(1), match.group(2), match.group(3))
-        check_number = u'%s%s%s' % (match.group(1), match.group(2), match.group(3))
+        number = '%s-%s-%s' % (match.group(1), match.group(2), match.group(3))
+        check_number = '%s%s%s' % (match.group(1), match.group(2), match.group(3))
         if not self.luhn_checksum_is_valid(check_number):
             raise ValidationError(self.error_messages['invalid'])
         return number

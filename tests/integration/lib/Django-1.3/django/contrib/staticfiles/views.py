@@ -5,7 +5,7 @@ development, and SHOULD NOT be used in a production setting.
 """
 import os
 import posixpath
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -31,7 +31,7 @@ def serve(request, path, document_root=None, insecure=False, **kwargs):
         raise ImproperlyConfigured("The staticfiles view can only be used in "
                                    "debug mode or if the the --insecure "
                                    "option of 'runserver' is used")
-    normalized_path = posixpath.normpath(urllib.unquote(path)).lstrip('/')
+    normalized_path = posixpath.normpath(urllib.parse.unquote(path)).lstrip('/')
     absolute_path = finders.find(normalized_path)
     if not absolute_path:
         raise Http404("'%s' could not be found" % path)

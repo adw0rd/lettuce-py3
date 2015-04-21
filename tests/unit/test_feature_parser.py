@@ -685,18 +685,18 @@ def test_single_scenario_many_scenarios():
     assert that(last_scenario.tags).equals([])
 
     result = feature.run()
-    print
-    print
+    print()
+    print()
     for sr in result.scenario_results:
         for failed in sr.steps_failed:
-            print "+" * 10
-            print
-            print failed.why.cause
-            print
-            print "+" * 10
+            print("+" * 10)
+            print()
+            print(failed.why.cause)
+            print()
+            print("+" * 10)
 
-    print
-    print
+    print()
+    print()
     assert result.passed
 
 
@@ -720,9 +720,9 @@ def test_scenarios_parsing():
     scenarios_and_tags.should.equal([
         ('Bootstraping Redis role', []),
         ('Restart scalarizr', []),
-        ('Rebundle server', [u'rebundle']),
-        ('Use new role', [u'rebundle']),
-        ('Restart scalarizr after bundling', [u'rebundle']),
+        ('Rebundle server', ['rebundle']),
+        ('Use new role', ['rebundle']),
+        ('Restart scalarizr after bundling', ['rebundle']),
         ('Bundling data', []),
         ('Modifying data', []),
         ('Reboot server', []),
@@ -730,11 +730,11 @@ def test_scenarios_parsing():
         ('Setup replication', []),
         ('Restart scalarizr in slave', []),
         ('Slave force termination', []),
-        ('Slave delete EBS', [u'ec2']),
-        ('Setup replication for EBS test', [u'ec2']),
+        ('Slave delete EBS', ['ec2']),
+        ('Setup replication for EBS test', ['ec2']),
         ('Writing on Master, reading on Slave', []),
         ('Slave -> Master promotion', []),
-        ('Restart farm', [u'restart_farm']),
+        ('Restart farm', ['restart_farm']),
     ])
 
 def test_scenarios_with_special_characters():
@@ -764,24 +764,24 @@ def test_background_parsing_with_mmf():
         'Given I have the following movies in my database:')
     step1.hashes.should.equal(HashList(step1, [
         {
-            u'Available': u'6',
-            u'Rating': u'4 stars',
-            u'Name': u'Matrix Revolutions',
-            u'New': u'no',
+            'Available': '6',
+            'Rating': '4 stars',
+            'Name': 'Matrix Revolutions',
+            'New': 'no',
         },
         {
-            u'Available': u'11',
-            u'Rating': u'5 stars',
-            u'Name': u'Iron Man 2',
-            u'New': u'yes',
+            'Available': '11',
+            'Rating': '5 stars',
+            'Name': 'Iron Man 2',
+            'New': 'yes',
         },
     ]))
 
     step2.sentence.should.equal(
         'And the following clients:')
     step2.hashes.should.equal(HashList(step2, [
-        {u'Name': u'John Doe'},
-        {u'Name': u'Foo Bar'},
+        {'Name': 'John Doe'},
+        {'Name': 'Foo Bar'},
     ]))
 
 
@@ -798,24 +798,24 @@ def test_background_parsing_without_mmf():
         'Given I have the following movies in my database:')
     step1.hashes.should.equal(HashList(step1, [
         {
-            u'Available': u'6',
-            u'Rating': u'4 stars',
-            u'Name': u'Matrix Revolutions',
-            u'New': u'no',
+            'Available': '6',
+            'Rating': '4 stars',
+            'Name': 'Matrix Revolutions',
+            'New': 'no',
         },
         {
-            u'Available': u'11',
-            u'Rating': u'5 stars',
-            u'Name': u'Iron Man 2',
-            u'New': u'yes',
+            'Available': '11',
+            'Rating': '5 stars',
+            'Name': 'Iron Man 2',
+            'New': 'yes',
         },
     ]))
 
     step2.sentence.should.equal(
         'And the following clients:')
     step2.hashes.should.equal(HashList(step2, [
-        {u'Name': u'John Doe'},
-        {u'Name': u'Foo Bar'},
+        {'Name': 'John Doe'},
+        {'Name': 'Foo Bar'},
     ]))
 
 

@@ -4,7 +4,7 @@ import sys
 import traceback
 import unittest
 
-from StringIO import StringIO
+from io import StringIO
 
 from django.utils.unittest import util
 from django.utils.unittest.compatibility import wraps

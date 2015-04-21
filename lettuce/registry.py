@@ -20,14 +20,15 @@ import threading
 import traceback
 
 from lettuce.exceptions import StepLoadingError
+import collections
 
 world = threading.local()
 world._set = False
 
 
 def _function_matches(one, other):
-    return (os.path.abspath(one.func_code.co_filename) == os.path.abspath(other.func_code.co_filename) and
-            one.func_code.co_firstlineno == other.func_code.co_firstlineno)
+    return (os.path.abspath(one.__code__.co_filename) == os.path.abspath(other.__code__.co_filename) and
+            one.__code__.co_firstlineno == other.__code__.co_firstlineno)
 
 
 class CallbackDict(dict):
@@ -36,8 +37,8 @@ class CallbackDict(dict):
             self[where][when].append(function)
 
     def clear(self):
-        for name, action_dict in self.items():
-            for callback_list in action_dict.values():
+        for name, action_dict in list(self.items()):
+            for callback_list in list(action_dict.values()):
                 callback_list[:] = []
 
 class StepDict(dict):
@@ -62,14 +63,14 @@ class StepDict(dict):
         func = getattr(func, '__func__', func)
         sentence = getattr(func, '__doc__', None)
         if sentence is None:
-            sentence = func.func_name.replace('_', ' ')
+            sentence = func.__name__.replace('_', ' ')
             sentence = sentence[0].upper() + sentence[1:]
         return sentence
 
     def _assert_is_step(self, step, func):
         try:
             re.compile(step)
-        except re.error, e:
+        except re.error as e:
             raise StepLoadingError("Error when trying to compile:\n"
                                    "  regex: %r\n"
                                    "  for function: %s\n"
@@ -80,7 +81,7 @@ class StepDict(dict):
 
     def _is_func_or_method(self, func):
         func_dir = dir(func)
-        return callable(func) and ("func_name" in func_dir or "__func__" in func_dir)
+        return isinstance(func, collections.Callable) and ("func_name" in func_dir or "__func__" in func_dir)
 
 
 STEP_REGISTRY = StepDict()
@@ -133,10 +134,10 @@ def call_hook(situation, kind, *args, **kw):
     for callback in CALLBACK_REGISTRY[kind][situation]:
         try:
             callback(*args, **kw)
-        except Exception, e:
-            print "=" * 1000
-            traceback.print_exc(e)
-            print
+        except Exception as e:
+            print("=" * 1000)
+            traceback.print_exc(0)
+            print()
             raise
 
 

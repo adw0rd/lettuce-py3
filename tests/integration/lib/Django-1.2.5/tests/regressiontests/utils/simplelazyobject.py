@@ -17,7 +17,7 @@ class _ComplexObject(object):
         return "I am _ComplexObject(%r)" % self.name
 
     def __unicode__(self):
-        return unicode(self.name)
+        return str(self.name)
 
     def __repr__(self):
         return "_ComplexObject(%r)" % self.name
@@ -52,7 +52,7 @@ class TestUtilsSimpleLazyObject(unittest.TestCase):
         self.assertEqual("I am _ComplexObject('joe')", str(SimpleLazyObject(complex_object)))
 
     def test_unicode(self):
-        self.assertEqual(u"joe", unicode(SimpleLazyObject(complex_object)))
+        self.assertEqual("joe", str(SimpleLazyObject(complex_object)))
 
     def test_class(self):
         # This is important for classes that use __class__ in things like

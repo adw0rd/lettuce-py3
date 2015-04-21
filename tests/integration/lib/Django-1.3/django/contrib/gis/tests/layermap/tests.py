@@ -8,7 +8,7 @@ from django.contrib.gis.gdal import DataSource, OGRException
 from django.contrib.gis.tests.utils import mysql
 from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
 
-from models import \
+from .models import \
     City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State, \
     city_mapping, co_mapping, cofeat_mapping, inter_mapping
 

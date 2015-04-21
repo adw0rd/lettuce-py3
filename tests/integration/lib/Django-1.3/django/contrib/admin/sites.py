@@ -138,7 +138,7 @@ class AdminSite(object):
         """
         Get all the enabled actions as an iterable of (name, func).
         """
-        return self._actions.iteritems()
+        return iter(self._actions.items())
 
     def has_permission(self, request):
         """
@@ -239,7 +239,7 @@ class AdminSite(object):
         )
 
         # Add in each model's views.
-        for model, model_admin in self._registry.iteritems():
+        for model, model_admin in self._registry.items():
             urlpatterns += patterns('',
                 url(r'^%s/%s/' % (model._meta.app_label, model._meta.module_name),
                     include(model_admin.urls))
@@ -338,7 +338,7 @@ class AdminSite(object):
         """
         app_dict = {}
         user = request.user
-        for model, model_admin in self._registry.items():
+        for model, model_admin in list(self._registry.items()):
             app_label = model._meta.app_label
             has_module_perms = user.has_module_perms(app_label)
 
@@ -347,7 +347,7 @@ class AdminSite(object):
 
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
-                if True in perms.values():
+                if True in list(perms.values()):
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
                         'admin_url': mark_safe('%s/%s/' % (app_label, model.__name__.lower())),
@@ -364,7 +364,7 @@ class AdminSite(object):
                         }
 
         # Sort the apps alphabetically.
-        app_list = app_dict.values()
+        app_list = list(app_dict.values())
         app_list.sort(key=lambda x: x['name'])
 
         # Sort the models alphabetically within each app.
@@ -386,14 +386,14 @@ class AdminSite(object):
         user = request.user
         has_module_perms = user.has_module_perms(app_label)
         app_dict = {}
-        for model, model_admin in self._registry.items():
+        for model, model_admin in list(self._registry.items()):
             if app_label == model._meta.app_label:
                 if has_module_perms:
                     perms = model_admin.get_model_perms(request)
 
                     # Check whether user has any perm for this module.
                     # If so, add the module to the model_list.
-                    if True in perms.values():
+                    if True in list(perms.values()):
                         model_dict = {
                             'name': capfirst(model._meta.verbose_name_plural),
                             'admin_url': '%s/' % model.__name__.lower(),

@@ -15,7 +15,7 @@ class SpatiaLiteCreation(DatabaseCreation):
         SQL prior to calling the `syncdb` command.
         """
         if verbosity >= 1:
-            print "Creating test database '%s'..." % self.connection.alias
+            print("Creating test database '%s'..." % self.connection.alias)
 
         test_database_name = self._create_test_db(verbosity, autoclobber)
 

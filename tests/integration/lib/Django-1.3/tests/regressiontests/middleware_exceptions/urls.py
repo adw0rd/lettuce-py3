@@ -1,7 +1,7 @@
 # coding: utf-8
 from django.conf.urls.defaults import *
 
-import views
+from . import views
 
 urlpatterns = patterns('',
     (r'^view/$', views.normal_view),

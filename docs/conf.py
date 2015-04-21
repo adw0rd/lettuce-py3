@@ -17,7 +17,7 @@
 
 from lettuce import version, release
 
-copyright = u'Gabriel Falcão <gabriel@nacaolivre.org>'
+copyright = 'Gabriel Falcão <gabriel@nacaolivre.org>'
 
 extensions = [
     'sphinx.ext.autodoc',

@@ -57,7 +57,7 @@ def raw_post_view(request):
 def redirect_view(request):
     "A view that redirects all requests to the GET view"
     if request.GET:
-        from urllib import urlencode
+        from urllib.parse import urlencode
         query = '?' + urlencode(request.GET, True)
     else:
         query = ''

@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-import views
+from . import views
 
 urlpatterns = patterns('',
     (r'^upload/$',          views.file_upload_view),

@@ -45,7 +45,7 @@ class MeasureBase(object):
         from the given keyword arguments dictionary.
         """
         val = 0.0
-        for unit, value in kwargs.iteritems():
+        for unit, value in kwargs.items():
             if not isinstance(value, float): value = float(value)
             if unit in self.UNITS:
                 val += self.UNITS[unit] * value
@@ -158,7 +158,7 @@ class Distance(MeasureBase):
         'Yard (Indian)' : 'indian_yd',
         'Yard (Sears)' : 'sears_yd'
         }
-    LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
+    LALIAS = dict([(k.lower(), v) for k, v in list(ALIAS.items())])
 
     def __init__(self, default_unit=None, **kwargs):
         # The base unit is in meters.
@@ -211,7 +211,7 @@ class Distance(MeasureBase):
             raise TypeError('Distance must be subtracted from Distance')
 
     def __mul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             return Distance(default_unit=self._default_unit, m=(self.m * float(other)))
         elif isinstance(other, Distance):
             return Area(default_unit='sq_' + self._default_unit, sq_m=(self.m * other.m))
@@ -219,7 +219,7 @@ class Distance(MeasureBase):
             raise TypeError('Distance must be multiplied with number or Distance')
 
     def __imul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             self.m *= float(other)
             return self
         else:
@@ -229,26 +229,26 @@ class Distance(MeasureBase):
         return self * other
 
     def __div__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             return Distance(default_unit=self._default_unit, m=(self.m / float(other)))
         else:
             raise TypeError('Distance must be divided with number')
 
     def __idiv__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             self.m /= float(other)
             return self
         else:
             raise TypeError('Distance must be divided with number')
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.m)
 
 class Area(MeasureBase):
     # Getting the square units values and the alias dictionary.
-    UNITS = dict([('sq_%s' % k, v ** 2) for k, v in Distance.UNITS.items()])
-    ALIAS = dict([(k, 'sq_%s' % v) for k, v in Distance.ALIAS.items()])
-    LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
+    UNITS = dict([('sq_%s' % k, v ** 2) for k, v in list(Distance.UNITS.items())])
+    ALIAS = dict([(k, 'sq_%s' % v) for k, v in list(Distance.ALIAS.items())])
+    LALIAS = dict([(k.lower(), v) for k, v in list(ALIAS.items())])
 
     def __init__(self, default_unit=None, **kwargs):
         self.sq_m, self._default_unit = self.default_units(kwargs)
@@ -300,13 +300,13 @@ class Area(MeasureBase):
             raise TypeError('Area must be subtracted from Area')
 
     def __mul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             return Area(default_unit=self._default_unit, sq_m=(self.sq_m * float(other)))
         else:
             raise TypeError('Area must be multiplied with number')
 
     def __imul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             self.sq_m *= float(other)
             return self
         else:
@@ -316,19 +316,19 @@ class Area(MeasureBase):
         return self * other
 
     def __div__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             return Area(default_unit=self._default_unit, sq_m=(self.sq_m / float(other)))
         else:
             raise TypeError('Area must be divided with number')
 
     def __idiv__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
+        if isinstance(other, (int, float, Decimal)):
             self.sq_m /= float(other)
             return self
         else:
             raise TypeError('Area must be divided with number')
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.sq_m)
 
 # Shortcuts

@@ -72,7 +72,7 @@ def get_tests(app_module):
     try:
         app_path = app_module.__name__.split('.')[:-1]
         test_module = __import__('.'.join(app_path + [TEST_MODULE]), {}, {}, TEST_MODULE)
-    except ImportError, e:
+    except ImportError as e:
         # Couldn't import tests.py. Was it due to a missing file, or
         # due to an import error in a tests.py that actually exists?
         import os.path
@@ -327,7 +327,7 @@ class DjangoTestSuiteRunner(object):
         # Second pass -- actually create the databases.
         old_names = []
         mirrors = []
-        for signature, (db_name, aliases) in dependency_ordered(test_databases.items(), dependencies):
+        for signature, (db_name, aliases) in dependency_ordered(list(test_databases.items()), dependencies):
             # Actually create the database for the first connection
             connection = connections[aliases[0]]
             old_names.append((connection, db_name, True))
@@ -344,7 +344,7 @@ class DjangoTestSuiteRunner(object):
                     old_names.append((connection, db_name, True))
                     connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
 
-        for alias, mirror_alias in mirrored_aliases.items():
+        for alias, mirror_alias in list(mirrored_aliases.items()):
             mirrors.append((alias, connections[alias].settings_dict['NAME']))
             connections[alias].settings_dict['NAME'] = connections[mirror_alias].settings_dict['NAME']
 

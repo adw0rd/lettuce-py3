@@ -4,11 +4,11 @@ from lettuce import step
 
 @step('When I write to stdout')
 def write_stdout(step):
-    print >> sys.stdout, "Badger"
+    print("Badger", file=sys.stdout)
 
 @step('When I write to stderr')
 def write_stderr(step):
-    print >> sys.stderr, "Mushroom"
+    print("Mushroom", file=sys.stderr)
 
 @step('Then I am happy')
 def happy(step):

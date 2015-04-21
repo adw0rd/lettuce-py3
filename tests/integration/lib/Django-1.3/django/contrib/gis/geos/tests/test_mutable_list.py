@@ -40,7 +40,7 @@ class UserListB(UserListA):
 
 def nextRange(length):
     nextRange.start += 100
-    return range(nextRange.start, nextRange.start + length)
+    return list(range(nextRange.start, nextRange.start + length))
 
 nextRange.start = 0
 
@@ -54,14 +54,14 @@ class ListMixinTest(unittest.TestCase):
 
     def lists_of_len(self, length=None):
         if length is None: length = self.limit
-        pl = range(length)
+        pl = list(range(length))
         return pl, self.listType(pl)
 
     def limits_plus(self, b):
-        return range(-self.limit - b, self.limit + b)
+        return list(range(-self.limit - b, self.limit + b))
 
     def step_range(self):
-        return range(-1 - self.limit, 0) + range(1, 1 + self.limit)
+        return list(range(-1 - self.limit, 0)) + list(range(1, 1 + self.limit))
 
     def test01_getslice(self):
         'Slice retrieval'
@@ -84,7 +84,7 @@ class ListMixinTest(unittest.TestCase):
 
     def test02_setslice(self):
         'Slice assignment'
-        def setfcn(x,i,j,k,L): x[i:j:k] = range(L)
+        def setfcn(x,i,j,k,L): x[i:j:k] = list(range(L))
         pl, ul = self.lists_of_len()
         for slen in range(self.limit + 1):
             ssl = nextRange(slen)
@@ -159,13 +159,13 @@ class ListMixinTest(unittest.TestCase):
                     del pl[i:j]
                     del ul[i:j]
                     self.assertEqual(pl[:], ul[:], 'del slice [%d:%d]' % (i,j))
-                    for k in range(-Len - 1,0) + range(1,Len):
+                    for k in list(range(-Len - 1,0)) + list(range(1,Len)):
                         pl, ul = self.lists_of_len(Len)
                         del pl[i:j:k]
                         del ul[i:j:k]
                         self.assertEqual(pl[:], ul[:], 'del slice [%d:%d:%d]' % (i,j,k))
 
-                for k in range(-Len - 1,0) + range(1,Len):
+                for k in list(range(-Len - 1,0)) + list(range(1,Len)):
                     pl, ul = self.lists_of_len(Len)
                     del pl[:i:k]
                     del ul[:i:k]
@@ -176,7 +176,7 @@ class ListMixinTest(unittest.TestCase):
                     del ul[i::k]
                     self.assertEqual(pl[:], ul[:], 'del slice [%d::%d]' % (i,k))
 
-            for k in range(-Len - 1,0) + range(1,Len):
+            for k in list(range(-Len - 1,0)) + list(range(1,Len)):
                 pl, ul = self.lists_of_len(Len)
                 del pl[::k]
                 del ul[::k]
@@ -218,8 +218,8 @@ class ListMixinTest(unittest.TestCase):
         ul.append(40)
         self.assertEqual(pl[:], ul[:], 'append')
 
-        pl.extend(range(50,55))
-        ul.extend(range(50,55))
+        pl.extend(list(range(50,55)))
+        ul.extend(list(range(50,55)))
         self.assertEqual(pl[:], ul[:], 'extend')
 
         pl.reverse()
@@ -267,7 +267,7 @@ class ListMixinTest(unittest.TestCase):
     def test07_allowed_types(self):
         'Type-restricted list'
         pl, ul = self.lists_of_len()
-        ul._allowed = (int, long)
+        ul._allowed = (int, int)
         ul[1] = 50
         ul[:2] = [60, 70, 80]
         def setfcn(x, i, v): x[i] = v
@@ -337,7 +337,7 @@ class ListMixinTest(unittest.TestCase):
     def test_12_arithmetic(self):
         'Arithmetic'
         pl, ul = self.lists_of_len()
-        al = range(10,14)
+        al = list(range(10,14))
         self.assertEqual(list(pl + al), list(ul + al), 'add')
         self.assertEqual(type(ul), type(ul + al), 'type of add result')
         self.assertEqual(list(al + pl), list(al + ul), 'radd')

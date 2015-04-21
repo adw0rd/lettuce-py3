@@ -9,7 +9,7 @@ from django.utils import importlib
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super(BaseMemcachedCache, self).__init__(params)
-        if isinstance(server, basestring):
+        if isinstance(server, str):
             self._servers = server.split(';')
         else:
             self._servers = server
@@ -69,12 +69,12 @@ class BaseMemcachedCache(BaseCache):
         self._cache.delete(key)
 
     def get_many(self, keys, version=None):
-        new_keys = map(lambda x: self.make_key(x, version=version), keys)
+        new_keys = [self.make_key(x, version=version) for x in keys]
         ret = self._cache.get_multi(new_keys)
         if ret:
             _ = {}
-            m = dict(zip(new_keys, keys))
-            for k, v in ret.items():
+            m = dict(list(zip(new_keys, keys)))
+            for k, v in list(ret.items()):
                 _[m[k]] = v
             ret = _
         return ret
@@ -114,14 +114,14 @@ class BaseMemcachedCache(BaseCache):
 
     def set_many(self, data, timeout=0, version=None):
         safe_data = {}
-        for key, value in data.items():
+        for key, value in list(data.items()):
             key = self.make_key(key, version=version)
             safe_data[key] = value
         self._cache.set_multi(safe_data, self._get_memcache_timeout(timeout))
 
     def delete_many(self, keys, version=None):
         l = lambda x: self.make_key(x, version=version)
-        self._cache.delete_multi(map(l, keys))
+        self._cache.delete_multi(list(map(l, keys)))
 
     def clear(self):
         self._cache.flush_all()

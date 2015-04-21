@@ -43,23 +43,23 @@ class DatabaseCreation(BaseDatabaseCreation):
         if test_database_name and test_database_name != ":memory:":
             # Erase the old test database
             if verbosity >= 1:
-                print "Destroying old test database..."
+                print("Destroying old test database...")
             if os.access(test_database_name, os.F_OK):
                 if not autoclobber:
-                    confirm = raw_input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
+                    confirm = input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
                 if autoclobber or confirm == 'yes':
                   try:
                       if verbosity >= 1:
-                          print "Destroying old test database..."
+                          print("Destroying old test database...")
                       os.remove(test_database_name)
-                  except Exception, e:
+                  except Exception as e:
                       sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
                       sys.exit(2)
                 else:
-                    print "Tests cancelled."
+                    print("Tests cancelled.")
                     sys.exit(1)
             if verbosity >= 1:
-                print "Creating test database..."
+                print("Creating test database...")
         else:
             test_database_name = ":memory:"
         return test_database_name

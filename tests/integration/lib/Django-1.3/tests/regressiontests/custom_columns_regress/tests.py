@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import FieldError
 
-from models import Author, Article
+from .models import Author, Article
 
 def pks(objects):
     """ Return pks to be able to compare lists"""
@@ -12,7 +12,7 @@ class CustomColumnRegression(TestCase):
     def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
         try:
             func(*args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(msg, str(e))
             self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
 

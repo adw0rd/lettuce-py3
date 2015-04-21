@@ -28,9 +28,9 @@ def utf8_string(s):
 
 
 def escape_if_necessary(what):
-    what = unicode(what)
+    what = str(what)
     if len(what) is 1:
-        what = u"[%s]" % what
+        what = "[%s]" % what
 
     return what
 
@@ -38,8 +38,8 @@ def escape_if_necessary(what):
 def get_stripped_lines(string, ignore_lines_starting_with=''):
     """Split lines at newline char, then return the array of stripped lines"""
     # used e.g. to separate out all the steps in a scenario
-    string = unicode(string)
-    lines = [unicode(l.strip()) for l in string.splitlines()]
+    string = str(string)
+    lines = [str(l.strip()) for l in string.splitlines()]
     if ignore_lines_starting_with:
         filter_func = lambda x: x and not x.startswith(
             ignore_lines_starting_with)
@@ -48,44 +48,44 @@ def get_stripped_lines(string, ignore_lines_starting_with=''):
         # will not be included in the returned list
         filter_func = lambda x: x
 
-    lines = filter(filter_func, lines)
+    lines = list(filter(filter_func, lines))
 
     return lines
 
 
 def split_wisely(string, sep, strip=False):
-    string = unicode(string)
+    string = str(string)
     if strip:
         string = string.strip()
     else:
         string = string.strip("\n")
-    sep = unicode(sep)
+    sep = str(sep)
 
     regex = re.compile(escape_if_necessary(sep),  re.UNICODE | re.M | re.I)
 
-    items = filter(lambda x: x, regex.split(string))
+    items = [x for x in regex.split(string) if x]
     if strip:
         items = [i.strip() for i in items]
     else:
         items = [i.strip("\n") for i in items]
 
-    return [unicode(i) for i in items]
+    return [str(i) for i in items]
 
 
 def wise_startswith(string, seed):
-    string = unicode(string).strip()
-    seed = unicode(seed)
-    regex = u"^%s" % re.escape(seed)
+    string = str(string).strip()
+    seed = str(seed)
+    regex = "^%s" % re.escape(seed)
     return bool(re.search(regex, string, re.I))
 
 
 def remove_it(string, what):
-    return unicode(re.sub(unicode(what), "", unicode(string)).strip())
+    return str(re.sub(str(what), "", str(string)).strip())
 
 
 def column_width(string):
     l = 0
-    for c in unicode(string):
+    for c in str(string):
         if unicodedata.east_asian_width(c) in "WF":
             l += 2
         else:
@@ -93,36 +93,36 @@ def column_width(string):
     return l
 
 
-def rfill(string, times, char=u" ", append=u""):
-    string = unicode(string)
+def rfill(string, times, char=" ", append=""):
+    string = str(string)
     missing = times - column_width(string)
     for x in range(missing):
         string += char
 
-    return unicode(string) + unicode(append)
+    return str(string) + str(append)
 
 
 def getlen(string):
-    return column_width(unicode(string)) + 1
+    return column_width(str(string)) + 1
 
 
 def dicts_to_string(dicts, order):
     '''
     Makes dictionary ready for comparison to strings
     '''
-    escape = "#{%s}" % unicode(time.time())
+    escape = "#{%s}" % str(time.time())
 
     def enline(line):
-        return unicode(line).replace("|", escape)
+        return str(line).replace("|", escape)
 
     def deline(line):
         return line.replace(escape, '\\|')
 
-    keys_and_sizes = dict([(k, getlen(k)) for k in dicts[0].keys()])
+    keys_and_sizes = dict([(k, getlen(k)) for k in list(dicts[0].keys())])
     for key in keys_and_sizes:
         for data in dicts:
             current_size = keys_and_sizes[key]
-            value = unicode(data.get(key, ''))
+            value = str(data.get(key, ''))
             size = getlen(value)
             if size > current_size:
                 keys_and_sizes[key] = size
@@ -130,27 +130,27 @@ def dicts_to_string(dicts, order):
     names = []
     for key in order:
         size = keys_and_sizes[key]
-        name = u" %s" % rfill(key, size)
+        name = " %s" % rfill(key, size)
         names.append(enline(name))
 
-    table = [u"|%s|" % "|".join(names)]
+    table = ["|%s|" % "|".join(names)]
     for data in dicts:
         names = []
         for key in order:
             value = data.get(key, '')
             size = keys_and_sizes[key]
-            names.append(enline(u" %s" % rfill(value, size)))
+            names.append(enline(" %s" % rfill(value, size)))
 
-        table.append(u"|%s|" % "|".join(names))
+        table.append("|%s|" % "|".join(names))
 
-    return deline(u"\n".join(table) + u"\n")
+    return deline("\n".join(table) + "\n")
 
 
 def parse_hashes(lines, json_format=None):
-    escape = "#{%s}" % unicode(time.time())
+    escape = "#{%s}" % str(time.time())
 
     def enline(line):
-        return unicode(line.replace("\\|", escape)).strip()
+        return str(line.replace("\\|", escape)).strip()
 
     def deline(line):
         return line.replace(escape, '|')
@@ -159,19 +159,19 @@ def parse_hashes(lines, json_format=None):
         return [line for line in lines if not line.startswith('#')]
 
     lines = discard_comments(lines)
-    lines = map(enline, lines)
+    lines = list(map(enline, lines))
 
     keys = []
     hashes = []
     if lines:
         first_line = lines.pop(0)
-        keys = split_wisely(first_line, u"|", True)
-        keys = map(deline, keys)
+        keys = split_wisely(first_line, "|", True)
+        keys = list(map(deline, keys))
 
         for line in lines:
-            values = split_wisely(line, u"|", True)
-            values = map(deline, values)
-            hashes.append(dict(zip(keys, values)))
+            values = split_wisely(line, "|", True)
+            values = list(map(deline, values))
+            hashes.append(dict(list(zip(keys, values))))
 
     return keys, hashes
 
@@ -180,25 +180,25 @@ def json_to_string(json_list, order):
     This is for aesthetic reasons, it will get the width of the largest column and
     rfill the rest with spaces
     '''
-    escape = "#{%s}" % unicode(time.time())
+    escape = "#{%s}" % str(time.time())
 
     def enline(line):
-        return unicode(line).replace("|", escape)
+        return str(line).replace("|", escape)
 
     def deline(line):
         return line.replace(escape, '\\|')
 
-    nu_keys_and_sizes = list([[k.keys()[0], getlen(k.keys()[0])] for k in json_list])
+    nu_keys_and_sizes = list([[list(k.keys())[0], getlen(list(k.keys())[0])] for k in json_list])
     maxlen = 0
     for key_list in nu_keys_and_sizes:
         current_size = key_list[1]
         counter = 0
-        temp_list = json_list[counter].values()[0]
+        temp_list = list(json_list[counter].values())[0]
         temp_maxlen = len(temp_list)
         if temp_maxlen > maxlen:
             maxlen = temp_maxlen
         for data in temp_list:
-            value = unicode(data)
+            value = str(data)
             size = getlen(value)
             if size > current_size:
                 key_list[1] = size
@@ -207,32 +207,32 @@ def json_to_string(json_list, order):
     idx = 0
     for key in nu_keys_and_sizes:
         size = key[1]
-        name = u" %s" % rfill(key[0], size)
+        name = " %s" % rfill(key[0], size)
         names.append(enline(name))
 
-    table = [u"|%s|" % "|".join(names)]
+    table = ["|%s|" % "|".join(names)]
 
-    for idx in xrange(maxlen):
+    for idx in range(maxlen):
         names = []
         for data, key in zip(json_list, nu_keys_and_sizes):
             try:
-                value = data.values()[0][idx]
+                value = list(data.values())[0][idx]
             except IndexError:
                 value = ''
             size = key[1]
-            names.append(enline(u" %s" % rfill(value, size)))
-        table.append(u"|%s|" % "|".join(names))
+            names.append(enline(" %s" % rfill(value, size)))
+        table.append("|%s|" % "|".join(names))
 
-    return deline(u"\n".join(table) + u"\n")
+    return deline("\n".join(table) + "\n")
 
 
 def parse_as_json(lines):
     '''
         Parse lines into json objects
     '''
-    escape = "#{%s}" % unicode(time.time())
+    escape = "#{%s}" % str(time.time())
     def enline(line):
-        return unicode(line.replace("\\|", escape)).strip()
+        return str(line.replace("\\|", escape)).strip()
 
     def deline(line):
         return line.replace(escape, '|')
@@ -240,23 +240,23 @@ def parse_as_json(lines):
     def discard_comments(lines):
         return [line for line in lines if not line.startswith('#')]
     lines = discard_comments(lines)
-    lines = map(enline, lines)
+    lines = list(map(enline, lines))
     non_unique_keys = []
     json_map = []
     if lines:
         first_line = lines.pop(0)
-        non_unique_keys = split_wisely(first_line, u"|", True)
-        non_unique_keys = map(deline, non_unique_keys)
+        non_unique_keys = split_wisely(first_line, "|", True)
+        non_unique_keys = list(map(deline, non_unique_keys))
         rng_idx = len(non_unique_keys)
         json_map = list(non_unique_keys)
-        for idx in xrange(rng_idx):
+        for idx in range(rng_idx):
             json_map[idx] = dict([(non_unique_keys[idx], [])])
         for line in lines:
-            values = split_wisely(line, u"|", True)
-            values = map(deline, values)
+            values = split_wisely(line, "|", True)
+            values = list(map(deline, values))
 
-            for idx in xrange(rng_idx):
-                json_map[idx].values()[0].append(values[idx])
+            for idx in range(rng_idx):
+                list(json_map[idx].values())[0].append(values[idx])
     return non_unique_keys, json_map
 
 
@@ -272,4 +272,4 @@ def parse_multiline(lines):
             if line.endswith('"'):
                 line = line[:-1]
             multilines.append(line)
-    return u'\n'.join(multilines)
+    return '\n'.join(multilines)

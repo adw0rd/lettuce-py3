@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import lettuce
 import os
-import commands
+import subprocess
 import sys
 from nose.tools import assert_equals
 from lettuce.fs import FileSystem
@@ -27,7 +27,7 @@ def test_server_threading():
     Test django httpd threading
     """
     FileSystem.pushd(current_directory, "django", "coconut")
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "python manage.py harvest --verbosity=1")
     
     assert_equals(status, 0, out)

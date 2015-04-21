@@ -86,12 +86,12 @@ class Command(ArgsCommand):
             raise CommandError('The given data source cannot be found: "%s"' % data_source)
         
         # Removing options with `None` values.
-        options = dict([(k, v) for k, v in options.items() if not v is None])
+        options = dict([(k, v) for k, v in list(options.items()) if not v is None])
 
         # Getting the OGR DataSource from the string parameter.
         try:
             ds = gdal.DataSource(data_source)
-        except gdal.OGRException, msg:
+        except gdal.OGRException as msg:
             raise CommandError(msg)
 
         # Whether the user wants to generate the LayerMapping dictionary as well.
@@ -114,7 +114,7 @@ class Command(ArgsCommand):
             mapping_dict = mapping(ds, **kwargs)
             # This extra legwork is so that the dictionary definition comes
             # out in the same order as the fields in the model definition.
-            rev_mapping = dict([(v, k) for k, v in mapping_dict.items()])
+            rev_mapping = dict([(v, k) for k, v in list(mapping_dict.items())])
             output.extend(['', '# Auto-generated `LayerMapping` dictionary for %s model' % model_name, 
                            '%s_mapping = {' % model_name.lower()])
             output.extend(["    '%s' : '%s'," % (rev_mapping[ogr_fld], ogr_fld) for ogr_fld in ds[options['layer_key']].fields])

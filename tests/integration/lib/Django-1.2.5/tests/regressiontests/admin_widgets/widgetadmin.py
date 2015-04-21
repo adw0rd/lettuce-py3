@@ -3,7 +3,7 @@
 """
 from django.contrib import admin
 
-import models
+from . import models
 
 class WidgetAdmin(admin.AdminSite):
     pass

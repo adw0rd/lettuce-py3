@@ -105,7 +105,7 @@ class BaseRunserverCommand(BaseCommand):
         try:
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler, ipv6=self.use_ipv6)
-        except WSGIServerException, e:
+        except WSGIServerException as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
                 13: "You don't have permission to access that port.",

@@ -1,5 +1,5 @@
-import urllib
-from urlparse import urlparse
+import urllib.request, urllib.parse, urllib.error
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIHandler
@@ -43,7 +43,7 @@ class StaticFilesHandler(WSGIHandler):
         Returns the relative path to the media file on disk for the given URL.
         """
         relative_url = url[len(self.base_url[2]):]
-        return urllib.url2pathname(relative_url)
+        return urllib.request.url2pathname(relative_url)
 
     def serve(self, request):
         """
@@ -57,7 +57,7 @@ class StaticFilesHandler(WSGIHandler):
         if self._should_handle(request.path):
             try:
                 return self.serve(request)
-            except Http404, e:
+            except Http404 as e:
                 if settings.DEBUG:
                     from django.views import debug
                     return debug.technical_404_response(request, e)

@@ -21,12 +21,12 @@ class DeletionTests(TestCase):
         PoetFormSet = modelformset_factory(Poet, can_delete=True)
         poet = Poet.objects.create(name='test')
         data = {
-            'form-TOTAL_FORMS': u'1',
-            'form-INITIAL_FORMS': u'1',
-            'form-MAX_NUM_FORMS': u'0',
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '0',
             'form-0-id': str(poet.pk),
-            'form-0-name': u'test',
-            'form-0-DELETE': u'on',
+            'form-0-name': 'test',
+            'form-0-DELETE': 'on',
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         formset.save()
@@ -40,11 +40,11 @@ class DeletionTests(TestCase):
         """
         PoetFormSet = modelformset_factory(Poet, can_delete=True)
         data = {
-            'form-TOTAL_FORMS': u'1',
-            'form-INITIAL_FORMS': u'0',
-            'form-MAX_NUM_FORMS': u'0',
-            'form-0-id': u'',
-            'form-0-name': u'x' * 1000,
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-id': '',
+            'form-0-name': 'x' * 1000,
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         # Make sure this form doesn't pass validation.
@@ -67,11 +67,11 @@ class DeletionTests(TestCase):
         PoetFormSet = modelformset_factory(Poet, can_delete=True)
         poet = Poet.objects.create(name='test')
         data = {
-            'form-TOTAL_FORMS': u'1',
-            'form-INITIAL_FORMS': u'1',
-            'form-MAX_NUM_FORMS': u'0',
-            'form-0-id': unicode(poet.id),
-            'form-0-name': u'x' * 1000,
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-id': str(poet.id),
+            'form-0-name': 'x' * 1000,
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         # Make sure this form doesn't pass validation.
@@ -243,7 +243,7 @@ class ModelFormsetTest(TestCase):
 
         # create an Author instance to add to the meeting.
 
-        author4 = Author.objects.create(name=u'John Steinbeck')
+        author4 = Author.objects.create(name='John Steinbeck')
 
         AuthorMeetingFormSet = modelformset_factory(AuthorMeeting, extra=1, can_delete=True)
         data = {
@@ -327,7 +327,7 @@ class ModelFormsetTest(TestCase):
             def save(self, commit=True):
                 # change the name to "Vladimir Mayakovsky" just to be a jerk.
                 author = super(PoetForm, self).save(commit=False)
-                author.name = u"Vladimir Mayakovsky"
+                author.name = "Vladimir Mayakovsky"
                 if commit:
                     author.save()
                 return author
@@ -616,7 +616,7 @@ class ModelFormsetTest(TestCase):
             def save(self, commit=True):
                 # change the name to "Brooklyn Bridge" just to be a jerk.
                 poem = super(PoemForm, self).save(commit=False)
-                poem.name = u"Brooklyn Bridge"
+                poem.name = "Brooklyn Bridge"
                 if commit:
                     poem.save()
                 return poem
@@ -707,7 +707,7 @@ class ModelFormsetTest(TestCase):
 
         # Custom primary keys with ForeignKey, OneToOneField and AutoField ############
 
-        place = Place.objects.create(pk=1, name=u'Giordanos', city=u'Chicago')
+        place = Place.objects.create(pk=1, name='Giordanos', city='Chicago')
 
         FormSet = inlineformset_factory(Place, Owner, extra=2, can_delete=False)
         formset = FormSet(instance=place)
@@ -722,7 +722,7 @@ class ModelFormsetTest(TestCase):
             'owner_set-INITIAL_FORMS': '0',
             'owner_set-MAX_NUM_FORMS': '',
             'owner_set-0-auto_id': '',
-            'owner_set-0-name': u'Joe Perry',
+            'owner_set-0-name': 'Joe Perry',
             'owner_set-1-auto_id': '',
             'owner_set-1-name': '',
         }
@@ -748,10 +748,10 @@ class ModelFormsetTest(TestCase):
             'owner_set-TOTAL_FORMS': '3',
             'owner_set-INITIAL_FORMS': '1',
             'owner_set-MAX_NUM_FORMS': '',
-            'owner_set-0-auto_id': unicode(owner1.auto_id),
-            'owner_set-0-name': u'Joe Perry',
+            'owner_set-0-auto_id': str(owner1.auto_id),
+            'owner_set-0-name': 'Joe Perry',
             'owner_set-1-auto_id': '',
-            'owner_set-1-name': u'Jack Berry',
+            'owner_set-1-name': 'Jack Berry',
             'owner_set-2-auto_id': '',
             'owner_set-2-name': '',
         }
@@ -776,7 +776,7 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_form-0-age">Age:</label> <input type="text" name="form-0-age" id="id_form-0-age" /></p>'
             % (owner1.auto_id, owner2.auto_id))
 
-        owner1 = Owner.objects.get(name=u'Joe Perry')
+        owner1 = Owner.objects.get(name='Joe Perry')
         FormSet = inlineformset_factory(Owner, OwnerProfile, max_num=1, can_delete=False)
         self.assertEqual(FormSet.max_num, 1)
 
@@ -791,7 +791,7 @@ class ModelFormsetTest(TestCase):
             'ownerprofile-INITIAL_FORMS': '0',
             'ownerprofile-MAX_NUM_FORMS': '1',
             'ownerprofile-0-owner': '',
-            'ownerprofile-0-age': u'54',
+            'ownerprofile-0-age': '54',
         }
         formset = FormSet(data, instance=owner1)
         self.assertTrue(formset.is_valid())
@@ -811,8 +811,8 @@ class ModelFormsetTest(TestCase):
             'ownerprofile-TOTAL_FORMS': '1',
             'ownerprofile-INITIAL_FORMS': '1',
             'ownerprofile-MAX_NUM_FORMS': '1',
-            'ownerprofile-0-owner': unicode(owner1.auto_id),
-            'ownerprofile-0-age': u'55',
+            'ownerprofile-0-owner': str(owner1.auto_id),
+            'ownerprofile-0-age': '55',
         }
         formset = FormSet(data, instance=owner1)
         self.assertTrue(formset.is_valid())
@@ -825,7 +825,7 @@ class ModelFormsetTest(TestCase):
     def test_unique_true_enforces_max_num_one(self):
         # ForeignKey with unique=True should enforce max_num=1
 
-        place = Place.objects.create(pk=1, name=u'Giordanos', city=u'Chicago')
+        place = Place.objects.create(pk=1, name='Giordanos', city='Chicago')
 
         FormSet = inlineformset_factory(Place, Location, can_delete=False)
         self.assertEqual(FormSet.max_num, 1)
@@ -863,7 +863,7 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{'slug': [u'Product with this Slug already exists.']}])
+        self.assertEqual(formset.errors, [{'slug': ['Product with this Slug already exists.']}])
 
     def test_unique_together_validation(self):
         FormSet = modelformset_factory(Price, extra=1)
@@ -871,7 +871,7 @@ class ModelFormsetTest(TestCase):
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '',
-            'form-0-price': u'12.00',
+            'form-0-price': '12.00',
             'form-0-quantity': '1',
         }
         formset = FormSet(data)
@@ -886,17 +886,17 @@ class ModelFormsetTest(TestCase):
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '',
-            'form-0-price': u'12.00',
+            'form-0-price': '12.00',
             'form-0-quantity': '1',
         }
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{'__all__': [u'Price with this Price and Quantity already exists.']}])
+        self.assertEqual(formset.errors, [{'__all__': ['Price with this Price and Quantity already exists.']}])
 
     def test_unique_together_with_inlineformset_factory(self):
         # Also see bug #8882.
 
-        repository = Repository.objects.create(name=u'Test Repo')
+        repository = Repository.objects.create(name='Test Repo')
         FormSet = inlineformset_factory(Repository, Revision, extra=1)
         data = {
             'revision_set-TOTAL_FORMS': '1',
@@ -925,7 +925,7 @@ class ModelFormsetTest(TestCase):
         }
         formset = FormSet(data, instance=repository)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{'__all__': [u'Revision with this Repository and Revision already exists.']}])
+        self.assertEqual(formset.errors, [{'__all__': ['Revision with this Repository and Revision already exists.']}])
 
         # unique_together with inlineformset_factory with overridden form fields
         # Also see #9494
@@ -969,8 +969,8 @@ class ModelFormsetTest(TestCase):
             'membership_set-TOTAL_FORMS': '1',
             'membership_set-INITIAL_FORMS': '0',
             'membership_set-MAX_NUM_FORMS': '',
-            'membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
-            'initial-membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
+            'membership_set-0-date_joined': str(now.strftime('%Y-%m-%d %H:%M:%S')),
+            'initial-membership_set-0-date_joined': str(now.strftime('%Y-%m-%d %H:%M:%S')),
             'membership_set-0-karma': '',
         }
         formset = FormSet(data, instance=person)
@@ -983,8 +983,8 @@ class ModelFormsetTest(TestCase):
             'membership_set-TOTAL_FORMS': '1',
             'membership_set-INITIAL_FORMS': '0',
             'membership_set-MAX_NUM_FORMS': '',
-            'membership_set-0-date_joined': unicode(one_day_later.strftime('%Y-%m-%d %H:%M:%S')),
-            'initial-membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
+            'membership_set-0-date_joined': str(one_day_later.strftime('%Y-%m-%d %H:%M:%S')),
+            'initial-membership_set-0-date_joined': str(now.strftime('%Y-%m-%d %H:%M:%S')),
             'membership_set-0-karma': '',
         }
         formset = FormSet(filled_data, instance=person)
@@ -1005,9 +1005,9 @@ class ModelFormsetTest(TestCase):
             'membership_set-TOTAL_FORMS': '1',
             'membership_set-INITIAL_FORMS': '0',
             'membership_set-MAX_NUM_FORMS': '',
-            'membership_set-0-date_joined_0': unicode(now.strftime('%Y-%m-%d')),
-            'membership_set-0-date_joined_1': unicode(now.strftime('%H:%M:%S')),
-            'initial-membership_set-0-date_joined': unicode(now.strftime('%Y-%m-%d %H:%M:%S')),
+            'membership_set-0-date_joined_0': str(now.strftime('%Y-%m-%d')),
+            'membership_set-0-date_joined_1': str(now.strftime('%H:%M:%S')),
+            'initial-membership_set-0-date_joined': str(now.strftime('%Y-%m-%d %H:%M:%S')),
             'membership_set-0-karma': '',
         }
         formset = FormSet(data, instance=person)
@@ -1016,7 +1016,7 @@ class ModelFormsetTest(TestCase):
     def test_inlineformset_factory_with_null_fk(self):
         # inlineformset_factory tests with fk having null=True. see #9462.
         # create some data that will exbit the issue
-        team = Team.objects.create(name=u"Red Vipers")
+        team = Team.objects.create(name="Red Vipers")
         Player(name="Timmy").save()
         Player(name="Bobby", team=team).save()
 
@@ -1049,7 +1049,7 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset._non_form_errors,
-            [u'Please correct the duplicate data for slug.'])
+            ['Please correct the duplicate data for slug.'])
 
         FormSet = modelformset_factory(Price, extra=2)
         data = {
@@ -1064,7 +1064,7 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset._non_form_errors,
-            [u'Please correct the duplicate data for price and quantity, which must be unique.'])
+            ['Please correct the duplicate data for price and quantity, which must be unique.'])
 
         # Only the price field is specified, this should skip any unique checks since
         # the unique_together is not fulfilled. This will fail with a KeyError if broken.
@@ -1102,9 +1102,9 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(data=data, instance=author)
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset._non_form_errors,
-            [u'Please correct the duplicate data for title.'])
+            ['Please correct the duplicate data for title.'])
         self.assertEqual(formset.errors,
-            [{}, {'__all__': [u'Please correct the duplicate values below.']}])
+            [{}, {'__all__': ['Please correct the duplicate values below.']}])
 
         FormSet = modelformset_factory(Post, extra=2)
         data = {
@@ -1124,9 +1124,9 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset._non_form_errors,
-            [u'Please correct the duplicate data for title which must be unique for the date in posted.'])
+            ['Please correct the duplicate data for title which must be unique for the date in posted.'])
         self.assertEqual(formset.errors,
-            [{}, {'__all__': [u'Please correct the duplicate values below.']}])
+            [{}, {'__all__': ['Please correct the duplicate values below.']}])
 
         data = {
             'form-TOTAL_FORMS': '2',
@@ -1145,7 +1145,7 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset._non_form_errors,
-            [u'Please correct the duplicate data for slug which must be unique for the year in posted.'])
+            ['Please correct the duplicate data for slug which must be unique for the year in posted.'])
 
         data = {
             'form-TOTAL_FORMS': '2',
@@ -1164,4 +1164,4 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset._non_form_errors,
-            [u'Please correct the duplicate data for subtitle which must be unique for the month in posted.'])
+            ['Please correct the duplicate data for subtitle which must be unique for the month in posted.'])

@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from namespace_urls import URLObject
+from .namespace_urls import URLObject
 
 testobj3 = URLObject('testapp', 'test-ns3')
 

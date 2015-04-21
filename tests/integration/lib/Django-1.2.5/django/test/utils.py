@@ -29,7 +29,7 @@ class ContextList(list):
     in a list of context objects.
     """
     def __getitem__(self, key):
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             for subcontext in self:
                 if key in subcontext:
                     return subcontext[key]

@@ -29,7 +29,7 @@ class Child(models.Model):
     parent = generic.GenericForeignKey()
 
     def __unicode__(self):
-        return u'I am %s, a child of %s' % (self.name, self.parent)
+        return 'I am %s, a child of %s' % (self.name, self.parent)
 
 class Book(models.Model):
     name = models.CharField(max_length=50)

@@ -8,5 +8,5 @@ class CustomTests(TestCase):
         t = template.Template("{% load custom %}{{ string|trim:5 }}")
         self.assertEqual(
             t.render(template.Context({"string": "abcdefghijklmnopqrstuvwxyz"})),
-            u"abcde"
+            "abcde"
         )

@@ -11,7 +11,7 @@ from django.db.models.query import Q, ITER_CHUNK_SIZE, EmptyQuerySet
 from django.test import TestCase
 from django.utils.datastructures import SortedDict
 
-from models import (Annotation, Article, Author, Celebrity, Child, Cover, Detail,
+from .models import (Annotation, Article, Author, Celebrity, Child, Cover, Detail,
     DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ, ManagedModel,
     Member, NamedCategory, Note, Number, Plaything, PointerA, Ranking, Related,
     Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten, Node)
@@ -24,7 +24,7 @@ class BaseQuerysetTest(TestCase):
     def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
         try:
             func(*args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(msg, str(e))
             self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
         else:
@@ -32,7 +32,7 @@ class BaseQuerysetTest(TestCase):
                 excName = exc.__name__
             else:
                 excName = str(exc)
-            raise AssertionError, "%s not raised" % excName
+            raise AssertionError("%s not raised" % excName)
 
 
 class Queries1Tests(BaseQuerysetTest):
@@ -113,7 +113,7 @@ class Queries1Tests(BaseQuerysetTest):
     def test_ticket2306(self):
         # Checking that no join types are "left outer" joins.
         query = Item.objects.filter(tags=self.t2).query
-        self.assertTrue(query.LOUTER not in [x[2] for x in query.alias_map.values()])
+        self.assertTrue(query.LOUTER not in [x[2] for x in list(query.alias_map.values())])
 
         self.assertQuerysetEqual(
             Item.objects.filter(Q(tags=self.t1)).order_by('name'),
@@ -309,7 +309,7 @@ class Queries1Tests(BaseQuerysetTest):
 
         # Excluding from a relation that cannot be NULL should not use outer joins.
         query = Item.objects.exclude(creator__in=[self.a1, self.a2]).query
-        self.assertTrue(query.LOUTER not in [x[2] for x in query.alias_map.values()])
+        self.assertTrue(query.LOUTER not in [x[2] for x in list(query.alias_map.values())])
 
         # Similarly, when one of the joins cannot possibly, ever, involve NULL
         # values (Author -> ExtraInfo, in the following), it should never be
@@ -317,7 +317,7 @@ class Queries1Tests(BaseQuerysetTest):
         # involve one "left outer" join (Author -> Item is 0-to-many).
         qs = Author.objects.filter(id=self.a1.id).filter(Q(extra__note=self.n1)|Q(item__note=self.n3))
         self.assertEqual(
-            len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER and qs.query.alias_refcount[x[1]]]),
+            len([x[2] for x in list(qs.query.alias_map.values()) if x[2] == query.LOUTER and qs.query.alias_refcount[x[1]]]),
             1
         )
 
@@ -464,7 +464,7 @@ class Queries1Tests(BaseQuerysetTest):
         # ordering columns.
         self.assertValueQuerysetEqual(
             Note.objects.values('misc').distinct().order_by('note', '-misc'),
-            [{'misc': u'foo'}, {'misc': u'bar'}, {'misc': u'foo'}]
+            [{'misc': 'foo'}, {'misc': 'bar'}, {'misc': 'foo'}]
         )
 
     def test_ticket4358(self):
@@ -474,7 +474,7 @@ class Queries1Tests(BaseQuerysetTest):
         # actually allow both "foo" and "foo_id".
 
         # The *_id version is returned by default.
-        self.assertTrue('note_id' in ExtraInfo.objects.values()[0])
+        self.assertTrue('note_id' in list(ExtraInfo.objects.values())[0])
 
         # You can also pass it in explicitly.
         self.assertValueQuerysetEqual(
@@ -496,7 +496,7 @@ class Queries1Tests(BaseQuerysetTest):
         # normal. A normal dict would thus fail.)
         s = [('a', '%s'), ('b', '%s')]
         params = ['one', 'two']
-        if {'a': 1, 'b': 2}.keys() == ['a', 'b']:
+        if list({'a': 1, 'b': 2}.keys()) == ['a', 'b']:
             s.reverse()
             params.reverse()
 
@@ -504,7 +504,7 @@ class Queries1Tests(BaseQuerysetTest):
         # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
         # using constants here and not a real concern.
         d = Item.objects.extra(select=SortedDict(s), select_params=params).values('a', 'b')[0]
-        self.assertEqual(d, {'a': u'one', 'b': u'two'})
+        self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
         # Order by the number of tags attached to an item.
         l = Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).order_by('-count')
@@ -580,7 +580,7 @@ class Queries1Tests(BaseQuerysetTest):
         # works.
         self.assertValueQuerysetEqual(
             Item.objects.values('note__note').order_by('queries_note.note', 'id'),
-            [{'note__note': u'n2'}, {'note__note': u'n3'}, {'note__note': u'n3'}, {'note__note': u'n3'}]
+            [{'note__note': 'n2'}, {'note__note': 'n3'}, {'note__note': 'n3'}, {'note__note': 'n3'}]
         )
 
     def test_ticket7096(self):
@@ -801,7 +801,7 @@ class Queries1Tests(BaseQuerysetTest):
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
         qs.query.bump_prefix()
         first = qs[0]
-        self.assertEqual(list(qs), range(first, first+5))
+        self.assertEqual(list(qs), list(range(first, first+5)))
 
     def test_ticket8439(self):
         # Complex combinations of conjunctions, disjunctions and nullable
@@ -826,7 +826,7 @@ class Queries1Tests(BaseQuerysetTest):
         xx.delete()
         q = Note.objects.filter(Q(extrainfo__author=self.a1)|Q(extrainfo=xx)).query
         self.assertEqual(
-            len([x[2] for x in q.alias_map.values() if x[2] == q.LOUTER and q.alias_refcount[x[1]]]),
+            len([x[2] for x in list(q.alias_map.values()) if x[2] == q.LOUTER and q.alias_refcount[x[1]]]),
             1
         )
 
@@ -984,12 +984,12 @@ class Queries4Tests(BaseQuerysetTest):
         # Note: In Oracle, we expect a null CharField to return u'' instead of
         # None.
         if connection.features.interprets_empty_strings_as_nulls:
-            expected_null_charfield_repr = u''
+            expected_null_charfield_repr = ''
         else:
             expected_null_charfield_repr = None
         self.assertValueQuerysetEqual(
             Report.objects.values_list("creator__extra__info", flat=True).order_by("name"),
-            [u'e1', u'e2', expected_null_charfield_repr],
+            ['e1', 'e2', expected_null_charfield_repr],
         )
 
         # Similarly for select_related(), joins beyond an initial nullable join
@@ -1010,7 +1010,7 @@ class Queries4Tests(BaseQuerysetTest):
         m2 = Member.objects.create(name="m2", details=d2)
         Child.objects.create(person=m2, parent=m1)
         obj = m1.children.select_related("person__details")[0]
-        self.assertEqual(obj.person.details.data, u'd2')
+        self.assertEqual(obj.person.details.data, 'd2')
 
     def test_order_by_resetting(self):
         # Calling order_by() with no parameters removes any existing ordering on the
@@ -1075,7 +1075,7 @@ class Queries5Tests(TestCase):
         # them in a values() query.
         dicts = qs.values('id', 'rank').order_by('id')
         self.assertEqual(
-            [d.items()[1] for d in dicts],
+            [list(d.items())[1] for d in dicts],
             [('rank', 2), ('rank', 1), ('rank', 3)]
         )
 
@@ -1083,7 +1083,7 @@ class Queries5Tests(TestCase):
         # An empty values() call includes all aliases, including those from an
         # extra()
         qs = Ranking.objects.extra(select={'good': 'case when rank > 2 then 1 else 0 end'})
-        dicts = qs.values().order_by('id')
+        dicts = list(qs.values()).order_by('id')
         for d in dicts: del d['id']; del d['author_id']
         self.assertEqual(
             [sorted(d.items()) for d in dicts],
@@ -1238,12 +1238,12 @@ class Queries6Tests(TestCase):
         # Test that parallel iterators work.
         qs = Tag.objects.all()
         i1, i2 = iter(qs), iter(qs)
-        self.assertEqual(repr(i1.next()), '<Tag: t1>')
-        self.assertEqual(repr(i1.next()), '<Tag: t2>')
-        self.assertEqual(repr(i2.next()), '<Tag: t1>')
-        self.assertEqual(repr(i2.next()), '<Tag: t2>')
-        self.assertEqual(repr(i2.next()), '<Tag: t3>')
-        self.assertEqual(repr(i1.next()), '<Tag: t3>')
+        self.assertEqual(repr(next(i1)), '<Tag: t1>')
+        self.assertEqual(repr(next(i1)), '<Tag: t2>')
+        self.assertEqual(repr(next(i2)), '<Tag: t1>')
+        self.assertEqual(repr(next(i2)), '<Tag: t2>')
+        self.assertEqual(repr(next(i2)), '<Tag: t3>')
+        self.assertEqual(repr(next(i1)), '<Tag: t3>')
 
         qs = X.objects.all()
         self.assertEqual(bool(qs), False)
@@ -1631,7 +1631,7 @@ if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != "django.db.backends.sqlite3
         def test_ticket14244(self):
             # Test that the "in" lookup works with lists of 1000 items or more.
             Number.objects.all().delete()
-            numbers = range(2500)
+            numbers = list(range(2500))
             for num in numbers:
                 _ = Number.objects.create(num=num)
             self.assertEqual(

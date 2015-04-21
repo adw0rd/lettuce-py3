@@ -75,8 +75,8 @@ class DummyCacheTests(unittest.TestCase):
     def test_has_key(self):
         "The has_key method doesn't ever return True for the dummy cache backend"
         self.cache.set("hello1", "goodbye1")
-        self.assertEqual(self.cache.has_key("hello1"), False)
-        self.assertEqual(self.cache.has_key("goodbye1"), False)
+        self.assertEqual("hello1" in self.cache, False)
+        self.assertEqual("goodbye1" in self.cache, False)
 
     def test_in(self):
         "The in operator doesn't ever return True for the dummy cache backend"
@@ -121,17 +121,17 @@ class DummyCacheTests(unittest.TestCase):
 
         self.cache.add("expire2", "newvalue")
         self.assertEqual(self.cache.get("expire2"), None)
-        self.assertEqual(self.cache.has_key("expire3"), False)
+        self.assertEqual("expire3" in self.cache, False)
 
     def test_unicode(self):
         "Unicode values are ignored by the dummy cache"
         stuff = {
-            u'ascii': u'ascii_value',
-            u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
-            u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii': {u'x' : 1 }
+            'ascii': 'ascii_value',
+            'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
+            'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
+            'ascii': {'x' : 1 }
             }
-        for (key, value) in stuff.items():
+        for (key, value) in list(stuff.items()):
             self.cache.set(key, value)
             self.assertEqual(self.cache.get(key), None)
 
@@ -180,7 +180,7 @@ class BaseCacheTests(object):
         self.cache.set('somekey', 'value')
 
         # should not be set in the prefixed cache
-        self.assertFalse(self.prefix_cache.has_key('somekey'))
+        self.assertFalse('somekey' in self.prefix_cache)
 
         self.prefix_cache.set('somekey', 'value2')
 
@@ -214,8 +214,8 @@ class BaseCacheTests(object):
     def test_has_key(self):
         # The cache can be inspected for cache keys
         self.cache.set("hello1", "goodbye1")
-        self.assertEqual(self.cache.has_key("hello1"), True)
-        self.assertEqual(self.cache.has_key("goodbye1"), False)
+        self.assertEqual("hello1" in self.cache, True)
+        self.assertEqual("goodbye1" in self.cache, False)
 
     def test_in(self):
         # The in operator can be used to inspet cache contents
@@ -307,32 +307,32 @@ class BaseCacheTests(object):
 
         self.cache.add("expire2", "newvalue")
         self.assertEqual(self.cache.get("expire2"), "newvalue")
-        self.assertEqual(self.cache.has_key("expire3"), False)
+        self.assertEqual("expire3" in self.cache, False)
 
     def test_unicode(self):
         # Unicode values can be cached
         stuff = {
-            u'ascii': u'ascii_value',
-            u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
-            u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii': {u'x' : 1 }
+            'ascii': 'ascii_value',
+            'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
+            'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
+            'ascii': {'x' : 1 }
             }
         # Test `set`
-        for (key, value) in stuff.items():
+        for (key, value) in list(stuff.items()):
             self.cache.set(key, value)
             self.assertEqual(self.cache.get(key), value)
 
         # Test `add`
-        for (key, value) in stuff.items():
+        for (key, value) in list(stuff.items()):
             self.cache.delete(key)
             self.cache.add(key, value)
             self.assertEqual(self.cache.get(key), value)
 
         # Test `set_many`
-        for (key, value) in stuff.items():
+        for (key, value) in list(stuff.items()):
             self.cache.delete(key)
         self.cache.set_many(stuff)
-        for (key, value) in stuff.items():
+        for (key, value) in list(stuff.items()):
             self.assertEqual(self.cache.get(key), value)
 
     def test_binary_string(self):
@@ -416,7 +416,7 @@ class BaseCacheTests(object):
         count = 0
         # Count how many keys are left in the cache.
         for i in range(1, initial_count):
-            if self.cache.has_key('cull%d' % i):
+            if 'cull%d' % i in self.cache:
                 count = count + 1
         self.assertEqual(count, final_count)
 
@@ -537,11 +537,11 @@ class BaseCacheTests(object):
         self.cache.set('answer1', 42)
 
         # has_key
-        self.assertTrue(self.cache.has_key('answer1'))
+        self.assertTrue('answer1' in self.cache)
         self.assertTrue(self.cache.has_key('answer1', version=1))
         self.assertFalse(self.cache.has_key('answer1', version=2))
 
-        self.assertFalse(self.v2_cache.has_key('answer1'))
+        self.assertFalse('answer1' in self.v2_cache)
         self.assertTrue(self.v2_cache.has_key('answer1', version=1))
         self.assertFalse(self.v2_cache.has_key('answer1', version=2))
 

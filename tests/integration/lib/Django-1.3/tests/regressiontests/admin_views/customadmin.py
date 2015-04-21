@@ -5,7 +5,7 @@ from django.conf.urls.defaults import patterns
 from django.contrib import admin
 from django.http import HttpResponse
 
-import models, forms
+from . import models, forms
 
 class Admin2(admin.AdminSite):
     login_form = forms.CustomAdminAuthenticationForm

@@ -34,7 +34,7 @@ def cleanse_setting(key, value):
             cleansed = '********************'
         else:
             if isinstance(value, dict):
-                cleansed = dict((k, cleanse_setting(k, v)) for k,v in value.items())
+                cleansed = dict((k, cleanse_setting(k, v)) for k,v in list(value.items()))
             else:
                 cleansed = value
     except TypeError:
@@ -75,7 +75,7 @@ class ExceptionReporter(object):
         self.loader_debug_info = None
 
         # Handle deprecated string exceptions
-        if isinstance(self.exc_type, basestring):
+        if isinstance(self.exc_type, str):
             self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
             self.exc_type = type(self.exc_value)
 
@@ -214,7 +214,7 @@ class ExceptionReporter(object):
             if match:
                 encoding = match.group(1)
                 break
-        source = [unicode(sline, encoding, 'replace') for sline in source]
+        source = [str(sline, encoding, 'replace') for sline in source]
 
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
@@ -246,7 +246,7 @@ class ExceptionReporter(object):
                     'filename': filename,
                     'function': function,
                     'lineno': lineno + 1,
-                    'vars': tb.tb_frame.f_locals.items(),
+                    'vars': list(tb.tb_frame.f_locals.items()),
                     'id': id(tb),
                     'pre_context': pre_context,
                     'context_line': context_line,

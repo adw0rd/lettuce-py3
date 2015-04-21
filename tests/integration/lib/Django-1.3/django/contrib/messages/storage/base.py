@@ -41,7 +41,7 @@ class Message(StrAndUnicode):
                                   strings_only=True)
         extra_tags = force_unicode(self.extra_tags, strings_only=True)
         if extra_tags and label_tag:
-            return u' '.join([extra_tags, label_tag])
+            return ' '.join([extra_tags, label_tag])
         elif extra_tags:
             return extra_tags
         elif label_tag:

@@ -1,7 +1,7 @@
 """
 Tests for django test runner
 """
-import StringIO
+import io
 import unittest
 from django.core.exceptions import ImproperlyConfigured
 from django.test import simple
@@ -17,7 +17,7 @@ class DjangoTestRunnerTests(unittest.TestCase):
                 assert False
 
         suite = unittest.TestSuite([MockTestOne(), MockTestTwo()])
-        mock_stream = StringIO.StringIO()
+        mock_stream = io.StringIO()
         dtr = simple.DjangoTestRunner(verbosity=0, failfast=False, stream=mock_stream)
         result = dtr.run(suite)
         self.assertEqual(2, result.testsRun)

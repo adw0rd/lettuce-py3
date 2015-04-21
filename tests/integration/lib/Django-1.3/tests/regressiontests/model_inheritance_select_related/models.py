@@ -12,14 +12,14 @@ class Place(models.Model):
         ordering = ('name',)
 
     def __unicode__(self):
-        return u"%s the place" % self.name
+        return "%s the place" % self.name
 
 class Restaurant(Place):
     serves_sushi = models.BooleanField()
     serves_steak = models.BooleanField()
 
     def __unicode__(self):
-        return u"%s the restaurant" % self.name
+        return "%s the restaurant" % self.name
 
 class Person(models.Model):
     name = models.CharField(max_length=50)

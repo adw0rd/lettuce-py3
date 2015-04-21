@@ -13,7 +13,7 @@ class HumanizeTests(unittest.TestCase):
     def humanize_tester(self, test_list, result_list, method):
         # Using max below ensures we go through both lists
         # However, if the lists are not equal length, this raises an exception
-        for index in xrange(max(len(test_list), len(result_list))):
+        for index in range(max(len(test_list), len(result_list))):
             test_content = test_list[index]
             t = Template('{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
@@ -53,8 +53,8 @@ class HumanizeTests(unittest.TestCase):
     def test_apnumber(self):
         test_list = [str(x) for x in range(1, 11)]
         test_list.append(None)
-        result_list = (u'one', u'two', u'three', u'four', u'five', u'six',
-                       u'seven', u'eight', u'nine', u'10', None)
+        result_list = ('one', 'two', 'three', 'four', 'five', 'six',
+                       'seven', 'eight', 'nine', '10', None)
 
         self.humanize_tester(test_list, result_list, 'apnumber')
 
@@ -64,12 +64,12 @@ class HumanizeTests(unittest.TestCase):
         yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
         someday = today - timedelta(days=10)
-        notdate = u"I'm not a date value"
+        notdate = "I'm not a date value"
 
         test_list = (today, yesterday, tomorrow, someday, notdate, None)
         someday_result = defaultfilters.date(someday)
-        result_list = (_(u'today'), _(u'yesterday'), _(u'tomorrow'),
-                       someday_result, u"I'm not a date value", None)
+        result_list = (_('today'), _('yesterday'), _('tomorrow'),
+                       someday_result, "I'm not a date value", None)
         self.humanize_tester(test_list, result_list, 'naturalday')
 
 if __name__ == '__main__':

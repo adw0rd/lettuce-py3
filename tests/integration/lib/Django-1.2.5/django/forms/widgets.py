@@ -13,8 +13,8 @@ from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats
 import time
 import datetime
-from util import flatatt
-from urlparse import urljoin
+from .util import flatatt
+from urllib.parse import urljoin
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
@@ -48,23 +48,23 @@ class Media(StrAndUnicode):
         return self.render()
 
     def render(self):
-        return mark_safe(u'\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
+        return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
 
     def render_js(self):
-        return [u'<script type="text/javascript" src="%s"></script>' % self.absolute_path(path) for path in self._js]
+        return ['<script type="text/javascript" src="%s"></script>' % self.absolute_path(path) for path in self._js]
 
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
-        media = self._css.keys()
+        media = list(self._css.keys())
         media.sort()
         return chain(*[
-            [u'<link href="%s" type="text/css" media="%s" rel="stylesheet" />' % (self.absolute_path(path), medium)
+            ['<link href="%s" type="text/css" media="%s" rel="stylesheet" />' % (self.absolute_path(path), medium)
                     for path in self._css[medium]]
                 for medium in media])
 
     def absolute_path(self, path):
-        if path.startswith(u'http://') or path.startswith(u'https://') or path.startswith(u'/'):
+        if path.startswith('http://') or path.startswith('https://') or path.startswith('/'):
             return path
         return urljoin(settings.MEDIA_URL,path)
 
@@ -82,7 +82,7 @@ class Media(StrAndUnicode):
 
     def add_css(self, data):
         if data:
-            for medium, paths in data.items():
+            for medium, paths in list(data.items()):
                 for path in paths:
                     if not self._css.get(medium) or path not in self._css[medium]:
                         self._css.setdefault(medium, []).append(path)
@@ -129,8 +129,7 @@ class MediaDefiningClass(type):
             new_class.media = media_property(new_class)
         return new_class
 
-class Widget(object):
-    __metaclass__ = MediaDefiningClass
+class Widget(object, metaclass=MediaDefiningClass):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
     needs_multipart_form = False # Determines does this widget need multipart-encrypted form
     is_localized = False
@@ -178,11 +177,11 @@ class Widget(object):
         # the same as an empty string, if the data or inital value we get
         # is None, replace it w/ u''.
         if data is None:
-            data_value = u''
+            data_value = ''
         else:
             data_value = data
         if initial is None:
-            initial_value = u''
+            initial_value = ''
         else:
             initial_value = initial
         if force_unicode(initial_value) != force_unicode(data_value):
@@ -221,7 +220,7 @@ class Input(Widget):
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(self._format_value(value))
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
+        return mark_safe('<input%s />' % flatatt(final_attrs))
 
 class TextInput(Input):
     input_type = 'text'
@@ -262,8 +261,8 @@ class MultipleHiddenInput(HiddenInput):
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
                 input_attrs['id'] = '%s_%s' % (id_, i)
-            inputs.append(u'<input%s />' % flatatt(input_attrs))
-        return mark_safe(u'\n'.join(inputs))
+            inputs.append('<input%s />' % flatatt(input_attrs))
+        return mark_safe('\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, (MultiValueDict, MergeDict)):
@@ -297,7 +296,7 @@ class Textarea(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
+        return mark_safe('<textarea%s>%s</textarea>' % (flatatt(final_attrs),
                 conditional_escape(force_unicode(value))))
 
 class DateInput(Input):
@@ -413,7 +412,7 @@ class CheckboxInput(Widget):
         if value not in ('', True, False, None):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(value)
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
+        return mark_safe('<input%s />' % flatatt(final_attrs))
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -423,7 +422,7 @@ class CheckboxInput(Widget):
         value = data.get(name)
         # Translate true and false strings to boolean values.
         values =  {'true': True, 'false': False}
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = values.get(value.lower(), value)
         return value
 
@@ -443,17 +442,17 @@ class Select(Widget):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<select%s>' % flatatt(final_attrs)]
+        output = ['<select%s>' % flatatt(final_attrs)]
         options = self.render_options(choices, [value])
         if options:
             output.append(options)
-        output.append(u'</select>')
-        return mark_safe(u'\n'.join(output))
+        output.append('</select>')
+        return mark_safe('\n'.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
         option_value = force_unicode(option_value)
-        selected_html = (option_value in selected_choices) and u' selected="selected"' or ''
-        return u'<option value="%s"%s>%s</option>' % (
+        selected_html = (option_value in selected_choices) and ' selected="selected"' or ''
+        return '<option value="%s"%s>%s</option>' % (
             escape(option_value), selected_html,
             conditional_escape(force_unicode(option_label)))
 
@@ -463,35 +462,35 @@ class Select(Widget):
         output = []
         for option_value, option_label in chain(self.choices, choices):
             if isinstance(option_label, (list, tuple)):
-                output.append(u'<optgroup label="%s">' % escape(force_unicode(option_value)))
+                output.append('<optgroup label="%s">' % escape(force_unicode(option_value)))
                 for option in option_label:
                     output.append(self.render_option(selected_choices, *option))
-                output.append(u'</optgroup>')
+                output.append('</optgroup>')
             else:
                 output.append(self.render_option(selected_choices, option_value, option_label))
-        return u'\n'.join(output)
+        return '\n'.join(output)
 
 class NullBooleanSelect(Select):
     """
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = ((u'1', ugettext('Unknown')), (u'2', ugettext('Yes')), (u'3', ugettext('No')))
+        choices = (('1', ugettext('Unknown')), ('2', ugettext('Yes')), ('3', ugettext('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
         try:
-            value = {True: u'2', False: u'3', u'2': u'2', u'3': u'3'}[value]
+            value = {True: '2', False: '3', '2': '2', '3': '3'}[value]
         except KeyError:
-            value = u'1'
+            value = '1'
         return super(NullBooleanSelect, self).render(name, value, attrs, choices)
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
-        return {u'2': True,
+        return {'2': True,
                 True: True,
                 'True': True,
-                u'3': False,
+                '3': False,
                 'False': False,
                 False: False}.get(value, None)
 
@@ -508,12 +507,12 @@ class SelectMultiple(Select):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
+        output = ['<select multiple="multiple"%s>' % flatatt(final_attrs)]
         options = self.render_options(choices, value)
         if options:
             output.append(options)
         output.append('</select>')
-        return mark_safe(u'\n'.join(output))
+        return mark_safe('\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, (MultiValueDict, MergeDict)):
@@ -550,7 +549,7 @@ class RadioInput(StrAndUnicode):
         else:
             label_for = ''
         choice_label = conditional_escape(force_unicode(self.choice_label))
-        return mark_safe(u'<label%s>%s %s</label>' % (label_for, self.tag(), choice_label))
+        return mark_safe('<label%s>%s %s</label>' % (label_for, self.tag(), choice_label))
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -561,7 +560,7 @@ class RadioInput(StrAndUnicode):
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
+        return mark_safe('<input%s />' % flatatt(final_attrs))
 
 class RadioFieldRenderer(StrAndUnicode):
     """
@@ -585,7 +584,7 @@ class RadioFieldRenderer(StrAndUnicode):
 
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return mark_safe(u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>'
+        return mark_safe('<ul>\n%s\n</ul>' % '\n'.join(['<li>%s</li>'
                 % force_unicode(w) for w in self]))
 
 class RadioSelect(Select):
@@ -624,7 +623,7 @@ class CheckboxSelectMultiple(SelectMultiple):
         if value is None: value = []
         has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<ul>']
+        output = ['<ul>']
         # Normalize to strings
         str_values = set([force_unicode(v) for v in value])
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
@@ -632,7 +631,7 @@ class CheckboxSelectMultiple(SelectMultiple):
             # so that the checkboxes don't all have the same ID attribute.
             if has_id:
                 final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
-                label_for = u' for="%s"' % final_attrs['id']
+                label_for = ' for="%s"' % final_attrs['id']
             else:
                 label_for = ''
 
@@ -640,9 +639,9 @@ class CheckboxSelectMultiple(SelectMultiple):
             option_value = force_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
             option_label = conditional_escape(force_unicode(option_label))
-            output.append(u'<li><label%s>%s %s</label></li>' % (label_for, rendered_cb, option_label))
-        output.append(u'</ul>')
-        return mark_safe(u'\n'.join(output))
+            output.append('<li><label%s>%s %s</label></li>' % (label_for, rendered_cb, option_label))
+        output.append('</ul>')
+        return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
@@ -715,7 +714,7 @@ class MultiWidget(Widget):
 
     def _has_changed(self, initial, data):
         if initial is None:
-            initial = [u'' for x in range(0, len(data))]
+            initial = ['' for x in range(0, len(data))]
         else:
             if not isinstance(initial, list):
                 initial = self.decompress(initial)
@@ -732,7 +731,7 @@ class MultiWidget(Widget):
         This hook allows you to format the HTML design of the widgets, if
         needed.
         """
-        return u''.join(rendered_widgets)
+        return ''.join(rendered_widgets)
 
     def decompress(self, value):
         """

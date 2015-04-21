@@ -31,7 +31,7 @@ class IDPostCodeField(Field):
     def clean(self, value):
         super(IDPostCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip()
         if not postcode_re.search(value):
@@ -44,7 +44,7 @@ class IDPostCodeField(Field):
         if value[0] == '1' and value[4] != '0':
             raise ValidationError(self.error_messages['invalid'])
 
-        return u'%s' % (value, )
+        return '%s' % (value, )
 
 
 class IDProvinceSelect(Select):
@@ -54,7 +54,7 @@ class IDProvinceSelect(Select):
     """
 
     def __init__(self, attrs=None):
-        from id_choices import PROVINCE_CHOICES
+        from .id_choices import PROVINCE_CHOICES
         super(IDProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 
@@ -71,7 +71,7 @@ class IDPhoneNumberField(Field):
     def clean(self, value):
         super(IDPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         phone_number = re.sub(r'[\-\s\(\)]', '', smart_unicode(value))
 
@@ -90,7 +90,7 @@ class IDLicensePlatePrefixSelect(Select):
     """
 
     def __init__(self, attrs=None):
-        from id_choices import LICENSE_PLATE_PREFIX_CHOICES
+        from .id_choices import LICENSE_PLATE_PREFIX_CHOICES
         super(IDLicensePlatePrefixSelect, self).__init__(attrs,
             choices=LICENSE_PLATE_PREFIX_CHOICES)
 
@@ -110,7 +110,7 @@ class IDLicensePlateField(Field):
     def clean(self, value):
         super(IDLicensePlateField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         plate_number = re.sub(r'\s+', ' ',
             smart_unicode(value.strip())).upper()
@@ -120,7 +120,7 @@ class IDLicensePlateField(Field):
             raise ValidationError(self.error_messages['invalid'])
 
         # Make sure prefix is in the list of known codes.
-        from id_choices import LICENSE_PLATE_PREFIX_CHOICES
+        from .id_choices import LICENSE_PLATE_PREFIX_CHOICES
         prefix = matches.group('prefix')
         if prefix not in [choice[0] for choice in LICENSE_PLATE_PREFIX_CHOICES]:
             raise ValidationError(self.error_messages['invalid'])
@@ -173,7 +173,7 @@ class IDNationalIdentityNumberField(Field):
     def clean(self, value):
         super(IDNationalIdentityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = re.sub(r'[\s.]', '', smart_unicode(value))
 

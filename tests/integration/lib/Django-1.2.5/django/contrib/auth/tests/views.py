@@ -1,6 +1,6 @@
 import os
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
@@ -212,7 +212,7 @@ class LoginTest(AuthViewsTestCase):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'bad_url': urllib.quote(bad_url)
+                'bad_url': urllib.parse.quote(bad_url)
             }
             response = self.client.post(nasty_url, {
                 'username': 'testclient',
@@ -229,7 +229,7 @@ class LoginTest(AuthViewsTestCase):
             safe_url = '%(url)s?%(next)s=/view/?param=%(safe_param)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'safe_param': urllib.quote(url_)
+                'safe_param': urllib.parse.quote(url_)
             }
             response = self.client.post(safe_url, {
                     'username': 'testclient',

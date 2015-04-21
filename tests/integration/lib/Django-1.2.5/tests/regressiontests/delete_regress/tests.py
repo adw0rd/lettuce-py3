@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import backend, connection, transaction, DEFAULT_DB_ALIAS
 from django.test import TestCase, TransactionTestCase
 
-from models import Book, Award, AwardNote, Person, Child, Toy, PlayedWith, PlayedWithNote
+from .models import Book, Award, AwardNote, Person, Child, Toy, PlayedWith, PlayedWithNote
 
 # Can't run this test under SQLite, because you can't
 # get two connections to an in-memory database.

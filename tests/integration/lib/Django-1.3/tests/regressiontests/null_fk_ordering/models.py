@@ -17,7 +17,7 @@ class Article(models.Model):
     author = models.ForeignKey(Author, null=True)
 
     def __unicode__(self):
-        return u'Article titled: %s' % (self.title, )
+        return 'Article titled: %s' % (self.title, )
 
     class Meta:
         ordering = ['author__name', ]

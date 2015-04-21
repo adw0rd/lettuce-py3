@@ -1,7 +1,7 @@
 from datetime import datetime
 from django.test import TestCase
 from django.core.exceptions import FieldError
-from models import Article, Reporter
+from .models import Article, Reporter
 
 class ManyToOneTests(TestCase):
 
@@ -169,7 +169,7 @@ class ManyToOneTests(TestCase):
         # ... and should work fine with the unicode that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__first_name__exact='John'
-                                  ).extra(where=["many_to_one_reporter.last_name='%s'" % u'Smith']),
+                                  ).extra(where=["many_to_one_reporter.last_name='%s'" % 'Smith']),
             [
                 "<Article: John's second story>",
                 "<Article: This is a test>",
@@ -296,7 +296,7 @@ class ManyToOneTests(TestCase):
         # It's possible to use values() calls across many-to-one relations.
         # (Note, too, that we clear the ordering here so as not to drag the
         # 'headline' field into the columns being used to determine uniqueness)
-        d = {'reporter__first_name': u'John', 'reporter__last_name': u'Smith'}
+        d = {'reporter__first_name': 'John', 'reporter__last_name': 'Smith'}
         self.assertEqual([d],
             list(Article.objects.filter(reporter=self.r).distinct().order_by()
                  .values('reporter__first_name', 'reporter__last_name')))

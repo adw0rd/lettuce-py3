@@ -168,7 +168,7 @@ class BaseTest(TestCase):
         """
         settings.MESSAGE_LEVEL = constants.DEBUG
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -186,10 +186,10 @@ class BaseTest(TestCase):
     def test_with_template_response(self):
         settings.MESSAGE_LEVEL = constants.DEBUG
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
-        for level in self.levels.keys():
+        for level in list(self.levels.keys()):
             add_url = reverse('django.contrib.messages.tests.urls.add_template_response',
                               args=(level,))
             response = self.client.post(add_url, data, follow=True)
@@ -210,7 +210,7 @@ class BaseTest(TestCase):
         """
         settings.MESSAGE_LEVEL = constants.DEBUG
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         messages = []
@@ -250,7 +250,7 @@ class BaseTest(TestCase):
             'django.contrib.messages.context_processors.messages',
         )
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -284,7 +284,7 @@ class BaseTest(TestCase):
             'django.contrib.messages.context_processors.messages',
         )
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -313,7 +313,7 @@ class BaseTest(TestCase):
             'django.contrib.messages.context_processors.messages',
         )
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(10)],
             'fail_silently': True,
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')

@@ -18,7 +18,7 @@ def _setup_environment(environ):
     if platform.system().upper().startswith('CYGWIN'):
         try:
             import ctypes
-        except ImportError, e:
+        except ImportError as e:
             from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured("Error loading ctypes: %s; "
                                        "the Oracle backend requires ctypes to "
@@ -41,7 +41,7 @@ _setup_environment([
 
 try:
     import cx_Oracle as Database
-except ImportError, e:
+except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
@@ -135,7 +135,7 @@ WHEN (new.%(col_name)s IS NULL)
         # string instead of null, but only if the field accepts the
         # empty string.
         if value is None and field and field.empty_strings_allowed:
-            value = u''
+            value = ''
         # Convert 1 or 0 to True or False
         elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
             value = bool(value)
@@ -182,7 +182,7 @@ WHEN (new.%(col_name)s IS NULL)
         return "DROP SEQUENCE %s;" % self.quote_name(get_sequence_name(table))
 
     def fetch_returned_insert_id(self, cursor):
-        return long(cursor._insert_id_var.getvalue())
+        return int(cursor._insert_id_var.getvalue())
 
     def field_cast_sql(self, db_type):
         if db_type and db_type.endswith('LOB'):
@@ -211,7 +211,7 @@ WHEN (new.%(col_name)s IS NULL)
 
     def process_clob(self, value):
         if value is None:
-            return u''
+            return ''
         return force_unicode(value.read())
 
     def quote_name(self, name):
@@ -314,7 +314,7 @@ WHEN (new.%(col_name)s IS NULL)
     def value_to_db_time(self, value):
         if value is None:
             return None
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
         return datetime.datetime(1900, 1, 1, value.hour, value.minute,
                                  value.second, value.microsecond)
@@ -463,11 +463,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.connection is not None:
             try:
                 return self.connection.commit()
-            except Database.IntegrityError, e:
+            except Database.IntegrityError as e:
                 # In case cx_Oracle implements (now or in a future version)
                 # raising this specific exception
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            except Database.DatabaseError, e:
+                raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+            except Database.DatabaseError as e:
                 # cx_Oracle 5.0.4 raises a cx_Oracle.DatabaseError exception
                 # with the following attributes and values:
                 #  code = 2091
@@ -478,8 +478,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 x = e.args[0]
                 if hasattr(x, 'code') and hasattr(x, 'message') \
                    and x.code == 2091 and 'ORA-02291' in x.message:
-                    raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-                raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                    raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+                raise utils.DatabaseError(utils.DatabaseError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
 
 class OracleParam(object):
@@ -501,7 +501,7 @@ class OracleParam(object):
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
-        elif isinstance(param, basestring) and len(param) > 4000:
+        elif isinstance(param, str) and len(param) > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
         else:
@@ -593,13 +593,13 @@ class FormatStylePlaceholderCursor(object):
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.IntegrityError as e:
+            raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+        except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+            raise utils.DatabaseError(utils.DatabaseError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
     def executemany(self, query, params=None):
         try:
@@ -619,13 +619,13 @@ class FormatStylePlaceholderCursor(object):
         try:
             return self.cursor.executemany(query,
                                 [self._param_generator(p) for p in formatted])
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.IntegrityError as e:
+            raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+        except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+            raise utils.DatabaseError(utils.DatabaseError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
     def fetchone(self):
         row = self.cursor.fetchone()
@@ -670,8 +670,8 @@ class CursorIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
-        return _rowfactory(self.iter.next(), self.cursor)
+    def __next__(self):
+        return _rowfactory(next(self.iter), self.cursor)
 
 
 def _rowfactory(row, cursor):
@@ -720,7 +720,7 @@ def to_unicode(s):
     Convert strings to Unicode objects (and return all other data types
     unchanged).
     """
-    if isinstance(s, basestring):
+    if isinstance(s, str):
         return force_unicode(s)
     return s
 

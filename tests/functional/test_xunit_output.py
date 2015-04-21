@@ -19,7 +19,7 @@
 import sys
 import os
 import lettuce
-from StringIO import StringIO
+from io import StringIO
 
 from nose.tools import assert_equals, assert_true, with_setup
 from sure import expect
@@ -143,8 +143,8 @@ def test_xunit_output_with_no_steps():
     'Test xunit output with no steps'
     called = []
     def assert_correct_xml(filename, content):
-        print filename
-        print content
+        print(filename)
+        print(content)
         called.append(True)
         assert_xsd_valid(filename, content)
         root = etree.fromstring(content)
@@ -184,8 +184,8 @@ def test_xunit_output_with_background_section():
     
     from lettuce import step
     
-    @step(ur'the variable "(\w+)" holds (\d+)')
-    @step(ur'the variable "(\w+)" is equal to (\d+)')
+    @step(r'the variable "(\w+)" holds (\d+)')
+    @step(r'the variable "(\w+)" is equal to (\d+)')
     def just_pass(step, *args):
         pass
     

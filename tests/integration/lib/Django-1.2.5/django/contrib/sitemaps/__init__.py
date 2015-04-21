@@ -1,7 +1,8 @@
 from django.contrib.sites.models import Site, get_current_site
 from django.core import urlresolvers, paginator
 from django.core.exceptions import ImproperlyConfigured
-import urllib
+import urllib.request, urllib.parse, urllib.error
+import collections
 
 PING_URL = "http://www.google.com/webmasters/tools/ping"
 
@@ -32,8 +33,8 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     from django.contrib.sites.models import Site
     current_site = Site.objects.get_current()
     url = "http://%s%s" % (current_site.domain, sitemap_url)
-    params = urllib.urlencode({'sitemap':url})
-    urllib.urlopen("%s?%s" % (ping_url, params))
+    params = urllib.parse.urlencode({'sitemap':url})
+    urllib.request.urlopen("%s?%s" % (ping_url, params))
 
 class Sitemap(object):
     # This limit is defined by Google. See the index documentation at
@@ -45,7 +46,7 @@ class Sitemap(object):
             attr = getattr(self, name)
         except AttributeError:
             return default
-        if callable(attr):
+        if isinstance(attr, collections.Callable):
             return attr(obj)
         return attr
 
@@ -57,7 +58,7 @@ class Sitemap(object):
 
     def _get_paginator(self):
         if not hasattr(self, "_paginator"):
-            self._paginator = paginator.Paginator(self.items(), self.limit)
+            self._paginator = paginator.Paginator(list(self.items()), self.limit)
         return self._paginator
     paginator = property(_get_paginator)
 

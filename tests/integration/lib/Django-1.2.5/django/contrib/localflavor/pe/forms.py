@@ -13,7 +13,7 @@ class PERegionSelect(Select):
     A Select widget that uses a list of Peruvian Regions as its choices.
     """
     def __init__(self, attrs=None):
-        from pe_region import REGION_CHOICES
+        from .pe_region import REGION_CHOICES
         super(PERegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class PEDNIField(CharField):
@@ -35,7 +35,7 @@ class PEDNIField(CharField):
         """
         value = super(PEDNIField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if not value.isdigit():
             raise ValidationError(self.error_messages['invalid'])
         if len(value) != 8:
@@ -63,7 +63,7 @@ class PERUCField(RegexField):
         """
         value = super(PERUCField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if not value.isdigit():
             raise ValidationError(self.error_messages['invalid'])
         if len(value) != 11:

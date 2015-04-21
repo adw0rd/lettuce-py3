@@ -5,7 +5,7 @@ from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.tests.utils import mysql, oracle, no_mysql, no_oracle, no_spatialite
 
-from models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
 
 class RelatedGeoModelTest(TestCase):
 
@@ -165,7 +165,7 @@ class RelatedGeoModelTest(TestCase):
         "Testing values() and values_list() and GeoQuerySets."
         # GeoQuerySet and GeoValuesQuerySet, and GeoValuesListQuerySet respectively.
         gqs = Location.objects.all()
-        gvqs = Location.objects.values()
+        gvqs = list(Location.objects.values())
         gvlqs = Location.objects.values_list()
 
         # Incrementing through each of the models, dictionaries, and tuples

@@ -18,7 +18,7 @@ class SQLEvaluator(object):
         return self.expression.evaluate(self, qn, connection)
 
     def relabel_aliases(self, change_map):
-        for node, col in self.cols.items():
+        for node, col in list(self.cols.items()):
             if hasattr(col, "relabel_aliases"):
                 col.relabel_aliases(change_map)
             else:
@@ -39,7 +39,7 @@ class SQLEvaluator(object):
 
         field_list = node.name.split(LOOKUP_SEP)
         if (len(field_list) == 1 and
-            node.name in query.aggregate_select.keys()):
+            node.name in list(query.aggregate_select.keys())):
             self.contains_aggregate = True
             self.cols[node] = query.aggregate_select[node.name]
         else:

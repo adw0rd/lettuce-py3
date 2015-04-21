@@ -2,10 +2,10 @@ import sys
 
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 
-from models import Person
+from .models import Person
 
 if sys.version_info >= (2, 5):
-    from tests_25 import AssertNumQueriesContextManagerTests
+    from .tests_25 import AssertNumQueriesContextManagerTests
 
 
 class SkippingTestCase(TestCase):

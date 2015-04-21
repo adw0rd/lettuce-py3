@@ -116,7 +116,7 @@ class Number(models.Model):
     num = models.IntegerField()
 
     def __unicode__(self):
-        return unicode(self.num)
+        return str(self.num)
 
 # Symmetrical m2m field with a normal field using the reverse accesor name
 # ("valid").
@@ -286,11 +286,11 @@ class Eaten(models.Model):
     meal = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return u"%s at %s" % (self.food, self.meal)
+        return "%s at %s" % (self.food, self.meal)
 
 class Node(models.Model):
     num = models.IntegerField(unique=True)
     parent = models.ForeignKey("self", to_field="num", null=True)
 
     def __unicode__(self):
-        return u"%s" % self.num
+        return "%s" % self.num

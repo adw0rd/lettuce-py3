@@ -65,7 +65,7 @@ class SQLCompiler(object):
         where, w_params = self.query.where.as_sql(qn=qn, connection=self.connection)
         having, h_params = self.query.having.as_sql(qn=qn, connection=self.connection)
         params = []
-        for val in self.query.extra_select.itervalues():
+        for val in self.query.extra_select.values():
             params.extend(val[1])
 
         result = ['SELECT']
@@ -144,7 +144,7 @@ class SQLCompiler(object):
         """
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
-        result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in self.query.extra_select.iteritems()]
+        result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in self.query.extra_select.items()]
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -194,7 +194,7 @@ class SQLCompiler(object):
                     and ' AS %s' % qn(truncate_name(alias, max_name_length))
                     or ''
             )
-            for alias, aggregate in self.query.aggregate_select.items()
+            for alias, aggregate in list(self.query.aggregate_select.items())
         ])
 
         for table, col in self.query.related_select_cols:
@@ -475,7 +475,7 @@ class SQLCompiler(object):
             group_by = self.query.group_by or []
 
             extra_selects = []
-            for extra_select, extra_params in self.query.extra_select.itervalues():
+            for extra_select, extra_params in self.query.extra_select.values():
                 extra_selects.append(extra_select)
                 params.extend(extra_params)
             cols = (group_by + self.query.select +
@@ -695,12 +695,12 @@ class SQLCompiler(object):
                     row = self.resolve_columns(row, fields)
 
                 if has_aggregate_select:
-                    aggregate_start = len(self.query.extra_select.keys()) + len(self.query.select)
+                    aggregate_start = len(list(self.query.extra_select.keys())) + len(self.query.select)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
                     row = tuple(row[:aggregate_start]) + tuple([
                         self.query.resolve_aggregate(value, aggregate, self.connection)
                         for (alias, aggregate), value
-                        in zip(self.query.aggregate_select.items(), row[aggregate_start:aggregate_end])
+                        in zip(list(self.query.aggregate_select.items()), row[aggregate_start:aggregate_end])
                     ]) + tuple(row[aggregate_end:])
 
                 yield row
@@ -929,7 +929,7 @@ class SQLAggregateCompiler(SQLCompiler):
         sql = ('SELECT %s FROM (%s) subquery' % (
             ', '.join([
                 aggregate.as_sql(qn, self.connection)
-                for aggregate in self.query.aggregate_select.values()
+                for aggregate in list(self.query.aggregate_select.values())
             ]),
             self.query.subquery)
         )
@@ -964,7 +964,7 @@ def empty_iter():
     """
     Returns an iterator containing no results.
     """
-    yield iter([]).next()
+    yield next(iter([]))
 
 
 def order_modified_iter(cursor, trim, sentinel):

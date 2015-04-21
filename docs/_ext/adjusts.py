@@ -7,5 +7,5 @@ class LettuceHTMLTranslator(sphinx_htmlwriter.SmartyPantsHTMLTranslator):
     """
 
     def visit_section(self, node):
-        node['ids'] = map(lambda x: "lettuce-%s" % x, node['ids'])
+        node['ids'] = ["lettuce-%s" % x for x in node['ids']]
         sphinx_htmlwriter.SmartyPantsHTMLTranslator.visit_section(self, node)

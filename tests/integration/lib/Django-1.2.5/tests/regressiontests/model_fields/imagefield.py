@@ -6,14 +6,14 @@ from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
 from django.test import TestCase
 
-from models import Image, Person, PersonWithHeight, PersonWithHeightAndWidth, \
+from .models import Image, Person, PersonWithHeight, PersonWithHeightAndWidth, \
         PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile
 
 
 # If PIL available, do these tests.
 if Image:
 
-    from models import temp_storage_dir
+    from .models import temp_storage_dir
 
 
     class ImageFieldTestMixin(object):

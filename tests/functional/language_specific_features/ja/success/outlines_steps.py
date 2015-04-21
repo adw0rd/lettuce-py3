@@ -5,33 +5,33 @@ from lettuce import step
 
 def assert_in(condition, possibilities):
     assert condition in possibilities, \
-        u"%r は次のリストに入っている可能性がある: %r" % (
+        "%r は次のリストに入っている可能性がある: %r" % (
         condition, possibilities
     )
 
-@step(u'入力値を (.*) とし')
+@step('入力値を (.*) とし')
 def dado_que_tenho(step, group):
     possibilities = [
-        u'何か',
-        u'その他',
-        u'データ'
+        '何か',
+        'その他',
+        'データ'
     ]
     assert_in(group, possibilities)
 
-@step(u'処理 (.*) を使って')
+@step('処理 (.*) を使って')
 def faco_algo_com(step, group):
     possibilities = [
-        u'これ',
-        u'ここ',
-        u'動く'
+        'これ',
+        'ここ',
+        '動く'
     ]
     assert_in(group, possibilities)
 
-@step(u'表示は (.*) である')
+@step('表示は (.*) である')
 def fico_feliz_em_ver(step, group):
     possibilities = [
-        u'機能',
-        u'同じ',
-        u'unicodeで!'
+        '機能',
+        '同じ',
+        'unicodeで!'
     ]
     assert_in(group, possibilities)

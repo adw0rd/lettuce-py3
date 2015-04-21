@@ -42,7 +42,7 @@ class SpatiaLiteRelate(SpatiaLiteFunctionParam):
         super(SpatiaLiteRelate, self).__init__('Relate')
 
 # Valid distance types and substitutions
-dtypes = (Decimal, Distance, float, int, long)
+dtypes = (Decimal, Distance, float, int, int)
 def get_dist_ops(operator):
     "Returns operations for regular distances; spherical distances are not currently supported."
     return (SpatiaLiteDistance(operator),)
@@ -89,7 +89,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         'overlaps' : SpatiaLiteFunction('Overlaps'),
         'contains' : SpatiaLiteFunction('Contains'),
         'intersects' : SpatiaLiteFunction('Intersects'),
-        'relate' : (SpatiaLiteRelate, basestring),
+        'relate' : (SpatiaLiteRelate, str),
         # Retruns true if B's bounding box completely contains A's bounding box.
         'contained' : SpatiaLiteFunction('MbrWithin'),
         # Returns true if A's bounding box completely contains B's bounding box.
@@ -123,7 +123,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             self.spatial_version = version
         except ImproperlyConfigured:
             raise
-        except Exception, msg:
+        except Exception as msg:
             raise ImproperlyConfigured('Cannot determine the SpatiaLite version for the "%s" '
                                        'database (error was "%s").  Was the SpatiaLite initialization '
                                        'SQL loaded on this database?' %
@@ -131,7 +131,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
 
         # Creating the GIS terms dictionary.
         gis_terms = ['isnull']
-        gis_terms += self.geometry_functions.keys()
+        gis_terms += list(self.geometry_functions.keys())
         self.gis_terms = dict([(term, None) for term in gis_terms])
 
     def check_aggregate_support(self, aggregate):

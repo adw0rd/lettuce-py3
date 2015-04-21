@@ -20,49 +20,49 @@ from lettuce import before, after
 
 @before.all
 def celeries_before_all():
-    print "Celeries before all"
+    print("Celeries before all")
 
 
 @after.all
 def celeries_after_all(total):
-    print "Celeries after all"
+    print("Celeries after all")
 
 
 @before.harvest
 def celeries_before_harvest(variables):
-    print "Celeries before harvest"
+    print("Celeries before harvest")
 
 
 @after.harvest
 def celeries_after_harvest(results):
-    print "Celeries after harvest"
+    print("Celeries after harvest")
 
 
 @before.each_feature
 def celeries_before_feature(feature):
-    print "Celeries before feature '%s'" % feature.name
+    print("Celeries before feature '%s'" % feature.name)
 
 
 @after.each_feature
 def celeries_after_feature(feature):
-    print "Celeries after feature '%s'" % feature.name
+    print("Celeries after feature '%s'" % feature.name)
 
 
 @before.each_scenario
 def celeries_before_scenario(scenario):
-    print "Celeries before scenario '%s'" % scenario.name
+    print("Celeries before scenario '%s'" % scenario.name)
 
 
 @after.each_scenario
 def celeries_after_scenario(scenario):
-    print "Celeries after scenario '%s'" % scenario.name
+    print("Celeries after scenario '%s'" % scenario.name)
 
 
 @before.each_step
 def celeries_before_step(step):
-    print "Celeries before step '%s'" % step.sentence
+    print("Celeries before step '%s'" % step.sentence)
 
 
 @after.each_step
 def celeries_after_step(step):
-    print "Celeries after step '%s'" % step.sentence
+    print("Celeries after step '%s'" % step.sentence)

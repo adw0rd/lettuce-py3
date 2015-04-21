@@ -1,3 +1,3 @@
 # Import all the models from subpackages
-from article import Article
-from publication import Publication
+from .article import Article
+from .publication import Publication

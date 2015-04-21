@@ -4,7 +4,7 @@ A series of tests to establish that the command-line bash completion works.
 import os
 import unittest
 import sys
-import StringIO
+import io
 
 from django.conf import settings
 from django.core.management import ManagementUtility
@@ -19,7 +19,7 @@ class BashCompletionTests(unittest.TestCase):
     def setUp(self):
         self.old_DJANGO_AUTO_COMPLETE = os.environ.get('DJANGO_AUTO_COMPLETE')
         os.environ['DJANGO_AUTO_COMPLETE'] = '1'
-        self.output = StringIO.StringIO()
+        self.output = io.StringIO()
         self.old_stdout = sys.stdout
         sys.stdout = self.output
 

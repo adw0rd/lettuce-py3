@@ -26,7 +26,7 @@ class OpenLayersWidget(Textarea):
 
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 value = GEOSGeometry(value)
             except (GEOSException, ValueError):

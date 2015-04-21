@@ -20,9 +20,9 @@ class Point(GEOSGeometry):
             # Here a tuple or list was passed in under the `x` parameter.
             ndim = len(x)
             coords = x
-        elif isinstance(x, (int, float, long)) and isinstance(y, (int, float, long)):
+        elif isinstance(x, (int, float)) and isinstance(y, (int, float)):
             # Here X, Y, and (optionally) Z were passed in individually, as parameters.
-            if isinstance(z, (int, float, long)):
+            if isinstance(z, (int, float)):
                 ndim = 3
                 coords = [x, y, z]
             else:
@@ -46,9 +46,9 @@ class Point(GEOSGeometry):
 
         cs = capi.create_cs(c_uint(1), c_uint(ndim))
         i = iter(coords)
-        capi.cs_setx(cs, 0, i.next())
-        capi.cs_sety(cs, 0, i.next())
-        if ndim == 3: capi.cs_setz(cs, 0, i.next())
+        capi.cs_setx(cs, 0, next(i))
+        capi.cs_sety(cs, 0, next(i))
+        if ndim == 3: capi.cs_setz(cs, 0, next(i))
 
         return capi.create_point(cs)
 
@@ -67,7 +67,7 @@ class Point(GEOSGeometry):
 
     def __iter__(self):
         "Allows iteration over coordinates of this Point."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):

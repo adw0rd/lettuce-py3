@@ -1,4 +1,4 @@
-from StringIO import StringIO
+from io import StringIO
 
 from django.core.servers.basehttp import ServerHandler
 from django.utils.unittest import TestCase

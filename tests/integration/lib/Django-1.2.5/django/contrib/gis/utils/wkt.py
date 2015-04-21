@@ -19,7 +19,7 @@ def precision_wkt(geom, prec):
     """
     if isinstance(prec, int):
         num_fmt = '%%.%df' % prec
-    elif isinstance(prec, basestring):
+    elif isinstance(prec, str):
         num_fmt = prec
     else:
         raise TypeError

@@ -8,6 +8,7 @@ from django.db.models.fields import DateTimeField
 from django.http import Http404, HttpResponse
 
 import warnings
+import collections
 warnings.warn(
     'Function-based generic views have been deprecated; use class-based views instead.',
     PendingDeprecationWarning
@@ -48,8 +49,8 @@ def archive_index(request, queryset, date_field, num_latest=15,
         'date_list' : date_list,
         template_object_name : latest,
     }, context_processors)
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             c[key] = value()
         else:
             c[key] = value
@@ -96,8 +97,8 @@ def archive_year(request, year, queryset, date_field, template_name=None,
         'year': year,
         '%s_list' % template_object_name: object_list,
     }, context_processors)
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             c[key] = value()
         else:
             c[key] = value
@@ -176,8 +177,8 @@ def archive_month(request, year, month, queryset, date_field,
         'next_month': next_month,
         'previous_month': previous_month,
     }, context_processors)
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             c[key] = value()
         else:
             c[key] = value
@@ -228,8 +229,8 @@ def archive_week(request, year, week, queryset, date_field,
         '%s_list' % template_object_name: object_list,
         'week': date,
     })
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             c[key] = value()
         else:
             c[key] = value
@@ -294,8 +295,8 @@ def archive_day(request, year, month, day, queryset, date_field,
         'previous_day': date - datetime.timedelta(days=1),
         'next_day': next_day,
     }, context_processors)
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             c[key] = value()
         else:
             c[key] = value
@@ -365,8 +366,8 @@ def object_detail(request, year, month, day, queryset, date_field,
     c = RequestContext(request, {
         template_object_name: obj,
     }, context_processors)
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             c[key] = value()
         else:
             c[key] = value

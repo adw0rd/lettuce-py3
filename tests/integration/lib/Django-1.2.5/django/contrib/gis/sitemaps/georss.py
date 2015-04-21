@@ -29,7 +29,7 @@ class GeoRSSSitemap(Sitemap):
         self.locations = []
         if slug_dict is None: slug_dict = {}
         # Getting the feed locations.
-        for section in feed_dict.keys():
+        for section in list(feed_dict.keys()):
             if slug_dict.get(section, False):
                 for slug in slug_dict[section]:
                     self.locations.append('%s/%s' % (section, slug))

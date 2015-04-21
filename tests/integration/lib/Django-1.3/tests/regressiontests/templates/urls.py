@@ -12,6 +12,6 @@ urlpatterns = patterns('',
     url(r'^named-client/(\d+)/$', views.client2, name="named.client"),
 
     # Unicode strings are permitted everywhere.
-    url(ur'^Юникод/(\w+)/$', views.client2, name=u"метка_оператора"),
-    url(ur'^Юникод/(?P<tag>\S+)/$', 'regressiontests.templates.views.client2', name=u"метка_оператора_2"),
+    url(r'^Юникод/(\w+)/$', views.client2, name="метка_оператора"),
+    url(r'^Юникод/(?P<tag>\S+)/$', 'regressiontests.templates.views.client2', name="метка_оператора_2"),
 )

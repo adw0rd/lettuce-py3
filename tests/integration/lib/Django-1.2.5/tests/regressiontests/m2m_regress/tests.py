@@ -1,7 +1,7 @@
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
+from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
     SelfReferChildSibling, Worksheet)
 
 
@@ -10,7 +10,7 @@ class M2MRegressionTests(TestCase):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
-        except error, e:
+        except error as e:
             self.assertEqual(message, str(e))
 
     def test_multiple_m2m(self):

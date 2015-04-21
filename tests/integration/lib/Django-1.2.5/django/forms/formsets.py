@@ -1,11 +1,11 @@
-from forms import Form
+from .forms import Form
 from django.core.exceptions import ValidationError
 from django.utils.encoding import StrAndUnicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from fields import IntegerField, BooleanField
-from widgets import Media, HiddenInput
-from util import ErrorList
+from .fields import IntegerField, BooleanField
+from .widgets import Media, HiddenInput
+from .util import ErrorList
 
 __all__ = ('BaseFormSet', 'all_valid')
 
@@ -93,7 +93,7 @@ class BaseFormSet(StrAndUnicode):
     def _construct_forms(self):
         # instantiate all the forms and put them in self.forms
         self.forms = []
-        for i in xrange(self.total_form_count()):
+        for i in range(self.total_form_count()):
             self.forms.append(self._construct_form(i))
 
     def _construct_form(self, i, **kwargs):
@@ -279,7 +279,7 @@ class BaseFormSet(StrAndUnicode):
         # Give self.clean() a chance to do cross-form validation.
         try:
             self.clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self._non_form_errors = self.error_class(e.messages)
 
     def clean(self):
@@ -296,11 +296,11 @@ class BaseFormSet(StrAndUnicode):
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
             if index is not None and index < self.initial_form_count():
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), initial=index+1, required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index+1, required=False)
             else:
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), required=False)
         if self.can_delete:
-            form.fields[DELETION_FIELD_NAME] = BooleanField(label=_(u'Delete'), required=False)
+            form.fields[DELETION_FIELD_NAME] = BooleanField(label=_('Delete'), required=False)
 
     def add_prefix(self, index):
         return '%s-%s' % (self.prefix, index)
@@ -326,8 +326,8 @@ class BaseFormSet(StrAndUnicode):
         # XXX: there is no semantic division between forms here, there
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
-        forms = u' '.join([form.as_table() for form in self.forms])
-        return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
+        forms = ' '.join([form.as_table() for form in self.forms])
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None):

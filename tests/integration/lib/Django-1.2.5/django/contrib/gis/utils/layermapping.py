@@ -75,7 +75,7 @@ class LayerMapping(object):
         argument usage.
         """
         # Getting the DataSource and the associated Layer.
-        if isinstance(data, basestring):
+        if isinstance(data, str):
             self.ds = DataSource(data)
         else:
             self.ds = data
@@ -176,7 +176,7 @@ class LayerMapping(object):
 
         # No need to increment through each feature in the model, simply check
         # the Layer metadata against what was given in the mapping dictionary.
-        for field_name, ogr_name in self.mapping.items():
+        for field_name, ogr_name in list(self.mapping.items()):
             # Ensuring that a corresponding field exists in the model
             # for the given field name in the mapping.
             try:
@@ -219,7 +219,7 @@ class LayerMapping(object):
                 if isinstance(ogr_name, dict):
                     # Is every given related model mapping field in the Layer?
                     rel_model = model_field.rel.to
-                    for rel_name, ogr_field in ogr_name.items():
+                    for rel_name, ogr_field in list(ogr_name.items()):
                         idx = check_ogr_fld(ogr_field)
                         try:
                             rel_field = rel_model._meta.get_field(rel_name)
@@ -253,7 +253,7 @@ class LayerMapping(object):
             sr = source_srs
         elif isinstance(source_srs, self.spatial_backend.spatial_ref_sys()):
             sr = source_srs.srs
-        elif isinstance(source_srs, (int, basestring)):
+        elif isinstance(source_srs, (int, str)):
             sr = SpatialReference(source_srs)
         else:
             # Otherwise just pulling the SpatialReference from the layer
@@ -270,7 +270,7 @@ class LayerMapping(object):
             # List of fields to determine uniqueness with
             for attr in unique:
                 if not attr in self.mapping: raise ValueError
-        elif isinstance(unique, basestring):
+        elif isinstance(unique, str):
             # Only a single field passed in.
             if unique not in self.mapping: raise ValueError
         else:
@@ -287,7 +287,7 @@ class LayerMapping(object):
 
         # Incrementing through each model field and OGR field in the
         # dictionary mapping.
-        for field_name, ogr_name in self.mapping.items():
+        for field_name, ogr_name in list(self.mapping.items()):
             model_field = self.fields[field_name]
 
             if isinstance(model_field, GeometryField):
@@ -313,7 +313,7 @@ class LayerMapping(object):
         will construct and return the uniqueness keyword arguments -- a subset
         of the feature kwargs.
         """
-        if isinstance(self.unique, basestring):
+        if isinstance(self.unique, str):
             return {self.unique : kwargs[self.unique]}
         else:
             return dict((fld, kwargs[fld]) for fld in self.unique)
@@ -330,7 +330,7 @@ class LayerMapping(object):
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
-                val = unicode(ogr_field.value, self.encoding)
+                val = str(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
                 if len(val) > model_field.max_length:
@@ -386,7 +386,7 @@ class LayerMapping(object):
 
         # Constructing and verifying the related model keyword arguments.
         fk_kwargs = {}
-        for field_name, ogr_name in rel_mapping.items():
+        for field_name, ogr_name in list(rel_mapping.items()):
             fk_kwargs[field_name] = self.verify_ogr_field(feat[ogr_name], rel_model._meta.get_field(field_name))
 
         # Attempting to retrieve and return the related model.
@@ -431,7 +431,7 @@ class LayerMapping(object):
 
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
-        except Exception, msg:
+        except Exception as msg:
             raise LayerMapError('Could not translate between the data source and model geometry: %s' % msg)
 
     def geometry_field(self):
@@ -515,7 +515,7 @@ class LayerMapping(object):
                 # Getting the keyword arguments
                 try:
                     kwargs = self.feature_kwargs(feat)
-                except LayerMapError, msg:
+                except LayerMapError as msg:
                     # Something borked the validation
                     if strict: raise
                     elif not silent:
@@ -554,7 +554,7 @@ class LayerMapping(object):
                         if verbose: stream.write('%s: %s\n' % (is_update and 'Updated' or 'Saved', m))
                     except SystemExit:
                         raise
-                    except Exception, msg:
+                    except Exception as msg:
                         if self.transaction_mode == 'autocommit':
                             # Rolling back the transaction so that other model saves
                             # will work.
@@ -582,7 +582,7 @@ class LayerMapping(object):
             if default_range:
                 raise LayerMapError('The `step` keyword may not be used in conjunction with the `fid_range` keyword.')
             beg, num_feat, num_saved = (0, 0, 0)
-            indices = range(step, nfeat, step)
+            indices = list(range(step, nfeat, step))
             n_i = len(indices)
 
             for i, end in enumerate(indices):

@@ -10,6 +10,7 @@ from django.utils.encoding import force_unicode, smart_unicode, smart_str
 from django.utils.translation import ungettext, ugettext as _
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.datastructures import SortedDict
+import collections
 
 def quote(s):
     """
@@ -18,7 +19,7 @@ def quote(s):
     quoting is slightly different so that it doesn't get automatically
     unquoted by the Web browser.
     """
-    if not isinstance(s, basestring):
+    if not isinstance(s, str):
         return s
     res = list(s)
     for i in range(len(res)):
@@ -79,14 +80,14 @@ def _format_callback(obj, user, admin_site, levels_to_root, perms_needed):
         if not user.has_perm(p):
             perms_needed.add(opts.verbose_name)
         # Display a link to the admin page.
-        return mark_safe(u'%s: <a href="%s">%s</a>' %
+        return mark_safe('%s: <a href="%s">%s</a>' %
                          (escape(capfirst(opts.verbose_name)),
                           admin_url,
                           escape(obj)))
     else:
         # Don't display link to edit, because it either has no
         # admin or is edited inline.
-        return u'%s: %s' % (capfirst(opts.verbose_name),
+        return '%s: %s' % (capfirst(opts.verbose_name),
                             force_unicode(obj))
 
 def get_deleted_objects(objs, opts, user, admin_site, levels_to_root=4):
@@ -208,7 +209,7 @@ class NestedObjects(object):
 
         """
         roots = []
-        for key in self.seen.keys():
+        for key in list(self.seen.keys()):
             if key not in self.parents:
                 roots.extend(self._nested(key, format_callback, **kwargs))
         return roots
@@ -258,7 +259,7 @@ def lookup_field(name, obj, model_admin=None):
     except models.FieldDoesNotExist:
         # For non-field values, the value is either a method, property or
         # returned via a callable.
-        if callable(name):
+        if isinstance(name, collections.Callable):
             attr = name
             value = attr(obj)
         elif (model_admin is not None and hasattr(model_admin, name) and
@@ -267,7 +268,7 @@ def lookup_field(name, obj, model_admin=None):
             value = attr(obj)
         else:
             attr = getattr(obj, name)
-            if callable(attr):
+            if isinstance(attr, collections.Callable):
                 value = attr()
             else:
                 value = attr
@@ -291,7 +292,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         elif name == "__str__":
             label = smart_str(model._meta.verbose_name)
         else:
-            if callable(name):
+            if isinstance(name, collections.Callable):
                 attr = name
             elif model_admin is not None and hasattr(model_admin, name):
                 attr = getattr(model_admin, name)
@@ -305,7 +306,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 
             if hasattr(attr, "short_description"):
                 label = attr.short_description
-            elif callable(attr):
+            elif isinstance(attr, collections.Callable):
                 if attr.__name__ == "<lambda>":
                     label = "--"
                 else:

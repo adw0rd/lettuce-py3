@@ -1,13 +1,13 @@
 from django.contrib.localflavor.jp.forms import (JPPostalCodeField,
     JPPrefectureSelect)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class JPLocalFlavorTests(LocalFlavorTestCase):
     def test_JPPrefectureSelect(self):
         f = JPPrefectureSelect()
-        out = u'''<select name="prefecture">
+        out = '''<select name="prefecture">
 <option value="hokkaido">Hokkaido</option>
 <option value="aomori">Aomori</option>
 <option value="iwate">Iwate</option>
@@ -59,7 +59,7 @@ class JPLocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('prefecture', 'kanagawa'), out)
 
     def test_JPPostalCodeField(self):
-        error_format = [u'Enter a postal code in the format XXXXXXX or XXX-XXXX.']
+        error_format = ['Enter a postal code in the format XXXXXXX or XXX-XXXX.']
         valid = {
                 '251-0032': '2510032',
                 '2510032': '2510032',

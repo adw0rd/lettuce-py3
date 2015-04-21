@@ -8,5 +8,5 @@ class Number(models.Model):
     float = models.FloatField(null=True, db_column='the_float')
 
     def __unicode__(self):
-        return u'%i, %.3f' % (self.integer, self.float)
+        return '%i, %.3f' % (self.integer, self.float)
 

@@ -36,9 +36,9 @@ def check_with_rego(step):
 @step(r'The database dump is as follows')
 def database_dump(step):
     try:
-        from cStringIO import StringIO
+        from io import StringIO
     except ImportError:
-        from StringIO import StringIO
+        from io import StringIO
     output = StringIO()
     call_command('dumpdata', stdout=output, indent=2)
     output = output.getvalue()
@@ -52,7 +52,7 @@ def database_populated(step):
 
 @step(r'I count the harvesters')
 def count_harvesters(step):
-    print "Harvester count: %d" % Harvester.objects.count()
+    print("Harvester count: %d" % Harvester.objects.count())
 
 
 @creates_models(Panda)

@@ -91,7 +91,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in values.iteritems():
+        for name, val in values.items():
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
@@ -129,7 +129,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in self.related_updates.iteritems():
+        for model, values in self.related_updates.items():
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:

@@ -13,15 +13,16 @@ or implicit commits or rollbacks.
 """
 
 try:
-    import thread
+    import _thread
 except ImportError:
-    import dummy_thread as thread
+    import _dummy_thread as thread
 try:
     from functools import wraps
 except ImportError:
     from django.utils.functional import wraps  # Python 2.4 fallback.
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.conf import settings
+import collections
 
 class TransactionManagementError(Exception):
     """
@@ -56,7 +57,7 @@ def enter_transaction_management(managed=True, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     connection = connections[using]
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in state and state[thread_ident].get(using):
         state[thread_ident][using].append(state[thread_ident][using][-1])
     else:
@@ -77,7 +78,7 @@ def leave_transaction_management(using=None):
         using = DEFAULT_DB_ALIAS
     connection = connections[using]
     connection._leave_transaction_management(is_managed(using=using))
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in state and state[thread_ident].get(using):
         del state[thread_ident][using][-1]
     else:
@@ -94,7 +95,7 @@ def is_dirty(using=None):
     """
     if using is None:
         using = DEFAULT_DB_ALIAS
-    return dirty.get(thread.get_ident(), {}).get(using, False)
+    return dirty.get(_thread.get_ident(), {}).get(using, False)
 
 def set_dirty(using=None):
     """
@@ -104,7 +105,7 @@ def set_dirty(using=None):
     """
     if using is None:
         using = DEFAULT_DB_ALIAS
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in dirty and using in dirty[thread_ident]:
         dirty[thread_ident][using] = True
     else:
@@ -118,7 +119,7 @@ def set_clean(using=None):
     """
     if using is None:
         using = DEFAULT_DB_ALIAS
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in dirty and using in dirty[thread_ident]:
         dirty[thread_ident][using] = False
     else:
@@ -128,7 +129,7 @@ def set_clean(using=None):
 def clean_savepoints(using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
         del savepoint_state[thread_ident][using]
 
@@ -138,7 +139,7 @@ def is_managed(using=None):
     """
     if using is None:
         using = DEFAULT_DB_ALIAS
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in state and using in state[thread_ident]:
         if state[thread_ident][using]:
             return state[thread_ident][using][-1]
@@ -154,7 +155,7 @@ def managed(flag=True, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     connection = connections[using]
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     top = state.get(thread_ident, {}).get(using, None)
     if top:
         top[-1] = flag
@@ -218,7 +219,7 @@ def savepoint(using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     connection = connections[using]
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
         savepoint_state[thread_ident][using].append(None)
     else:
@@ -237,7 +238,7 @@ def savepoint_rollback(sid, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     connection = connections[using]
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
         connection._savepoint_rollback(sid)
 
@@ -249,7 +250,7 @@ def savepoint_commit(sid, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     connection = connections[using]
-    thread_ident = thread.get_ident()
+    thread_ident = _thread.get_ident()
     if thread_ident in savepoint_state and using in savepoint_state[thread_ident]:
         connection._savepoint_commit(sid)
 
@@ -278,7 +279,7 @@ def autocommit(using=None):
     # are both allowed forms.
     if using is None:
         using = DEFAULT_DB_ALIAS
-    if callable(using):
+    if isinstance(using, collections.Callable):
         return inner_autocommit(using, DEFAULT_DB_ALIAS)
     return lambda func: inner_autocommit(func,  using)
 
@@ -319,7 +320,7 @@ def commit_on_success(using=None):
     # are both allowed forms.
     if using is None:
         using = DEFAULT_DB_ALIAS
-    if callable(using):
+    if isinstance(using, collections.Callable):
         return inner_commit_on_success(using, DEFAULT_DB_ALIAS)
     return lambda func: inner_commit_on_success(func, using)
 
@@ -346,6 +347,6 @@ def commit_manually(using=None):
     # are both allowed forms.
     if using is None:
         using = DEFAULT_DB_ALIAS
-    if callable(using):
+    if isinstance(using, collections.Callable):
         return inner_commit_manually(using, DEFAULT_DB_ALIAS)
     return lambda func: inner_commit_manually(func, using)

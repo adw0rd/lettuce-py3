@@ -1,6 +1,6 @@
 import re
 import sys
-from urlparse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 
 from django.conf import settings
@@ -116,7 +116,7 @@ class OutputChecker(doctest.OutputChecker):
             return norm_whitespace(child_text(element))
 
         def attrs_dict(element):
-            return dict(element.attributes.items())
+            return dict(list(element.attributes.items()))
 
         def check_element(want_element, got_element):
             if want_element.tagName != got_element.tagName:
@@ -511,7 +511,7 @@ class TransactionTestCase(ut2.TestCase):
         self.assertTrue(template_name in template_names,
             msg_prefix + "Template '%s' was not a template used to render"
             " the response. Actual template(s) used: %s" %
-                (template_name, u', '.join(template_names)))
+                (template_name, ', '.join(template_names)))
 
     def assertTemplateNotUsed(self, response, template_name, msg_prefix=''):
         """
@@ -527,7 +527,7 @@ class TransactionTestCase(ut2.TestCase):
             " the response" % template_name)
 
     def assertQuerysetEqual(self, qs, values, transform=repr):
-        return self.assertEqual(map(transform, qs), values)
+        return self.assertEqual(list(map(transform, qs)), values)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)

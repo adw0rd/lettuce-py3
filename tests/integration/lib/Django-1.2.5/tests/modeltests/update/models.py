@@ -11,14 +11,14 @@ class DataPoint(models.Model):
     another_value = models.CharField(max_length=20, blank=True)
 
     def __unicode__(self):
-        return unicode(self.name)
+        return str(self.name)
 
 class RelatedPoint(models.Model):
     name = models.CharField(max_length=20)
     data = models.ForeignKey(DataPoint)
 
     def __unicode__(self):
-        return unicode(self.name)
+        return str(self.name)
 
 
 class A(models.Model):

@@ -19,6 +19,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils import datetime_safe
+import collections
 
 class NOT_PROVIDED:
     pass
@@ -45,9 +46,8 @@ class FieldDoesNotExist(Exception):
 #
 #     getattr(obj, opts.pk.attname)
 
-class Field(object):
+class Field(object, metaclass=LegacyConnection):
     """Base class for all field types"""
-    __metaclass__ = LegacyConnection
 
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
@@ -60,14 +60,14 @@ class Field(object):
     auto_creation_counter = -1
     default_validators = [] # Default set of validators
     default_error_messages = {
-        'invalid_choice': _(u'Value %r is not a valid choice.'),
-        'null': _(u'This field cannot be null.'),
-        'blank': _(u'This field cannot be blank.'),
+        'invalid_choice': _('Value %r is not a valid choice.'),
+        'null': _('This field cannot be null.'),
+        'blank': _('This field cannot be blank.'),
     }
 
     # Generic field type description, usually overriden by subclasses
     def _description(self):
-        return _(u'Field of type: %(field_type)s') % {
+        return _('Field of type: %(field_type)s') % {
             'field_type': self.__class__.__name__
         }
     description = property(_description)
@@ -148,7 +148,7 @@ class Field(object):
         for v in self.validators:
             try:
                 v(value)
-            except exceptions.ValidationError, e:
+            except exceptions.ValidationError as e:
                 if hasattr(e, 'code') and e.code in self.error_messages:
                     message = self.error_messages[e.code]
                     if e.params:
@@ -346,7 +346,7 @@ class Field(object):
     def get_default(self):
         "Returns the default value for this field."
         if self.has_default():
-            if callable(self.default):
+            if isinstance(self.default, collections.Callable):
                 return self.default()
             return force_unicode(self.default, strings_only=True)
         if not self.empty_strings_allowed or (self.null and not connection.features.interprets_empty_strings_as_nulls):
@@ -419,7 +419,7 @@ class Field(object):
         "Returns a django.forms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         if self.has_default():
-            if callable(self.default):
+            if isinstance(self.default, collections.Callable):
                 defaults['initial'] = self.default
                 defaults['show_hidden_initial'] = True
             else:
@@ -435,7 +435,7 @@ class Field(object):
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
             # the values that TypedChoiceField will understand.
-            for k in kwargs.keys():
+            for k in list(kwargs.keys()):
                 if k not in ('coerce', 'empty_value', 'choices', 'required',
                              'widget', 'label', 'initial', 'help_text',
                              'error_messages', 'show_hidden_initial'):
@@ -452,7 +452,7 @@ class AutoField(Field):
 
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u'This value must be an integer.'),
+        'invalid': _('This value must be an integer.'),
     }
     def __init__(self, *args, **kwargs):
         assert kwargs.get('primary_key', False) is True, "%ss must have primary_key=True." % self.__class__.__name__
@@ -490,7 +490,7 @@ class AutoField(Field):
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u'This value must be either True or False.'),
+        'invalid': _('This value must be either True or False.'),
     }
     description = _("Boolean (Either True or False)")
     def __init__(self, *args, **kwargs):
@@ -549,7 +549,7 @@ class CharField(Field):
         return "CharField"
 
     def to_python(self, value):
-        if isinstance(value, basestring) or value is None:
+        if isinstance(value, str) or value is None:
             return value
         return smart_unicode(value)
 
@@ -572,7 +572,7 @@ class CommaSeparatedIntegerField(CharField):
     def formfield(self, **kwargs):
         defaults = {
             'error_messages': {
-                'invalid': _(u'Enter only digits separated by commas.'),
+                'invalid': _('Enter only digits separated by commas.'),
             }
         }
         defaults.update(kwargs)
@@ -613,10 +613,10 @@ class DateField(Field):
         # sure it's a valid date.
         # We could use time.strptime here and catch errors, but datetime.date
         # produces much friendlier error messages.
-        year, month, day = map(int, value.split('-'))
+        year, month, day = list(map(int, value.split('-')))
         try:
             return datetime.date(year, month, day)
-        except ValueError, e:
+        except ValueError as e:
             msg = self.error_messages['invalid_date'] % _(str(e))
             raise exceptions.ValidationError(msg)
 
@@ -667,7 +667,7 @@ class DateField(Field):
 
 class DateTimeField(DateField):
     default_error_messages = {
-        'invalid': _(u'Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format.'),
+        'invalid': _('Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format.'),
     }
     description = _("Date (with time)")
 
@@ -743,7 +743,7 @@ class DateTimeField(DateField):
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u'This value must be a decimal number.'),
+        'invalid': _('This value must be a decimal number.'),
     }
     description = _("Decimal number")
 
@@ -763,7 +763,7 @@ class DecimalField(Field):
             raise exceptions.ValidationError(self.error_messages['invalid'])
 
     def _format(self, value):
-        if isinstance(value, basestring) or value is None:
+        if isinstance(value, str) or value is None:
             return value
         else:
             return self.format_number(value)
@@ -1027,7 +1027,7 @@ class TextField(Field):
         return "TextField"
 
     def get_prep_value(self, value):
-        if isinstance(value, basestring) or value is None:
+        if isinstance(value, str) or value is None:
             return value
         return smart_unicode(value)
 

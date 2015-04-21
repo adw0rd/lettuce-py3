@@ -53,7 +53,7 @@ class GeometryProxy(object):
         if isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
             # Assigning the SRID to the geometry.
             if value.srid is None: value.srid = self._field.srid
-        elif value is None or isinstance(value, (basestring, buffer)):
+        elif value is None or isinstance(value, (str, buffer)):
             # Set with None, WKT, HEX, or WKB
             pass
         else:

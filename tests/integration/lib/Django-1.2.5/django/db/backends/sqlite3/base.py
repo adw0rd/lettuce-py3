@@ -21,9 +21,9 @@ from django.utils.safestring import SafeString
 try:
     try:
         from pysqlite2 import dbapi2 as Database
-    except ImportError, e1:
+    except ImportError as e1:
         from sqlite3 import dbapi2 as Database
-except ImportError, exc:
+except ImportError as exc:
     import sys
     from django.core.exceptions import ImproperlyConfigured
     if sys.version_info < (2, 5, 0):
@@ -198,19 +198,19 @@ class SQLiteCursorWrapper(Database.Cursor):
         query = self.convert_query(query)
         try:
             return Database.Cursor.execute(self, query, params)
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+        except Database.IntegrityError as e:
+            raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+        except Database.DatabaseError as e:
+            raise utils.DatabaseError(utils.DatabaseError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)
         try:
             return Database.Cursor.executemany(self, query, param_list)
-        except Database.IntegrityError, e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+        except Database.IntegrityError as e:
+            raise utils.IntegrityError(utils.IntegrityError(*tuple(e))).with_traceback(sys.exc_info()[2])
+        except Database.DatabaseError as e:
+            raise utils.DatabaseError(utils.DatabaseError(*tuple(e))).with_traceback(sys.exc_info()[2])
 
     def convert_query(self, query):
         return FORMAT_QMARK_REGEX.sub('?', query).replace('%%','%')

@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.test import TestCase
 
-from models import Issue, User
+from .models import Issue, User
 
 
 class RelatedObjectTests(TestCase):

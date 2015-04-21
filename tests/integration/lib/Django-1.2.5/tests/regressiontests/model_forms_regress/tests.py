@@ -5,7 +5,7 @@ from django.conf import settings
 from django.forms.models import modelform_factory, ModelChoiceField
 from django.test import TestCase
 
-from models import Person, RealPerson, Triple, FilePathModel, Article, \
+from .models import Person, RealPerson, Triple, FilePathModel, Article, \
     Publication, CustomFF, Author, Author1, Homepage
 
 
@@ -140,7 +140,7 @@ class ManyToManyCallableInitialTests(TestCase):
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
         form = ModelForm()
-        self.assertEquals(form.as_ul(), u"""<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
+        self.assertEquals(form.as_ul(), """<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
 <li><label for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
 <option value="1" selected="selected">First Book</option>
 <option value="2" selected="selected">Second Book</option>
@@ -199,7 +199,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
         self.assert_(form.is_valid())
         self.assertEqual(form.cleaned_data['publication'], None)
         author = form.save()
@@ -217,7 +217,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author1.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
         self.assert_(not form.is_valid())
 
 

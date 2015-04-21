@@ -10,7 +10,7 @@ class SKRegionSelect(Select):
     A select widget widget with list of Slovak regions as choices.
     """
     def __init__(self, attrs=None):
-        from sk_regions import REGION_CHOICES
+        from .sk_regions import REGION_CHOICES
         super(SKRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class SKDistrictSelect(Select):
@@ -18,7 +18,7 @@ class SKDistrictSelect(Select):
     A select widget with list of Slovak districts as choices.
     """
     def __init__(self, attrs=None):
-        from sk_districts import DISTRICT_CHOICES
+        from .sk_districts import DISTRICT_CHOICES
         super(SKDistrictSelect, self).__init__(attrs, choices=DISTRICT_CHOICES)
 
 class SKPostalCodeField(RegexField):
@@ -27,7 +27,7 @@ class SKPostalCodeField(RegexField):
     Valid form is XXXXX or XXX XX, where X represents integer.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXXXX or XXX XX.'),
+        'invalid': _('Enter a postal code in the format XXXXX or XXX XX.'),
     }
 
     def __init__(self, *args, **kwargs):

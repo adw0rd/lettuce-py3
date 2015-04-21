@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from views import empty_view
+from .views import empty_view
 
 urlpatterns = patterns('',
     url(r'^$', empty_view, name="inner-nothing"),

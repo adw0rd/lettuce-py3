@@ -16,7 +16,7 @@ class UYDepartamentSelect(Select):
     A Select widget that uses a list of Uruguayan departaments as its choices.
     """
     def __init__(self, attrs=None):
-        from uy_departaments import DEPARTAMENT_CHOICES
+        from .uy_departaments import DEPARTAMENT_CHOICES
         super(UYDepartamentSelect, self).__init__(attrs, choices=DEPARTAMENT_CHOICES)
 
 
@@ -46,7 +46,7 @@ class UYCIField(RegexField):
 
         value = super(UYCIField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         match = self.regex.match(value)
         if not match:
             raise ValidationError(self.error_messages['invalid'])

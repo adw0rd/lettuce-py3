@@ -4,7 +4,7 @@ from django.db.models.query import CollectedObjects
 from django.db.models.query_utils import CyclicDependency
 from django.test import TestCase
 
-from models import A, B, C, D, E, F
+from .models import A, B, C, D, E, F
 
 
 class DeleteTests(TestCase):
@@ -67,7 +67,7 @@ class DeleteTests(TestCase):
 
         o = CollectedObjects()
         a1._collect_sub_objects(o)
-        self.assertEqual(o.keys(), [D, C, B, A])
+        self.assertEqual(list(o.keys()), [D, C, B, A])
         a1.delete()
 
         # Same again with a known bad order
@@ -81,7 +81,7 @@ class DeleteTests(TestCase):
 
         o = CollectedObjects()
         a2._collect_sub_objects(o)
-        self.assertEqual(o.keys(), [D, C, B, A])
+        self.assertEqual(list(o.keys()), [D, C, B, A])
         a2.delete()
 
     def test_collected_objects_null(self):
@@ -102,7 +102,7 @@ class DeleteTests(TestCase):
 
         o = CollectedObjects()
         e1._collect_sub_objects(o)
-        self.assertEqual(o.keys(), [F, E])
+        self.assertEqual(list(o.keys()), [F, E])
 
         # temporarily replace the UpdateQuery class to verify that E.f is
         # actually nulled out first
@@ -127,7 +127,7 @@ class DeleteTests(TestCase):
         # Same deal as before, though we are starting from the other object.
         o = CollectedObjects()
         f2._collect_sub_objects(o)
-        self.assertEqual(o.keys(), [F, E])
+        self.assertEqual(list(o.keys()), [F, E])
         f2.delete()
         self.assertEqual(logged, ["f"])
         logged = []

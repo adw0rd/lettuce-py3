@@ -160,7 +160,7 @@ class Price(models.Model):
     quantity = models.PositiveIntegerField()
 
     def __unicode__(self):
-        return u"%s for %s" % (self.quantity, self.price)
+        return "%s for %s" % (self.quantity, self.price)
 
     class Meta:
         unique_together = (('price', 'quantity'),)
@@ -224,7 +224,7 @@ class BigInt(models.Model):
     biggie = models.BigIntegerField()
 
     def __unicode__(self):
-        return unicode(self.biggie)
+        return str(self.biggie)
 
 class MarkupField(models.CharField):
     def __init__(self, *args, **kwargs):

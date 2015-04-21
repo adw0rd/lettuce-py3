@@ -1,5 +1,5 @@
 from unittest import TestCase
-from StringIO import StringIO
+from io import StringIO
 from django.core.servers.basehttp import ServerHandler
 
 #

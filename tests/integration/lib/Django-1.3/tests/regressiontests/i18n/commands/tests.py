@@ -5,7 +5,7 @@ from subprocess import Popen, PIPE
 def find_command(cmd, path=None, pathext=None):
     if path is None:
         path = os.environ.get('PATH', []).split(os.pathsep)
-    if isinstance(path, basestring):
+    if isinstance(path, str):
         path = [path]
     # check if there are funny path extensions for executables, e.g. Windows
     if pathext is None:
@@ -36,8 +36,8 @@ if xgettext_cmd:
     if match:
         xversion = (int(match.group('major')), int(match.group('minor')))
         if xversion >= (0, 15):
-            from extraction import *
+            from .extraction import *
     del p
 
 if find_command('msgfmt'):
-    from compilation import *
+    from .compilation import *

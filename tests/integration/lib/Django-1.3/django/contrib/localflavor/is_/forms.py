@@ -16,7 +16,7 @@ class ISIdNumberField(RegexField):
     """
     default_error_messages = {
         'invalid': _('Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.'),
-        'checksum': _(u'The Icelandic identification number is not valid.'),
+        'checksum': _('The Icelandic identification number is not valid.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -27,7 +27,7 @@ class ISIdNumberField(RegexField):
         value = super(ISIdNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = self._canonify(value)
         if self._validate(value):
@@ -69,7 +69,7 @@ class ISPhoneNumberField(RegexField):
         value = super(ISPhoneNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         return value.replace('-', '').replace(' ', '')
 
@@ -78,6 +78,6 @@ class ISPostalCodeSelect(Select):
     A Select widget that uses a list of Icelandic postal codes as its choices.
     """
     def __init__(self, attrs=None):
-        from is_postalcodes import IS_POSTALCODES
+        from .is_postalcodes import IS_POSTALCODES
         super(ISPostalCodeSelect, self).__init__(attrs, choices=IS_POSTALCODES)
 

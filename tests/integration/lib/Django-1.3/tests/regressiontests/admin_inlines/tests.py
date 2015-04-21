@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 # local test models
-from models import (Holder, Inner, InnerInline, Holder2, Inner2, Holder3,
+from .models import (Holder, Inner, InnerInline, Holder2, Inner2, Holder3,
     Inner3, Person, OutfitItem, Fashionista, Teacher, Parent, Child)
 
 
@@ -58,7 +58,7 @@ class TestInline(TestCase):
             'shoppingweakness_set-TOTAL_FORMS': 1,
             'shoppingweakness_set-INITIAL_FORMS': 0,
             'shoppingweakness_set-MAX_NUM_FORMS': 0,
-            '_save': u'Save',
+            '_save': 'Save',
             'person': person.id,
             'max_weight': 0,
             'shoppingweakness_set-0-item': item.id,
@@ -76,7 +76,7 @@ class TestInline(TestCase):
             'title_set-TOTAL_FORMS': 1,
             'title_set-INITIAL_FORMS': 0,
             'title_set-MAX_NUM_FORMS': 0,
-            '_save': u'Save',
+            '_save': 'Save',
             'title_set-0-title1': 'a title',
             'title_set-0-title2': 'a different title',
         }

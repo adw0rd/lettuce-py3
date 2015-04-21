@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from lxml import html
 from nose.tools import assert_equals
 from lettuce import world, before, step
@@ -30,7 +30,7 @@ def given_i_navigate_to_group1(step, url):
     url = django_url(url)
     assert_equals(url, 'http://127.0.0.1:8000/')
 
-    raw = urllib2.urlopen(url).read()
+    raw = urllib.request.urlopen(url).read()
     world.dom = html.fromstring(raw)
 
 @step(r'I see the title of the page is "(.*)"')

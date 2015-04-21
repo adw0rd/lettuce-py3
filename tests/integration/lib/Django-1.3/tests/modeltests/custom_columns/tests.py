@@ -1,7 +1,7 @@
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from models import Author, Article
+from .models import Author, Article
 
 
 class CustomColumnsTests(TestCase):
@@ -20,13 +20,13 @@ class CustomColumnsTests(TestCase):
             Author.objects.all(), [
                 "Peter Jones", "John Smith",
             ],
-            unicode
+            str
         )
         self.assertQuerysetEqual(
             Author.objects.filter(first_name__exact="John"), [
                 "John Smith",
             ],
-            unicode
+            str
         )
         self.assertEqual(
             Author.objects.get(first_name__exact="John"),
@@ -53,7 +53,7 @@ class CustomColumnsTests(TestCase):
                 "Peter Jones",
                 "John Smith",
             ],
-            unicode
+            str
         )
         # Get the articles for an author
         self.assertQuerysetEqual(
@@ -67,5 +67,5 @@ class CustomColumnsTests(TestCase):
             art.authors.filter(last_name='Jones'), [
                 "Peter Jones"
             ],
-            unicode
+            str
         )

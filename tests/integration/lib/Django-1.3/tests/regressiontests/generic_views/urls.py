@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 from django.views.generic import TemplateView
 from django.views.decorators.cache import cache_page
 
-import views
+from . import views
 
 
 urlpatterns = patterns('',

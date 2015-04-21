@@ -1,7 +1,7 @@
 from django.db.models.query_utils import DeferredAttribute
 from django.test import TestCase
 
-from models import Secondary, Primary, Child, BigChild
+from .models import Secondary, Primary, Child, BigChild
 
 
 class DeferTests(TestCase):
@@ -47,13 +47,13 @@ class DeferTests(TestCase):
 
         # User values() won't defer anything (you get the full list of
         # dictionaries back), but it still works.
-        self.assertEqual(qs.defer("name").values()[0], {
+        self.assertEqual(list(qs.defer("name").values())[0], {
             "id": p1.id,
             "name": "p1",
             "value": "xx",
             "related_id": s1.id,
         })
-        self.assertEqual(qs.only("name").values()[0], {
+        self.assertEqual(list(qs.only("name").values())[0], {
             "id": p1.id,
             "name": "p1",
             "value": "xx",

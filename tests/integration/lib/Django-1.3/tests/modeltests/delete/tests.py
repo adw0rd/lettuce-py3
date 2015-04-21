@@ -152,7 +152,7 @@ class DeletionTests(TestCase):
     def test_bulk(self):
         from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(2*GET_ITERATOR_CHUNK_SIZE):
+        for i in range(2*GET_ITERATOR_CHUNK_SIZE):
             T.objects.create(s=s)
         #   1 (select related `T` instances)
         # + 1 (select related `U` instances)

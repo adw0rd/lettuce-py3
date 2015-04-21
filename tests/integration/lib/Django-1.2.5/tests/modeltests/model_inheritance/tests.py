@@ -5,7 +5,7 @@ from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase
 
-from models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
+from .models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
     Post, Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel)
 
 
@@ -21,8 +21,8 @@ class ModelInheritanceTests(TestCase):
 
         s = Student.objects.create(name="Pebbles", age=5, school_class="1B")
 
-        self.assertEqual(unicode(w1), "Worker Fred")
-        self.assertEqual(unicode(s), "Student Pebbles")
+        self.assertEqual(str(w1), "Worker Fred")
+        self.assertEqual(str(s), "Student Pebbles")
 
         # The children inherit the Meta class of their parents (if they don't
         # specify their own).

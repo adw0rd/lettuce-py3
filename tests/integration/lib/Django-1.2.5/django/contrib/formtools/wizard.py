@@ -4,7 +4,7 @@ step and storing the form's state as HTML hidden fields so that no state is
 stored on the server side.
 """
 
-import cPickle as pickle
+import pickle as pickle
 
 from django import forms
 from django.conf import settings

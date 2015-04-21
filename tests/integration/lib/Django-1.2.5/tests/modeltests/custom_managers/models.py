@@ -24,7 +24,7 @@ class Person(models.Model):
     objects = PersonManager()
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 # An example of a custom manager that sets get_query_set().
 

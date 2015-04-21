@@ -4,9 +4,9 @@ import os
 import re
 import sys
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 from django.core import management
 from django.core.management.commands.dumpdata import sort_dependencies
@@ -16,14 +16,14 @@ from django.db import transaction
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, \
     skipUnlessDBFeature
 
-from models import Animal, Stuff
-from models import Absolute, Parent, Child
-from models import Article, Widget
-from models import Store, Person, Book
-from models import NKChild, RefToNKChild
-from models import Circle1, Circle2, Circle3
-from models import ExternalDependency
-from models import Thingy
+from .models import Animal, Stuff
+from .models import Absolute, Parent, Child
+from .models import Article, Widget
+from .models import Store, Person, Book
+from .models import NKChild, RefToNKChild
+from .models import Circle1, Circle2, Circle3
+from .models import ExternalDependency
+from .models import Thingy
 
 
 pre_save_checks = []
@@ -91,7 +91,7 @@ class TestFixtures(TestCase):
             verbosity=0,
             commit=False
         )
-        self.assertEqual(Stuff.objects.all()[0].name, u'')
+        self.assertEqual(Stuff.objects.all()[0].name, '')
         self.assertEqual(Stuff.objects.all()[0].owner, None)
 
     def test_absolute_path(self):
@@ -368,7 +368,7 @@ class NaturalKeyFixtureTests(TestCase):
     def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
         try:
             func(*args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(msg, str(e))
             self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
 

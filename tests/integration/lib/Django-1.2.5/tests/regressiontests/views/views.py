@@ -10,7 +10,7 @@ from django.views.generic.create_update import create_object
 
 from regressiontests.views import BrokenException, except_args
 
-from models import Article
+from .models import Article
 
 
 def index_page(request):

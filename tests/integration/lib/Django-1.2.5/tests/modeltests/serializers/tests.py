@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from StringIO import StringIO
+from io import StringIO
 import unittest
 from xml.dom import minidom
 
@@ -10,7 +10,7 @@ from django.db import transaction
 from django.test import TestCase, TransactionTestCase, Approximate
 from django.utils import simplejson
 
-from models import Category, Author, Article, AuthorProfile, Actor, \
+from .models import Category, Author, Article, AuthorProfile, Actor, \
                                     Movie, Score, Player, Team
 
 class SerializerRegistrationTests(unittest.TestCase):
@@ -159,8 +159,8 @@ class SerializersTestBase(object):
 
     def test_serialize_unicode(self):
         """Tests that unicode makes the roundtrip intact"""
-        actor_name = u"Za\u017c\u00f3\u0142\u0107"
-        movie_title = u'G\u0119\u015bl\u0105 ja\u017a\u0144'
+        actor_name = "Za\u017c\u00f3\u0142\u0107"
+        movie_title = 'G\u0119\u015bl\u0105 ja\u017a\u0144'
         ac = Actor(name=actor_name)
         mv = Movie(title=movie_title, actor=ac)
         ac.save()
@@ -278,7 +278,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     def _comparison_value(value):
         # The XML serializer handles everything as strings, so comparisons
         # need to be performed on the stringified value
-        return unicode(value)
+        return str(value)
 
     @staticmethod
     def _validate_output(serial_str):
@@ -444,7 +444,7 @@ else:
                     # yaml.load will return non-string objects for some
                     # of the fields we are interested in, this ensures that
                     # everything comes back as a string
-                    if isinstance(field_value, basestring):
+                    if isinstance(field_value, str):
                         ret_list.append(field_value)
                     else:
                         ret_list.append(str(field_value))

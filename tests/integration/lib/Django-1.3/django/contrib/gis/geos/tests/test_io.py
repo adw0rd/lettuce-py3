@@ -11,7 +11,7 @@ class GEOSIOTest(unittest.TestCase):
         # read() should return a GEOSGeometry
         ref = GEOSGeometry(wkt)
         g1 = wkt_r.read(wkt)
-        g2 = wkt_r.read(unicode(wkt))
+        g2 = wkt_r.read(str(wkt))
 
         for geom in (g1, g2):
             self.assertEqual(ref, geom)

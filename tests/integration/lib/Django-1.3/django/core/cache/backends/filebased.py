@@ -4,7 +4,7 @@ import os
 import time
 import shutil
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 

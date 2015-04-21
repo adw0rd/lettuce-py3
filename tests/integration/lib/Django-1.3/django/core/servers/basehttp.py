@@ -7,12 +7,12 @@ This is a simple server for use in testing or debugging Django apps. It hasn't
 been reviewed for security issues. Don't use it for production use.
 """
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import re
 import socket
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import warnings
 
 from django.core.management.color import color_style
@@ -50,7 +50,7 @@ class FileWrapper(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         data = self.filelike.read(self.blksize)
         if data:
             return data
@@ -96,7 +96,7 @@ class Headers(object):
         Does *not* raise an exception if the header is missing.
         """
         name = name.lower()
-        self._headers[:] = [kv for kv in self._headers if kv[0].lower()<>name]
+        self._headers[:] = [kv for kv in self._headers if kv[0].lower()!=name]
 
     def __getitem__(self,name):
         """Get the first header value for 'name'
@@ -166,7 +166,7 @@ class Headers(object):
         return self._headers[:]
 
     def __repr__(self):
-        return "Headers(%s)" % `self._headers`
+        return "Headers(%s)" % repr(self._headers)
 
     def __str__(self):
         """str() returns the formatted headers, complete with end line,
@@ -204,7 +204,7 @@ class Headers(object):
         parts = []
         if _value is not None:
             parts.append(_value)
-        for k, v in _params.items():
+        for k, v in list(_params.items()):
             if v is None:
                 parts.append(k.replace('_', '-'))
             else:
@@ -245,7 +245,7 @@ class ServerHandler(object):
     # os_environ is used to supply configuration from the OS environment:
     # by default it's a copy of 'os.environ' as of import time, but you can
     # override this in e.g. your __init__ method.
-    os_environ = dict(os.environ.items())
+    os_environ = dict(list(os.environ.items()))
 
     # Collaborator classes
     wsgi_file_wrapper = FileWrapper     # set to None to disable
@@ -356,7 +356,7 @@ class ServerHandler(object):
             try:
                 if self.headers_sent:
                     # Re-raise original exception if headers sent
-                    raise exc_info[0], exc_info[1], exc_info[2]
+                    raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
             finally:
                 exc_info = None        # avoid dangling circular ref
         elif self.headers is not None:
@@ -537,7 +537,7 @@ class WSGIServer(HTTPServer):
         """Override server_bind to store the server name."""
         try:
             HTTPServer.server_bind(self)
-        except Exception, e:
+        except Exception as e:
             raise WSGIServerException(e)
         self.setup_environ()
 
@@ -578,7 +578,7 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
         else:
             path,query = self.path,''
 
-        env['PATH_INFO'] = urllib.unquote(path)
+        env['PATH_INFO'] = urllib.parse.unquote(path)
         env['QUERY_STRING'] = query
         env['REMOTE_ADDR'] = self.client_address[0]
 
@@ -673,7 +673,7 @@ class AdminMediaHandler(handlers.StaticFilesHandler):
         is raised.
         """
         relative_url = url[len(self.base_url[2]):]
-        relative_path = urllib.url2pathname(relative_url)
+        relative_path = urllib.request.url2pathname(relative_url)
         return safe_join(self.base_dir, relative_path)
 
     def serve(self, request):

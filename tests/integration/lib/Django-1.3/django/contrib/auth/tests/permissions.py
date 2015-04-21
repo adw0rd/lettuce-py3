@@ -1,7 +1,7 @@
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth import models as auth_models

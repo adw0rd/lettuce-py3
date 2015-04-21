@@ -8,7 +8,7 @@ import os
 import posixpath
 import re
 import stat
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from email.Utils import parsedate_tz, mktime_tz
 
 from django.template import loader
@@ -32,7 +32,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     """
 
     # Clean up given path to only allow serving files below document_root.
-    path = posixpath.normpath(urllib.unquote(path))
+    path = posixpath.normpath(urllib.parse.unquote(path))
     path = path.lstrip('/')
     newpath = ''
     for part in path.split('/'):

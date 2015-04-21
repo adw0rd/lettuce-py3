@@ -47,7 +47,7 @@ def parse_docstring(docstring):
             metadata = {}
             body = "\n\n".join(parts[1:])
         else:
-            metadata = dict(metadata.items())
+            metadata = dict(list(metadata.items()))
             if metadata:
                 body = "\n\n".join(parts[1:-1])
             else:
@@ -101,5 +101,5 @@ if docutils_is_available:
     docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
     docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE = 'cmsreference'
 
-    for name, urlbase in ROLES.items():
+    for name, urlbase in list(ROLES.items()):
         create_reference_role(name, urlbase)

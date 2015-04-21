@@ -39,7 +39,7 @@ def fullsplit(path, result=None):
 # Tell distutils to put the data_files in platform-specific installation
 # locations. See here for an explanation:
 # http://groups.google.com/group/comp.lang.python/browse_thread/thread/35ec7b2fed36eaec/2105ee4d9e8042cb
-for scheme in INSTALL_SCHEMES.values():
+for scheme in list(INSTALL_SCHEMES.values()):
     scheme['data'] = scheme['purelib']
 
 # Compile the list of packages available, because distutils doesn't have
@@ -67,7 +67,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
-if u'SVN' in version:
+if 'SVN' in version:
     version = ' '.join(version.split(' ')[:-1])
 
 setup(

@@ -1,4 +1,4 @@
-import StringIO
+import io
 import sys
 
 from django.test import TestCase, TransactionTestCase
@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core import management
 from django.db import DEFAULT_DB_ALIAS
 
-from models import Article, Blog, Book, Category, Person, Tag, Visa
+from .models import Article, Blog, Book, Category, Person, Tag, Visa
 
 class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
@@ -24,7 +24,7 @@ class TestCaseFixtureLoadingTests(TestCase):
 class FixtureLoadingTests(TestCase):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False):
-        new_io = StringIO.StringIO()
+        new_io = io.StringIO()
         management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io, 'use_natural_keys':natural_keys})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
@@ -36,7 +36,7 @@ class FixtureLoadingTests(TestCase):
         ])
 
     def test_loading_and_dumping(self):
-        new_io = StringIO.StringIO()
+        new_io = io.StringIO()
 
         # Load fixture 1. Single JSON file, with two objects.
         management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
@@ -176,7 +176,7 @@ class FixtureLoadingTests(TestCase):
 
     def test_ambiguous_compressed_fixture(self):
         # The name "fixture5" is ambigous, so loading it will raise an error
-        new_io = StringIO.StringIO()
+        new_io = io.StringIO()
         management.call_command('loaddata', 'fixture5', verbosity=0, stderr=new_io, commit=False)
         output = new_io.getvalue().strip().split('\n')
         self.assertEqual(len(output), 1)
@@ -235,7 +235,7 @@ class FixtureLoadingTests(TestCase):
 if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     class FixtureTransactionTests(TransactionTestCase):
         def _dumpdata_assert(self, args, output, format='json'):
-            new_io = StringIO.StringIO()
+            new_io = io.StringIO()
             management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io})
             command_output = new_io.getvalue().strip()
             self.assertEqual(command_output, output)
@@ -251,7 +251,7 @@ if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
 
             # Try to load fixture 2 using format discovery; this will fail
             # because there are two fixture2's in the fixtures directory
-            new_io = StringIO.StringIO()
+            new_io = io.StringIO()
             management.call_command('loaddata', 'fixture2', verbosity=0, stderr=new_io)
             output = new_io.getvalue().strip().split('\n')
             self.assertEqual(len(output), 1)

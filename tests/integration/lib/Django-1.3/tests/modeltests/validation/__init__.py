@@ -7,14 +7,14 @@ class ValidationTestCase(unittest.TestCase):
         self.assertRaises(ValidationError, clean)
         try:
             clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(sorted(failed_fields), sorted(e.message_dict.keys()))
     
     def assertFieldFailsValidationWithMessage(self, clean, field_name, message):
         self.assertRaises(ValidationError, clean)
         try:
             clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertTrue(field_name in e.message_dict)
             self.assertEqual(message, e.message_dict[field_name])
 

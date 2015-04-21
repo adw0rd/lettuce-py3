@@ -7,7 +7,7 @@ from itertools import repeat
 from django.utils import tree
 from django.db.models.fields import Field
 from django.db.models.query_utils import QueryWrapper
-from datastructures import EmptyResultSet, FullResultSet
+from .datastructures import EmptyResultSet, FullResultSet
 
 # Connection types
 AND = 'AND'
@@ -183,7 +183,7 @@ class WhereNode(tree.Node):
             if max_in_list_size and len(params) > max_in_list_size:
                 # Break up the params list into an OR of manageable chunks.
                 in_clause_elements = ['(']
-                for offset in xrange(0, len(params), max_in_list_size):
+                for offset in range(0, len(params), max_in_list_size):
                     if offset > 0:
                         in_clause_elements.append(' OR ')
                     in_clause_elements.append('%s IN (' % field_sql)

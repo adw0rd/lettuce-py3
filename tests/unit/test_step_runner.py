@@ -132,7 +132,7 @@ def step_runner_environ():
     def define_a_step(*args, **kw):
         assert True
 
-    @step(u'When I have a step that raises an exception')
+    @step('When I have a step that raises an exception')
     def raises_exception(step):
         raise Exception()
 

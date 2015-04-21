@@ -47,7 +47,7 @@ class Comparison(models.Model):
     other_obj = generic.GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
 
     def __unicode__(self):
-        return u"%s is %s than %s" % (self.first_obj, self.comparative, self.other_obj)
+        return "%s is %s than %s" % (self.first_obj, self.comparative, self.other_obj)
 
 class Animal(models.Model):
     common_name = models.CharField(max_length=150)

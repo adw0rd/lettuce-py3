@@ -14,7 +14,7 @@ class LocalFlavorTestCase(TestCase):
         restore_warnings_state(self._warnings_state)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=[],
-            field_kwargs={}, empty_value=u''):
+            field_kwargs={}, empty_value=''):
         """
         Asserts that a field behaves correctly with various inputs.
 
@@ -32,19 +32,19 @@ class LocalFlavorTestCase(TestCase):
         required = fieldclass(*field_args, **field_kwargs)
         optional = fieldclass(*field_args, **dict(field_kwargs, required=False))
         # test valid inputs
-        for input, output in valid.items():
+        for input, output in list(valid.items()):
             self.assertEqual(required.clean(input), output)
             self.assertEqual(optional.clean(input), output)
         # test invalid inputs
-        for input, errors in invalid.items():
-            self.assertRaisesRegexp(ValidationError, unicode(errors),
+        for input, errors in list(invalid.items()):
+            self.assertRaisesRegexp(ValidationError, str(errors),
                 required.clean, input
             )
-            self.assertRaisesRegexp(ValidationError, unicode(errors),
+            self.assertRaisesRegexp(ValidationError, str(errors),
                 optional.clean, input
             )
         # test required inputs
-        error_required = u'This field is required'
+        error_required = 'This field is required'
         for e in EMPTY_VALUES:
             self.assertRaisesRegexp(ValidationError, error_required,
                 required.clean, e)

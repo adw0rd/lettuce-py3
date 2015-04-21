@@ -1,5 +1,6 @@
 from django.template import loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseGone
+import collections
 
 def direct_to_template(request, template, extra_context=None, mimetype=None, **kwargs):
     """
@@ -8,8 +9,8 @@ def direct_to_template(request, template, extra_context=None, mimetype=None, **k
     """
     if extra_context is None: extra_context = {}
     dictionary = {'params': kwargs}
-    for key, value in extra_context.items():
-        if callable(value):
+    for key, value in list(extra_context.items()):
+        if isinstance(value, collections.Callable):
             dictionary[key] = value()
         else:
             dictionary[key] = value

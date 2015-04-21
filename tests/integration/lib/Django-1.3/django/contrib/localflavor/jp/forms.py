@@ -33,5 +33,5 @@ class JPPrefectureSelect(Select):
     A Select widget that uses a list of Japanese prefectures as its choices.
     """
     def __init__(self, attrs=None):
-        from jp_prefectures import JP_PREFECTURES
+        from .jp_prefectures import JP_PREFECTURES
         super(JPPrefectureSelect, self).__init__(attrs, choices=JP_PREFECTURES)

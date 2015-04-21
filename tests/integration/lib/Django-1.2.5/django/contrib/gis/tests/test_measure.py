@@ -63,28 +63,28 @@ class DistanceTest(unittest.TestCase):
         
         try:
             d5 = d1 + 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Distance + number should raise TypeError')
 
         try:
             d5 = d1 - 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Distance - number should raise TypeError')
 
         try:
             d1 += 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Distance += number should raise TypeError')
 
         try:
             d1 -= 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Distance -= number should raise TypeError')
@@ -111,21 +111,21 @@ class DistanceTest(unittest.TestCase):
 
         try:
             d1 *= D(m=1)
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Distance *= Distance should raise TypeError')
             
         try:
             d5 = d1 / D(m=1)
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Distance / Distance should raise TypeError')
 
         try:
             d1 /= D(m=1)
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Distance /= Distance should raise TypeError')
@@ -218,28 +218,28 @@ class AreaTest(unittest.TestCase):
         
         try:
             a5 = a1 + 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area + number should raise TypeError')
 
         try:
             a5 = a1 - 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area - number should raise TypeError')
 
         try:
             a1 += 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area += number should raise TypeError')
 
         try:
             a1 -= 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area -= number should raise TypeError')
@@ -262,28 +262,28 @@ class AreaTest(unittest.TestCase):
         
         try:
             a5 = a1 * A(sq_m=1)
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area * Area should raise TypeError')
 
         try:
             a1 *= A(sq_m=1)
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area *= Area should raise TypeError')
             
         try:
             a5 = a1 / A(sq_m=1)
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area / Area should raise TypeError')
 
         try:
             a1 /= A(sq_m=1)
-        except TypeError, e:
+        except TypeError as e:
             pass
         else:
             self.fail('Area /= Area should raise TypeError')

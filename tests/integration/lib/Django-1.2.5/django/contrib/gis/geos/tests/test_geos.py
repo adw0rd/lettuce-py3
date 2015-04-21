@@ -131,7 +131,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test01d_errors(self):
         "Testing the Error handlers."
         # string-based
-        print "\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n"
+        print("\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n")
         for err in self.geometries.errors:
             try:
                 g = fromstr(err.wkt)
@@ -141,7 +141,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Bad WKB
         self.assertRaises(GEOSException, GEOSGeometry, buffer('0'))
 
-        print "\nEND - expecting GEOS_ERROR; safe to ignore.\n"
+        print("\nEND - expecting GEOS_ERROR; safe to ignore.\n")
 
         class NotAGeometry(object):
             pass
@@ -199,7 +199,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test01k_fromfile(self):
         "Testing the fromfile() factory."
-        from StringIO import StringIO
+        from io import StringIO
         ref_pnt = GEOSGeometry('POINT(5 23)')
 
         wkt_f = StringIO()
@@ -435,7 +435,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test05b_multipolygons(self):
         "Testing MultiPolygon objects."
-        print "\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n"
+        print("\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n")
         prev = fromstr('POINT (0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = fromstr(mp.wkt)
@@ -454,7 +454,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                     self.assertEqual(p.valid, True)
                 self.assertEqual(mpoly.wkt, MultiPolygon(*tuple(poly.clone() for poly in mpoly)).wkt)
 
-        print "\nEND - expecting GEOS_NOTICE; safe to ignore.\n"
+        print("\nEND - expecting GEOS_NOTICE; safe to ignore.\n")
 
     def test06a_memory_hijinks(self):
         "Testing Geometry __del__() on rings and polygons."
@@ -491,7 +491,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(len(p.ext_ring_cs), len(cs)) # Making sure __len__ works
 
                 # Checks __getitem__ and __setitem__
-                for i in xrange(len(p.ext_ring_cs)):
+                for i in range(len(p.ext_ring_cs)):
                     c1 = p.ext_ring_cs[i] # Expected value
                     c2 = cs[i] # Value from coordseq
                     self.assertEqual(c1, c2)
@@ -518,7 +518,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test10_intersection(self):
         "Testing intersects() and intersection()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             i1 = fromstr(self.geometries.intersect_geoms[i].wkt)
@@ -531,7 +531,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test11_union(self):
         "Testing union()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             u1 = fromstr(self.geometries.union_geoms[i].wkt)
@@ -543,7 +543,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test12_difference(self):
         "Testing difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.diff_geoms[i].wkt)
@@ -555,7 +555,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test13_symdifference(self):
         "Testing sym_difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.sdiff_geoms[i].wkt)
@@ -584,11 +584,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(len(exp_buf), len(buf))
 
             # Now assuring that each point in the buffer is almost equal
-            for j in xrange(len(exp_buf)):
+            for j in range(len(exp_buf)):
                 exp_ring = exp_buf[j]
                 buf_ring = buf[j]
                 self.assertEqual(len(exp_ring), len(buf_ring))
-                for k in xrange(len(exp_ring)):
+                for k in range(len(exp_ring)):
                     # Asserting the X, Y of each point are almost equal (due to floating point imprecision)
                     self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
                     self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
@@ -670,13 +670,13 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Polygon w/in the collection has its own rings.
         for tg in self.geometries.multipolygons:
             mpoly = fromstr(tg.wkt)
-            for i in xrange(len(mpoly)):
+            for i in range(len(mpoly)):
                 poly = mpoly[i]
                 old_poly = mpoly[i]
                 # Offsetting the each ring in the polygon by 500.
-                for j in xrange(len(poly)):
+                for j in range(len(poly)):
                     r = poly[j]
-                    for k in xrange(len(r)): r[k] = (r[k][0] + 500., r[k][1] + 500.)
+                    for k in range(len(r)): r[k] = (r[k][0] + 500., r[k][1] + 500.)
                     poly[j] = r
 
                 self.assertNotEqual(mpoly[i], poly)
@@ -870,7 +870,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test25_pickle(self):
         "Testing pickling and unpickling support."
         # Using both pickle and cPickle -- just 'cause.
-        import pickle, cPickle
+        import pickle, pickle
 
         # Creating a list of test geometries for pickling,
         # and setting the SRID on some of them.
@@ -884,8 +884,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # The SRID won't be exported in GEOS 3.0 release candidates.
         no_srid = self.null_srid == -1
         for geom in tgeoms:
-            s1, s2 = cPickle.dumps(geom), pickle.dumps(geom)
-            g1, g2 = cPickle.loads(s1), pickle.loads(s2)
+            s1, s2 = pickle.dumps(geom), pickle.dumps(geom)
+            g1, g2 = pickle.loads(s1), pickle.loads(s2)
             for tmpg in (g1, g2):
                 self.assertEqual(geom, tmpg)
                 if not no_srid: self.assertEqual(geom.srid, tmpg.srid)

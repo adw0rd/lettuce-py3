@@ -21,10 +21,10 @@ class Command(LabelCommand):
         if result:
             if not isinstance(result, (list, tuple)):
                 result = [result]
-            output = u'\n  '.join(
+            output = '\n  '.join(
                 (smart_unicode(os.path.realpath(path)) for path in result))
             self.stdout.write(
-                smart_str(u"Found '%s' here:\n  %s\n" % (path, output)))
+                smart_str("Found '%s' here:\n  %s\n" % (path, output)))
         else:
             if verbosity >= 1:
                 self.stderr.write(

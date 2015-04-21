@@ -4,7 +4,7 @@ from django.contrib.localflavor.ca.forms import (CAPostalCodeField,
         CAPhoneNumberField, CAProvinceField, CAProvinceSelect,
         CASocialInsuranceNumberField)
 
-from utils import LocalFlavorTestCase
+from .utils import LocalFlavorTestCase
 
 
 class CALocalFlavorTests(LocalFlavorTestCase):
@@ -21,7 +21,7 @@ class CALocalFlavorTests(LocalFlavorTestCase):
 
     def test_CAProvinceSelect(self):
         f = CAProvinceSelect()
-        out = u'''<select name="province">
+        out = '''<select name="province">
 <option value="AB" selected="selected">Alberta</option>
 <option value="BC">British Columbia</option>
 <option value="MB">Manitoba</option>
@@ -39,7 +39,7 @@ class CALocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('province', 'AB'), out)
 
     def test_CAPostalCodeField(self):
-        error_format = [u'Enter a postal code in the format XXX XXX.']
+        error_format = ['Enter a postal code in the format XXX XXX.']
         valid = {
             'T2S 2H7': 'T2S 2H7',
             'T2S 2W7': 'T2S 2W7',
@@ -65,7 +65,7 @@ class CALocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(CAPostalCodeField, valid, invalid)
 
     def test_CAPhoneNumberField(self):
-        error_format = [u'Phone numbers must be in XXX-XXX-XXXX format.']
+        error_format = ['Phone numbers must be in XXX-XXX-XXXX format.']
         valid = {
             '403-555-1212': '403-555-1212',
             '4035551212': '403-555-1212',
@@ -83,7 +83,7 @@ class CALocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(CAPhoneNumberField, valid, invalid)
 
     def test_CAProvinceField(self):
-        error_format = [u'Enter a Canadian province or territory.']
+        error_format = ['Enter a Canadian province or territory.']
         valid = {
             'ab': 'AB',
             'BC': 'BC',
@@ -96,7 +96,7 @@ class CALocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(CAProvinceField, valid, invalid)
 
     def test_CASocialInsuranceField(self):
-        error_format = [u'Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format.']
+        error_format = ['Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format.']
         valid = {
             '046-454-286': '046-454-286',
         }

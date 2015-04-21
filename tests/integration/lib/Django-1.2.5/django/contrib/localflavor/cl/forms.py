@@ -15,7 +15,7 @@ class CLRegionSelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from cl_regions import REGION_CHOICES
+        from .cl_regions import REGION_CHOICES
         super(CLRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class CLRutField(RegexField):
@@ -48,7 +48,7 @@ class CLRutField(RegexField):
         """
         super(CLRutField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         rut, verificador = self._canonify(value)
         if self._algorithm(rut) == verificador:
             return self._format(rut, verificador)
@@ -66,7 +66,7 @@ class CLRutField(RegexField):
             multi += 1
             if multi == 8:
                 multi = 2
-        return u'0123456789K0'[11 - suma % 11]
+        return '0123456789K0'[11 - suma % 11]
 
     def _canonify(self, rut):
         """
@@ -91,5 +91,5 @@ class CLRutField(RegexField):
             else:
                 new_dot = pos - 3
             code = code[:new_dot] + '.' + code[new_dot:]
-        return u'%s-%s' % (code, verifier)
+        return '%s-%s' % (code, verifier)
 

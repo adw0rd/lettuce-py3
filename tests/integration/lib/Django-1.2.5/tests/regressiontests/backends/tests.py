@@ -9,7 +9,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends.postgresql import version as pg_version
 from django.test import TestCase, TransactionTestCase
 
-import models
+from . import models
 
 class OracleChecks(unittest.TestCase):
 
@@ -40,7 +40,7 @@ class OracleChecks(unittest.TestCase):
         if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
             c = connection.cursor()
             c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join([unicode(x) for x in xrange(4000)])
+            long_str = ''.join([str(x) for x in range(4000)])
             c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
             c.execute('SELECT text FROM ltext')
             row = c.fetchone()
@@ -203,6 +203,6 @@ class FkConstraintsTests(TransactionTestCase):
              qn(f3.column)))
         cursor = connection.cursor()
         cursor.execute(query2)
-        self.assertEqual(cursor.fetchone(), (u'Clark', u'Kent'))
-        self.assertEqual(list(cursor.fetchmany(2)), [(u'Jane', u'Doe'), (u'John', u'Doe')])
-        self.assertEqual(list(cursor.fetchall()), [(u'Mary', u'Agnelline'), (u'Peter', u'Parker')])
+        self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
+        self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
+        self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])

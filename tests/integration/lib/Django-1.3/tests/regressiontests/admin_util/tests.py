@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.utils import unittest
 from django.utils.formats import localize
 
-from models import Article, Count, Event, Location
+from .models import Article, Count, Event, Location
 
 
 class NestedObjectsTests(TestCase):
@@ -133,7 +133,7 @@ class UtilTests(unittest.TestCase):
         # Regression test for #13071: NullBooleanField has special
         # handling.
         display_value = display_for_field(None, models.NullBooleanField())
-        expected = u'<img src="%simg/admin/icon-unknown.gif" alt="None" />' % settings.ADMIN_MEDIA_PREFIX
+        expected = '<img src="%simg/admin/icon-unknown.gif" alt="None" />' % settings.ADMIN_MEDIA_PREFIX
         self.assertEqual(display_value, expected)
 
         display_value = display_for_field(None, models.DecimalField())

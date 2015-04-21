@@ -1,15 +1,16 @@
-import urllib
-from urlparse import urlparse, urlunparse, urlsplit
+import urllib.request, urllib.parse, urllib.error
+from urllib.parse import urlparse, urlunparse, urlsplit
 import sys
 import os
 import re
 import mimetypes
 import warnings
 from copy import copy
+import collections
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -111,15 +112,15 @@ def encode_multipart(boundary, data):
     to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
-    is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
+    is_file = lambda thing: hasattr(thing, "read") and isinstance(thing.read, collections.Callable)
 
     # Each bit of the multipart form data could be either a form value or a
     # file, or a *list* of form values and/or files. Remember that HTTP field
     # names can be duplicated!
-    for (key, value) in data.items():
+    for (key, value) in list(data.items()):
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, basestring) and is_iterable(value):
+        elif not isinstance(value, str) and is_iterable(value):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
@@ -210,9 +211,9 @@ class RequestFactory(object):
     def _get_path(self, parsed):
         # If there are parameters, add them
         if parsed[3]:
-            return urllib.unquote(parsed[2] + ";" + parsed[3])
+            return urllib.parse.unquote(parsed[2] + ";" + parsed[3])
         else:
-            return urllib.unquote(parsed[2])
+            return urllib.parse.unquote(parsed[2])
 
     def get(self, path, data={}, **extra):
         "Construct a GET request"
@@ -294,7 +295,7 @@ class RequestFactory(object):
         # Make `data` into a querystring only if it's not already a string. If
         # it is a string, we'll assume that the caller has already encoded it.
         query_string = None
-        if not isinstance(data, basestring):
+        if not isinstance(data, str):
             query_string = urlencode(data, doseq=True)
 
         parsed = urlparse(path)
@@ -385,7 +386,7 @@ class Client(RequestFactory):
 
             try:
                 response = self.handler(environ)
-            except TemplateDoesNotExist, e:
+            except TemplateDoesNotExist as e:
                 # If the view raises an exception, Django will attempt to show
                 # the 500.html template. If that template is not available,
                 # we should ignore the error in favor of re-raising the
@@ -402,7 +403,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                raise exc_info[1], None, exc_info[2]
+                raise exc_info[1].with_traceback(exc_info[2])
 
             # Save the client and request that stimulated the response.
             response.client = self

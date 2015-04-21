@@ -1,6 +1,6 @@
 import os
 import sys
-import commands
+import subprocess
 
 from tests.asserts import assert_not_equals
 from lettuce.fs import FileSystem
@@ -19,7 +19,7 @@ def test_email():
     os.environ['PYTHONPATH'] = current_directory
     os.environ['DJANGO_SETTINGS_MODULE'] = 'djangoapp'
 
-    status, out = commands.getstatusoutput(
+    status, out = subprocess.getstatusoutput(
         "django-admin.py harvest email.feature --verbosity=2")
 
     assert_not_equals(status, 0)

@@ -19,8 +19,8 @@ from lettuce import before, after
 
 @before.all
 def couves_before():
-    print "Couves before all"
+    print("Couves before all")
 
 @after.all
 def couves_after(total):
-    print "Couves after all"
+    print("Couves after all")

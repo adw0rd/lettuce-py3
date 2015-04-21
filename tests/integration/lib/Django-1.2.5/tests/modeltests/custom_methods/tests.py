@@ -2,7 +2,7 @@ from datetime import date
 
 from django.test import TestCase
 
-from models import Article
+from .models import Article
 
 
 class MethodsTests(TestCase):

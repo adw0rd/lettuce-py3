@@ -40,7 +40,7 @@ class KWCivilIDNumberField(Field):
     def clean(self, value):
         super(KWCivilIDNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         if not re.match(r'^\d{12}$', value):
             raise ValidationError(self.error_messages['invalid'])

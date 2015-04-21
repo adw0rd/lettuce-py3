@@ -9,7 +9,7 @@ from django.utils import translation
 from django.utils import unittest
 from django.utils.encoding import force_unicode
 from django.utils.encoding import smart_unicode
-from error_messages import AssertFormErrorsMixin
+from .error_messages import AssertFormErrorsMixin
 
 class GetDate(Form):
     mydate = DateField(widget=SelectDateWidget)
@@ -354,7 +354,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         # Invalid dates shouldn't be allowed
         c = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
         self.assertFalse(c.is_valid())
-        self.assertEqual(c.errors, {'mydate': [u'Enter a valid date.']})
+        self.assertEqual(c.errors, {'mydate': ['Enter a valid date.']})
 
         # label tag is correctly associated with month dropdown
         d = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
@@ -383,7 +383,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):
-                return u'\n'.join(rendered_widgets)
+                return '\n'.join(rendered_widgets)
 
         w = ComplexMultiWidget()
         self.assertEqual(w.render('name', 'some text,JP,2007-04-25 06:24:00'), """<input type="text" name="name_0" value="some text" />
@@ -410,11 +410,11 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
                 return None
 
         f = ComplexField(widget=w)
-        self.assertEqual(f.clean(['some text', ['J','P'], ['2007-04-25','6:24:00']]), u'some text,JP,2007-04-25 06:24:00')
-        self.assertFormErrors([u'Select a valid choice. X is not one of the available choices.'], f.clean, ['some text',['X'], ['2007-04-25','6:24:00']])
+        self.assertEqual(f.clean(['some text', ['J','P'], ['2007-04-25','6:24:00']]), 'some text,JP,2007-04-25 06:24:00')
+        self.assertFormErrors(['Select a valid choice. X is not one of the available choices.'], f.clean, ['some text',['X'], ['2007-04-25','6:24:00']])
 
         # If insufficient data is provided, None is substituted
-        self.assertFormErrors([u'This field is required.'], f.clean, ['some text',['JP']])
+        self.assertFormErrors(['This field is required.'], f.clean, ['some text',['JP']])
 
         class ComplexFieldForm(Form):
             field1 = ComplexField(widget=w)
@@ -439,26 +439,26 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 </select>
 <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" /><input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>""")
 
-        self.assertEqual(f.cleaned_data['field1'], u'some text,JP,2007-04-25 06:24:00')
+        self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
 
     def test_ipaddress(self):
         f = IPAddressField()
-        self.assertFormErrors([u'This field is required.'], f.clean, '')
-        self.assertFormErrors([u'This field is required.'], f.clean, None)
-        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
+        self.assertFormErrors(['This field is required.'], f.clean, '')
+        self.assertFormErrors(['This field is required.'], f.clean, None)
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
 
         f = IPAddressField(required=False)
-        self.assertEqual(f.clean(''), u'')
-        self.assertEqual(f.clean(None), u'')
-        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(''), '')
+        self.assertEqual(f.clean(None), '')
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
 
     def test_smart_unicode(self):
         class Test:
@@ -469,12 +469,12 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
             def __str__(self):
                return 'Foo'
             def __unicode__(self):
-               return u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+               return '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
 
-        self.assertEqual(smart_unicode(Test()), u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_unicode(TestU()), u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_unicode(1), u'1')
-        self.assertEqual(smart_unicode('foo'), u'foo')
+        self.assertEqual(smart_unicode(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_unicode(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_unicode(1), '1')
+        self.assertEqual(smart_unicode('foo'), 'foo')
 
     def test_accessing_clean(self):
         class UserForm(Form):
@@ -491,7 +491,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 
         f = UserForm({'username': 'SirRobin', 'password': 'blue'})
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['username'], u'sirrobin')
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
 
     def test_overriding_errorlist(self):
         class DivErrorList(ErrorList):
@@ -499,8 +499,8 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
                 return self.as_divs()
 
             def as_divs(self):
-                if not self: return u''
-                return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % force_unicode(e) for e in self])
+                if not self: return ''
+                return '<div class="errorlist">%s</div>' % ''.join(['<div class="error">%s</div>' % force_unicode(e) for e in self])
 
         class CommentForm(Form):
             name = CharField(max_length=50, required=False)
@@ -619,7 +619,7 @@ class FormsExtraL10NTestCase(unittest.TestCase):
         a = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
         self.assertFalse(a.is_valid())
         # 'Geef een geldige datum op.' = 'Enter a valid date.'
-        self.assertEqual(a.errors, {'mydate': [u'Geef een geldige datum op.']})
+        self.assertEqual(a.errors, {'mydate': ['Geef een geldige datum op.']})
 
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown

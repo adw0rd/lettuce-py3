@@ -6,7 +6,7 @@ from django.core.validators import EMPTY_VALUES
 
 class LocalFlavorTestCase(TestCase):
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=[],
-            field_kwargs={}, empty_value=u''):
+            field_kwargs={}, empty_value=''):
         """
         Asserts that a field behaves correctly with various inputs.
 
@@ -24,29 +24,29 @@ class LocalFlavorTestCase(TestCase):
         required = fieldclass(*field_args, **field_kwargs)
         optional = fieldclass(*field_args, **dict(field_kwargs, required=False))
         # test valid inputs
-        for input, output in valid.items():
+        for input, output in list(valid.items()):
             self.assertEqual(required.clean(input), output)
             self.assertEqual(optional.clean(input), output)
         # test invalid inputs
-        for input, errors in invalid.items():
+        for input, errors in list(invalid.items()):
             try:
                 required.clean(input)
-            except ValidationError, e:
+            except ValidationError as e:
                 self.assertEqual(errors, e.messages)
             else:
                 self.fail()
             try:
                 optional.clean(input)
-            except ValidationError, e:
+            except ValidationError as e:
                 self.assertEqual(errors, e.messages)
             else:
                 self.fail()
         # test required inputs
-        error_required = [u'This field is required.']
+        error_required = ['This field is required.']
         for val in EMPTY_VALUES:
             try:
                 required.clean(val)
-            except ValidationError, e:
+            except ValidationError as e:
                 self.assertEqual(error_required, e.messages)
             else:
                 self.fail()

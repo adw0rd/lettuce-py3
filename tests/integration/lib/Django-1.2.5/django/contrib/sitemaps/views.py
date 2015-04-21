@@ -4,14 +4,15 @@ from django.contrib.sites.models import get_current_site
 from django.core import urlresolvers
 from django.utils.encoding import smart_str
 from django.core.paginator import EmptyPage, PageNotAnInteger
+import collections
 
 def index(request, sitemaps):
     current_site = get_current_site(request)
     sites = []
     protocol = request.is_secure() and 'https' or 'http'
-    for section, site in sitemaps.items():
+    for section, site in list(sitemaps.items()):
         site.request = request
-        if callable(site):
+        if isinstance(site, collections.Callable):
             pages = site().paginator.num_pages
         else:
             pages = site.paginator.num_pages
@@ -30,12 +31,12 @@ def sitemap(request, sitemaps, section=None):
             raise Http404("No sitemap available for section: %r" % section)
         maps.append(sitemaps[section])
     else:
-        maps = sitemaps.values()
+        maps = list(sitemaps.values())
     page = request.GET.get("p", 1)
     current_site = get_current_site(request)
     for site in maps:
         try:
-            if callable(site):
+            if isinstance(site, collections.Callable):
                 urls.extend(site().get_urls(page=page, site=current_site))
             else:
                 urls.extend(site.get_urls(page=page, site=current_site))

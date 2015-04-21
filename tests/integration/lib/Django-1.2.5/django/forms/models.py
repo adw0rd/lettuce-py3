@@ -11,12 +11,13 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.core.validators import EMPTY_VALUES
-from util import ErrorList
-from forms import BaseForm, get_declared_fields
-from fields import Field, ChoiceField
-from widgets import SelectMultiple, HiddenInput, MultipleHiddenInput
-from widgets import media_property
-from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
+from .util import ErrorList
+from .forms import BaseForm, get_declared_fields
+from .fields import Field, ChoiceField
+from .widgets import SelectMultiple, HiddenInput, MultipleHiddenInput
+from .widgets import media_property
+from .formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
+import collections
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
@@ -178,7 +179,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
 
         if formfield_callback is None:
             formfield = f.formfield(**kwargs)
-        elif not callable(formfield_callback):
+        elif not isinstance(formfield_callback, collections.Callable):
             raise TypeError('formfield_callback must be a function or callable')
         else:
             formfield = formfield_callback(f, **kwargs)
@@ -258,7 +259,7 @@ class BaseModelForm(BaseForm):
                                             error_class, label_suffix, empty_permitted)
 
     def _update_errors(self, message_dict):
-        for k, v in message_dict.items():
+        for k, v in list(message_dict.items()):
             if k != NON_FIELD_ERRORS:
                 self._errors.setdefault(k, self.error_class()).extend(v)
                 # Remove the data from the cleaned_data dict since it was invalid
@@ -294,7 +295,7 @@ class BaseModelForm(BaseForm):
 
             # Exclude fields that failed form validation. There's no need for
             # the model fields to validate them as well.
-            elif field in self._errors.keys():
+            elif field in list(self._errors.keys()):
                 exclude.append(f.name)
 
             # Exclude empty fields that are not required by the form, if the
@@ -328,20 +329,20 @@ class BaseModelForm(BaseForm):
         # object being referred to may not yet fully exist (#12749).
         # However, these fields *must* be included in uniqueness checks,
         # so this can't be part of _get_validation_exclusions().
-        for f_name, field in self.fields.items():
+        for f_name, field in list(self.fields.items()):
             if isinstance(field, InlineForeignKeyField):
                 exclude.append(f_name)
 
         # Clean the model instance's fields.
         try:
             self.instance.clean_fields(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             self._update_errors(e.message_dict)
 
         # Call the model instance's clean method.
         try:
             self.instance.clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self._update_errors({NON_FIELD_ERRORS: e.messages})
 
         # Validate uniqueness if needed.
@@ -356,7 +357,7 @@ class BaseModelForm(BaseForm):
         exclude = self._get_validation_exclusions()
         try:
             self.instance.validate_unique(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             self._update_errors(e.message_dict)
 
     def save(self, commit=True):
@@ -376,8 +377,8 @@ class BaseModelForm(BaseForm):
 
     save.alters_data = True
 
-class ModelForm(BaseModelForm):
-    __metaclass__ = ModelFormMetaclass
+class ModelForm(BaseModelForm, metaclass=ModelFormMetaclass):
+    pass
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                        formfield_callback=None):
@@ -568,7 +569,7 @@ class BaseModelFormSet(BaseFormSet):
         else:
             return ugettext("Please correct the duplicate data for %(field)s, "
                 "which must be unique.") % {
-                    "field": get_text_list(unique_check, unicode(_("and"))),
+                    "field": get_text_list(unique_check, str(_("and"))),
                 }
 
     def get_date_error_message(self, date_check):
@@ -576,7 +577,7 @@ class BaseModelFormSet(BaseFormSet):
             "which must be unique for the %(lookup)s in %(date_field)s.") % {
             'field_name': date_check[2],
             'date_field': date_check[3],
-            'lookup': unicode(date_check[1]),
+            'lookup': str(date_check[1]),
         }
 
     def get_form_error(self):
@@ -847,7 +848,7 @@ class InlineForeignKeyField(Field):
     given parent instance in an inline.
     """
     default_error_messages = {
-        'invalid_choice': _(u'The inline foreign key did not match the parent instance primary key.'),
+        'invalid_choice': _('The inline foreign key did not match the parent instance primary key.'),
     }
 
     def __init__(self, parent_instance, *args, **kwargs):
@@ -885,7 +886,7 @@ class ModelChoiceIterator(object):
 
     def __iter__(self):
         if self.field.empty_label is not None:
-            yield (u"", self.field.empty_label)
+            yield ("", self.field.empty_label)
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
@@ -908,11 +909,11 @@ class ModelChoiceField(ChoiceField):
     # This class is a subclass of ChoiceField for purity, but it doesn't
     # actually use any of ChoiceField's implementation.
     default_error_messages = {
-        'invalid_choice': _(u'Select a valid choice. That choice is not one of'
-                            u' the available choices.'),
+        'invalid_choice': _('Select a valid choice. That choice is not one of'
+                            ' the available choices.'),
     }
 
-    def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
+    def __init__(self, queryset, empty_label="---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
                  help_text=None, to_field_name=None, *args, **kwargs):
         if required and (initial is not None):
@@ -997,10 +998,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
     widget = SelectMultiple
     hidden_widget = MultipleHiddenInput
     default_error_messages = {
-        'list': _(u'Enter a list of values.'),
-        'invalid_choice': _(u'Select a valid choice. %s is not one of the'
-                            u' available choices.'),
-        'invalid_pk_value': _(u'"%s" is not a valid value for a primary key.')
+        'list': _('Enter a list of values.'),
+        'invalid_choice': _('Select a valid choice. %s is not one of the'
+                            ' available choices.'),
+        'invalid_pk_value': _('"%s" is not a valid value for a primary key.')
     }
 
     def __init__(self, queryset, cache_choices=False, required=True,

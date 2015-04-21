@@ -1,5 +1,5 @@
 from django.test import TestCase
-from models import Category, Person
+from .models import Category, Person
 
 class ManyToOneRecursiveTests(TestCase):
 

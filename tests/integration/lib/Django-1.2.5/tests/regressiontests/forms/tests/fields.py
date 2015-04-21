@@ -38,7 +38,7 @@ from django.forms.widgets import RadioFieldRenderer
 
 
 def fix_os_paths(x):
-    if isinstance(x, basestring):
+    if isinstance(x, str):
         return x.replace('\\', '/')
     elif isinstance(x, tuple):
         return tuple(fix_os_paths(list(x)))
@@ -54,45 +54,45 @@ class FieldsTests(TestCase):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
             callable(*args, **kwargs)
-        except error, e:
+        except error as e:
             self.assertEqual(message, str(e))
 
     # CharField ###################################################################
 
     def test_charfield_1(self):
         f = CharField()
-        self.assertEqual(u'1', f.clean(1))
-        self.assertEqual(u'hello', f.clean('hello'))
+        self.assertEqual('1', f.clean(1))
+        self.assertEqual('hello', f.clean('hello'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
-        self.assertEqual(u'[1, 2, 3]', f.clean([1, 2, 3]))
+        self.assertEqual('[1, 2, 3]', f.clean([1, 2, 3]))
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, None)
 
     def test_charfield_2(self):
         f = CharField(required=False)
-        self.assertEqual(u'1', f.clean(1))
-        self.assertEqual(u'hello', f.clean('hello'))
-        self.assertEqual(u'', f.clean(None))
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'[1, 2, 3]', f.clean([1, 2, 3]))
+        self.assertEqual('1', f.clean(1))
+        self.assertEqual('hello', f.clean('hello'))
+        self.assertEqual('', f.clean(None))
+        self.assertEqual('', f.clean(''))
+        self.assertEqual('[1, 2, 3]', f.clean([1, 2, 3]))
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, None)
 
     def test_charfield_3(self):
         f = CharField(max_length=10, required=False)
-        self.assertEqual(u'12345', f.clean('12345'))
-        self.assertEqual(u'1234567890', f.clean('1234567890'))
+        self.assertEqual('12345', f.clean('12345'))
+        self.assertEqual('1234567890', f.clean('1234567890'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 10 characters (it has 11).']", f.clean, '1234567890a')
         self.assertEqual(f.max_length, 10)
         self.assertEqual(f.min_length, None)
 
     def test_charfield_4(self):
         f = CharField(min_length=10, required=False)
-        self.assertEqual(u'', f.clean(''))
+        self.assertEqual('', f.clean(''))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 5).']", f.clean, '12345')
-        self.assertEqual(u'1234567890', f.clean('1234567890'))
-        self.assertEqual(u'1234567890a', f.clean('1234567890a'))
+        self.assertEqual('1234567890', f.clean('1234567890'))
+        self.assertEqual('1234567890a', f.clean('1234567890a'))
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
@@ -100,8 +100,8 @@ class FieldsTests(TestCase):
         f = CharField(min_length=10, required=True)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 5).']", f.clean, '12345')
-        self.assertEqual(u'1234567890', f.clean('1234567890'))
-        self.assertEqual(u'1234567890a', f.clean('1234567890a'))
+        self.assertEqual('1234567890', f.clean('1234567890'))
+        self.assertEqual('1234567890a', f.clean('1234567890a'))
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
@@ -229,7 +229,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, 'Inf')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, '-Inf')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, 'a')
-        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, u'łąść')
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, 'łąść')
         self.assertEqual(f.clean('1.0 '), Decimal("1.0"))
         self.assertEqual(f.clean(' 1.0'), Decimal("1.0"))
         self.assertEqual(f.clean(' 1.0 '), Decimal("1.0"))
@@ -392,8 +392,8 @@ class FieldsTests(TestCase):
 
     def test_regexfield_1(self):
         f = RegexField('^\d[A-F]\d$')
-        self.assertEqual(u'2A2', f.clean('2A2'))
-        self.assertEqual(u'3F3', f.clean('3F3'))
+        self.assertEqual('2A2', f.clean('2A2'))
+        self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '3G3')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, ' 2A2')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '2A2 ')
@@ -401,22 +401,22 @@ class FieldsTests(TestCase):
 
     def test_regexfield_2(self):
         f = RegexField('^\d[A-F]\d$', required=False)
-        self.assertEqual(u'2A2', f.clean('2A2'))
-        self.assertEqual(u'3F3', f.clean('3F3'))
+        self.assertEqual('2A2', f.clean('2A2'))
+        self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '3G3')
-        self.assertEqual(u'', f.clean(''))
+        self.assertEqual('', f.clean(''))
 
     def test_regexfield_3(self):
         f = RegexField(re.compile('^\d[A-F]\d$'))
-        self.assertEqual(u'2A2', f.clean('2A2'))
-        self.assertEqual(u'3F3', f.clean('3F3'))
+        self.assertEqual('2A2', f.clean('2A2'))
+        self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '3G3')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, ' 2A2')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '2A2 ')
 
     def test_regexfield_4(self):
         f = RegexField('^\d\d\d\d$', error_message='Enter a four-digit number.')
-        self.assertEqual(u'1234', f.clean('1234'))
+        self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a four-digit number.']", f.clean, '123')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a four-digit number.']", f.clean, 'abcd')
 
@@ -424,8 +424,8 @@ class FieldsTests(TestCase):
         f = RegexField('^\d+$', min_length=5, max_length=10)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 5 characters (it has 3).']", f.clean, '123')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 5 characters (it has 3).', u'Enter a valid value.']", f.clean, 'abc')
-        self.assertEqual(u'12345', f.clean('12345'))
-        self.assertEqual(u'1234567890', f.clean('1234567890'))
+        self.assertEqual('12345', f.clean('12345'))
+        self.assertEqual('1234567890', f.clean('1234567890'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 10 characters (it has 11).']", f.clean, '12345678901')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '12345a')
 
@@ -435,7 +435,7 @@ class FieldsTests(TestCase):
         f = EmailField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
-        self.assertEqual(u'person@example.com', f.clean('person@example.com'))
+        self.assertEqual('person@example.com', f.clean('person@example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@bar')
@@ -443,10 +443,10 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'example@-invalid.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'example@inv-.alid-.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'example@inv-.-alid.com')
-        self.assertEqual(u'example@valid-----hyphens.com', f.clean('example@valid-----hyphens.com'))
-        self.assertEqual(u'example@valid-with-hyphens.com', f.clean('example@valid-with-hyphens.com'))
+        self.assertEqual('example@valid-----hyphens.com', f.clean('example@valid-----hyphens.com'))
+        self.assertEqual('example@valid-with-hyphens.com', f.clean('example@valid-with-hyphens.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'example@.com')
-        self.assertEqual(u'local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com', f.clean('local@domain.with.idn.xyzäöüßabc.part.com'))
+        self.assertEqual('local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com', f.clean('local@domain.with.idn.xyzäöüßabc.part.com'))
 
     def test_email_regexp_for_performance(self):
         f = EmailField()
@@ -461,10 +461,10 @@ class FieldsTests(TestCase):
 
     def test_emailfield_2(self):
         f = EmailField(required=False)
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'', f.clean(None))
-        self.assertEqual(u'person@example.com', f.clean('person@example.com'))
-        self.assertEqual(u'example@example.com', f.clean('      example@example.com  \t   \t '))
+        self.assertEqual('', f.clean(''))
+        self.assertEqual('', f.clean(None))
+        self.assertEqual('person@example.com', f.clean('person@example.com'))
+        self.assertEqual('example@example.com', f.clean('      example@example.com  \t   \t '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@bar')
@@ -472,7 +472,7 @@ class FieldsTests(TestCase):
     def test_emailfield_3(self):
         f = EmailField(min_length=10, max_length=15)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 9).']", f.clean, 'a@foo.com')
-        self.assertEqual(u'alf@foo.com', f.clean('alf@foo.com'))
+        self.assertEqual('alf@foo.com', f.clean('alf@foo.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 15 characters (it has 20).']", f.clean, 'alf123456788@foo.com')
 
     # FileField ##################################################################
@@ -508,15 +508,15 @@ class FieldsTests(TestCase):
         f = URLField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
-        self.assertEqual(u'http://localhost/', f.clean('http://localhost'))
-        self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
-        self.assertEqual(u'http://example.com./', f.clean('http://example.com.'))
-        self.assertEqual(u'http://www.example.com/', f.clean('http://www.example.com'))
-        self.assertEqual(u'http://www.example.com:8000/test', f.clean('http://www.example.com:8000/test'))
-        self.assertEqual(u'http://valid-with-hyphens.com/', f.clean('valid-with-hyphens.com'))
-        self.assertEqual(u'http://subdomain.domain.com/', f.clean('subdomain.domain.com'))
-        self.assertEqual(u'http://200.8.9.10/', f.clean('http://200.8.9.10'))
-        self.assertEqual(u'http://200.8.9.10:8000/test', f.clean('http://200.8.9.10:8000/test'))
+        self.assertEqual('http://localhost/', f.clean('http://localhost'))
+        self.assertEqual('http://example.com/', f.clean('http://example.com'))
+        self.assertEqual('http://example.com./', f.clean('http://example.com.'))
+        self.assertEqual('http://www.example.com/', f.clean('http://www.example.com'))
+        self.assertEqual('http://www.example.com:8000/test', f.clean('http://www.example.com:8000/test'))
+        self.assertEqual('http://valid-with-hyphens.com/', f.clean('valid-with-hyphens.com'))
+        self.assertEqual('http://subdomain.domain.com/', f.clean('subdomain.domain.com'))
+        self.assertEqual('http://200.8.9.10/', f.clean('http://200.8.9.10'))
+        self.assertEqual('http://200.8.9.10:8000/test', f.clean('http://200.8.9.10:8000/test'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'foo')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
@@ -528,9 +528,9 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://-invalid.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://inv-.alid-.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://inv-.-alid.com')
-        self.assertEqual(u'http://valid-----hyphens.com/', f.clean('http://valid-----hyphens.com'))
-        self.assertEqual(u'http://some.idn.xyz\xe4\xf6\xfc\xdfabc.domain.com:123/blah', f.clean('http://some.idn.xyzäöüßabc.domain.com:123/blah'))
-        self.assertEqual(u'http://www.example.com/s/http://code.djangoproject.com/ticket/13804', f.clean('www.example.com/s/http://code.djangoproject.com/ticket/13804'))
+        self.assertEqual('http://valid-----hyphens.com/', f.clean('http://valid-----hyphens.com'))
+        self.assertEqual('http://some.idn.xyz\xe4\xf6\xfc\xdfabc.domain.com:123/blah', f.clean('http://some.idn.xyzäöüßabc.domain.com:123/blah'))
+        self.assertEqual('http://www.example.com/s/http://code.djangoproject.com/ticket/13804', f.clean('www.example.com/s/http://code.djangoproject.com/ticket/13804'))
 
     def test_url_regex_ticket11198(self):
         f = URLField()
@@ -543,10 +543,10 @@ class FieldsTests(TestCase):
 
     def test_urlfield_2(self):
         f = URLField(required=False)
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'', f.clean(None))
-        self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
-        self.assertEqual(u'http://www.example.com/', f.clean('http://www.example.com'))
+        self.assertEqual('', f.clean(''))
+        self.assertEqual('', f.clean(None))
+        self.assertEqual('http://example.com/', f.clean('http://example.com'))
+        self.assertEqual('http://www.example.com/', f.clean('http://www.example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'foo')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
@@ -555,51 +555,51 @@ class FieldsTests(TestCase):
 
     def test_urlfield_3(self):
         f = URLField(verify_exists=True)
-        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
+        self.assertEqual('http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
         self.assertRaises(ValidationError, f.clean, 'http://www.broken.djangoproject.com') # bad domain
         try:
             f.clean('http://www.broken.djangoproject.com') # bad domain
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
         self.assertRaises(ValidationError, f.clean, 'http://google.com/we-love-microsoft.html') # good domain, bad page
         try:
             f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
         # Valid and existent IDN
-        self.assertEqual(u'http://\u05e2\u05d1\u05e8\u05d9\u05ea.idn.icann.org/', f.clean(u'http://עברית.idn.icann.org/'))
+        self.assertEqual('http://\u05e2\u05d1\u05e8\u05d9\u05ea.idn.icann.org/', f.clean('http://עברית.idn.icann.org/'))
         # Valid but non-existent IDN
         try:
-            f.clean(u'http://broken.עברית.idn.icann.org/')
-        except ValidationError, e:
+            f.clean('http://broken.עברית.idn.icann.org/')
+        except ValidationError as e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
     def test_urlfield_4(self):
         f = URLField(verify_exists=True, required=False)
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
+        self.assertEqual('', f.clean(''))
+        self.assertEqual('http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
 
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 15 characters (it has 13).']", f.clean, 'http://f.com')
-        self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
+        self.assertEqual('http://example.com/', f.clean('http://example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 20 characters (it has 38).']", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
 
     def test_urlfield_6(self):
         f = URLField(required=False)
-        self.assertEqual(u'http://example.com/', f.clean('example.com'))
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'https://example.com/', f.clean('https://example.com'))
+        self.assertEqual('http://example.com/', f.clean('example.com'))
+        self.assertEqual('', f.clean(''))
+        self.assertEqual('https://example.com/', f.clean('https://example.com'))
 
     def test_urlfield_7(self):
         f = URLField()
-        self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
-        self.assertEqual(u'http://example.com/test', f.clean('http://example.com/test'))
+        self.assertEqual('http://example.com/', f.clean('http://example.com'))
+        self.assertEqual('http://example.com/test', f.clean('http://example.com/test'))
 
     def test_urlfield_ticket11826(self):
         f = URLField()
-        self.assertEqual(u'http://example.com/?some_param=some_value', f.clean('http://example.com?some_param=some_value'))
+        self.assertEqual('http://example.com/?some_param=some_value', f.clean('http://example.com?some_param=some_value'))
 
     # BooleanField ################################################################
 
@@ -634,31 +634,31 @@ class FieldsTests(TestCase):
         f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
-        self.assertEqual(u'1', f.clean(1))
-        self.assertEqual(u'1', f.clean('1'))
+        self.assertEqual('1', f.clean(1))
+        self.assertEqual('1', f.clean('1'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 3 is not one of the available choices.']", f.clean, '3')
 
     def test_choicefield_2(self):
         f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'', f.clean(None))
-        self.assertEqual(u'1', f.clean(1))
-        self.assertEqual(u'1', f.clean('1'))
+        self.assertEqual('', f.clean(''))
+        self.assertEqual('', f.clean(None))
+        self.assertEqual('1', f.clean(1))
+        self.assertEqual('1', f.clean('1'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 3 is not one of the available choices.']", f.clean, '3')
 
     def test_choicefield_3(self):
         f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
-        self.assertEqual(u'J', f.clean('J'))
+        self.assertEqual('J', f.clean('J'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. John is not one of the available choices.']", f.clean, 'John')
 
     def test_choicefield_4(self):
         f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
-        self.assertEqual(u'1', f.clean(1))
-        self.assertEqual(u'1', f.clean('1'))
-        self.assertEqual(u'3', f.clean(3))
-        self.assertEqual(u'3', f.clean('3'))
-        self.assertEqual(u'5', f.clean(5))
-        self.assertEqual(u'5', f.clean('5'))
+        self.assertEqual('1', f.clean(1))
+        self.assertEqual('1', f.clean('1'))
+        self.assertEqual('3', f.clean(3))
+        self.assertEqual('3', f.clean('3'))
+        self.assertEqual('5', f.clean(5))
+        self.assertEqual('5', f.clean('5'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 6 is not one of the available choices.']", f.clean, '6')
 
     # TypedChoiceField ############################################################
@@ -750,11 +750,11 @@ class FieldsTests(TestCase):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
-        self.assertEqual([u'1'], f.clean([1]))
-        self.assertEqual([u'1'], f.clean(['1']))
-        self.assertEqual([u'1', u'2'], f.clean(['1', '2']))
-        self.assertEqual([u'1', u'2'], f.clean([1, '2']))
-        self.assertEqual([u'1', u'2'], f.clean((1, '2')))
+        self.assertEqual(['1'], f.clean([1]))
+        self.assertEqual(['1'], f.clean(['1']))
+        self.assertEqual(['1', '2'], f.clean(['1', '2']))
+        self.assertEqual(['1', '2'], f.clean([1, '2']))
+        self.assertEqual(['1', '2'], f.clean((1, '2')))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a list of values.']", f.clean, 'hello')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, [])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, ())
@@ -764,11 +764,11 @@ class FieldsTests(TestCase):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
         self.assertEqual([], f.clean(''))
         self.assertEqual([], f.clean(None))
-        self.assertEqual([u'1'], f.clean([1]))
-        self.assertEqual([u'1'], f.clean(['1']))
-        self.assertEqual([u'1', u'2'], f.clean(['1', '2']))
-        self.assertEqual([u'1', u'2'], f.clean([1, '2']))
-        self.assertEqual([u'1', u'2'], f.clean((1, '2')))
+        self.assertEqual(['1'], f.clean([1]))
+        self.assertEqual(['1'], f.clean(['1']))
+        self.assertEqual(['1', '2'], f.clean(['1', '2']))
+        self.assertEqual(['1', '2'], f.clean([1, '2']))
+        self.assertEqual(['1', '2'], f.clean((1, '2')))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a list of values.']", f.clean, 'hello')
         self.assertEqual([], f.clean([]))
         self.assertEqual([], f.clean(()))
@@ -776,12 +776,12 @@ class FieldsTests(TestCase):
 
     def test_multiplechoicefield_3(self):
         f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
-        self.assertEqual([u'1'], f.clean([1]))
-        self.assertEqual([u'1'], f.clean(['1']))
-        self.assertEqual([u'1', u'5'], f.clean([1, 5]))
-        self.assertEqual([u'1', u'5'], f.clean([1, '5']))
-        self.assertEqual([u'1', u'5'], f.clean(['1', 5]))
-        self.assertEqual([u'1', u'5'], f.clean(['1', '5']))
+        self.assertEqual(['1'], f.clean([1]))
+        self.assertEqual(['1'], f.clean(['1']))
+        self.assertEqual(['1', '5'], f.clean([1, 5]))
+        self.assertEqual(['1', '5'], f.clean([1, '5']))
+        self.assertEqual(['1', '5'], f.clean(['1', 5]))
+        self.assertEqual(['1', '5'], f.clean(['1', '5']))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 6 is not one of the available choices.']", f.clean, ['6'])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 6 is not one of the available choices.']", f.clean, ['1','6'])
 
@@ -789,7 +789,7 @@ class FieldsTests(TestCase):
 
     def test_combofield_1(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()])
-        self.assertEqual(u'test@example.com', f.clean('test@example.com'))
+        self.assertEqual('test@example.com', f.clean('test@example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 20 characters (it has 28).']", f.clean, 'longemailaddress@example.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'not an e-mail')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
@@ -797,11 +797,11 @@ class FieldsTests(TestCase):
 
     def test_combofield_2(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()], required=False)
-        self.assertEqual(u'test@example.com', f.clean('test@example.com'))
+        self.assertEqual('test@example.com', f.clean('test@example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 20 characters (it has 28).']", f.clean, 'longemailaddress@example.com')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'not an e-mail')
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'', f.clean(None))
+        self.assertEqual('', f.clean(''))
+        self.assertEqual('', f.clean(None))
 
     # FilePathField ###############################################################
 

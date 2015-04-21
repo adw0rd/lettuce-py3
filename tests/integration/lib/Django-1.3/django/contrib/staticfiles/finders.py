@@ -132,7 +132,7 @@ class AppDirectoriesFinder(BaseFinder):
         """
         List all files in all app storages.
         """
-        for storage in self.storages.itervalues():
+        for storage in self.storages.values():
             if storage.exists(''): # check if storage location exists
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
@@ -249,7 +249,7 @@ def _get_finder(import_path):
     module, attr = import_path.rsplit('.', 1)
     try:
         mod = import_module(module)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured('Error importing module %s: "%s"' %
                                    (module, e))
     try:

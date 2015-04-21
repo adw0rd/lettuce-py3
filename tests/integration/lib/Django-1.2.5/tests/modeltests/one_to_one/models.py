@@ -13,7 +13,7 @@ class Place(models.Model):
     address = models.CharField(max_length=80)
 
     def __unicode__(self):
-        return u"%s the place" % self.name
+        return "%s the place" % self.name
 
 class Restaurant(models.Model):
     place = models.OneToOneField(Place, primary_key=True)
@@ -21,14 +21,14 @@ class Restaurant(models.Model):
     serves_pizza = models.BooleanField()
 
     def __unicode__(self):
-        return u"%s the restaurant" % self.place.name
+        return "%s the restaurant" % self.place.name
 
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant)
     name = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return u"%s the waiter at %s" % (self.name, self.restaurant)
+        return "%s the waiter at %s" % (self.name, self.restaurant)
 
 class ManualPrimaryKey(models.Model):
     primary_key = models.CharField(max_length=10, primary_key=True)
@@ -44,4 +44,4 @@ class MultiModel(models.Model):
     name = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return u"Multimodel %s" % self.name
+        return "Multimodel %s" % self.name

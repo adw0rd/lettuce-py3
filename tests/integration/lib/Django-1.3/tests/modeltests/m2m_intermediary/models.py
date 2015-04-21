@@ -17,7 +17,7 @@ class Reporter(models.Model):
     last_name = models.CharField(max_length=30)
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
@@ -32,5 +32,5 @@ class Writer(models.Model):
     position = models.CharField(max_length=100)
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.reporter, self.position)
+        return '%s (%s)' % (self.reporter, self.position)
 

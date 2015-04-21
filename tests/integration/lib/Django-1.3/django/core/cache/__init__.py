@@ -27,7 +27,7 @@ try:
 except ImportError:
     try:
         # Python 2.6 and greater
-        from urlparse import parse_qsl
+        from urllib.parse import parse_qsl
     except ImportError:
         # Python 2.5, 2.4.  Works on Python 2.6 but raises
         # PendingDeprecationWarning
@@ -174,7 +174,7 @@ def get_cache(backend, **kwargs):
             mod_path, cls_name = backend.rsplit('.', 1)
             mod = importlib.import_module(mod_path)
             backend_cls = getattr(mod, cls_name)
-    except (AttributeError, ImportError), e:
+    except (AttributeError, ImportError) as e:
         raise InvalidCacheBackendError(
             "Could not find backend '%s': %s" % (backend, e))
     return backend_cls(location, params)

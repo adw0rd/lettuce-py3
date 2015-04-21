@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
-import views
-import customadmin
+from . import views
+from . import customadmin
 
 urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),

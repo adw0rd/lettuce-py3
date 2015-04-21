@@ -22,7 +22,7 @@ class Driver(GDALBase):
     def __init__(self, dr_input):
         "Initializes an OGR driver on either a string or integer input."
 
-        if isinstance(dr_input, basestring):
+        if isinstance(dr_input, str):
             # If a string name of the driver was passed in
             self._register()
 

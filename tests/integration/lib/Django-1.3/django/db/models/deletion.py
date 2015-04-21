@@ -5,6 +5,7 @@ from django.db.models import signals, sql
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.utils.datastructures import SortedDict
 from django.utils.functional import wraps
+import collections
 
 
 class ProtectedError(IntegrityError):
@@ -31,7 +32,7 @@ def PROTECT(collector, field, sub_objs, using):
 
 
 def SET(value):
-    if callable(value):
+    if isinstance(value, collections.Callable):
         def set_on_delete(collector, field, sub_objs, using):
             collector.add_field_update(field, value(), sub_objs)
     else:
@@ -150,7 +151,7 @@ class Collector(object):
 
         # Recursively collect parent models, but not their related objects.
         # These will be found by meta.get_all_related_objects()
-        for parent_model, ptr in model._meta.parents.iteritems():
+        for parent_model, ptr in model._meta.parents.items():
             if ptr:
                 parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
                 self.collect(parent_objs, source=model,
@@ -191,13 +192,13 @@ class Collector(object):
         )
 
     def instances_with_model(self):
-        for model, instances in self.data.iteritems():
+        for model, instances in self.data.items():
             for obj in instances:
                 yield model, obj
 
     def sort(self):
         sorted_models = []
-        models = self.data.keys()
+        models = list(self.data.keys())
         while len(sorted_models) < len(models):
             found = False
             for model in models:
@@ -215,7 +216,7 @@ class Collector(object):
     @force_managed
     def delete(self):
         # sort instance collections
-        for model, instances in self.data.items():
+        for model, instances in list(self.data.items()):
             self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
@@ -231,24 +232,24 @@ class Collector(object):
                 )
 
         # update fields
-        for model, instances_for_fieldvalues in self.field_updates.iteritems():
+        for model, instances_for_fieldvalues in self.field_updates.items():
             query = sql.UpdateQuery(model)
-            for (field, value), instances in instances_for_fieldvalues.iteritems():
+            for (field, value), instances in instances_for_fieldvalues.items():
                 query.update_batch([obj.pk for obj in instances],
                                    {field.name: value}, self.using)
 
         # reverse instance collections
-        for instances in self.data.itervalues():
+        for instances in self.data.values():
             instances.reverse()
 
         # delete batches
-        for model, batches in self.batches.iteritems():
+        for model, batches in self.batches.items():
             query = sql.DeleteQuery(model)
-            for field, instances in batches.iteritems():
+            for field, instances in batches.items():
                 query.delete_batch([obj.pk for obj in instances], self.using, field)
 
         # delete instances
-        for model, instances in self.data.iteritems():
+        for model, instances in self.data.items():
             query = sql.DeleteQuery(model)
             pk_list = [obj.pk for obj in instances]
             query.delete_batch(pk_list, self.using)
@@ -261,10 +262,10 @@ class Collector(object):
                 )
 
         # update collected instances
-        for model, instances_for_fieldvalues in self.field_updates.iteritems():
-            for (field, value), instances in instances_for_fieldvalues.iteritems():
+        for model, instances_for_fieldvalues in self.field_updates.items():
+            for (field, value), instances in instances_for_fieldvalues.items():
                 for obj in instances:
                     setattr(obj, field.attname, value)
-        for model, instances in self.data.iteritems():
+        for model, instances in self.data.items():
             for instance in instances:
                 setattr(instance, model._meta.pk.attname, None)

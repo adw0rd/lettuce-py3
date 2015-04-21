@@ -63,9 +63,9 @@ class TokenGeneratorTest(TestCase):
 
             timestamp = (date.today() - date(2001,1,1)).days
             ts_b36 = int_to_base36(timestamp)
-            hash = sha_constructor(settings.SECRET_KEY + unicode(user.id) +
+            hash = sha_constructor(settings.SECRET_KEY + str(user.id) +
                                    user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') +
-                                   unicode(timestamp)).hexdigest()[::2]
+                                   str(timestamp)).hexdigest()[::2]
             return "%s-%s" % (ts_b36, hash)
 
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')

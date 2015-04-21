@@ -1,5 +1,5 @@
 import datetime
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
@@ -75,10 +75,10 @@ class Permission(models.Model):
         ordering = ('content_type__app_label', 'content_type__model', 'codename')
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (
-            unicode(self.content_type.app_label),
-            unicode(self.content_type),
-            unicode(self.name))
+        return "%s | %s | %s" % (
+            str(self.content_type.app_label),
+            str(self.content_type),
+            str(self.name))
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
@@ -212,7 +212,7 @@ class User(models.Model):
         return self.username
 
     def get_absolute_url(self):
-        return "/users/%s/" % urllib.quote(smart_str(self.username))
+        return "/users/%s/" % urllib.parse.quote(smart_str(self.username))
 
     def is_anonymous(self):
         """
@@ -230,7 +230,7 @@ class User(models.Model):
 
     def get_full_name(self):
         "Returns the first_name plus the last_name, with a space in between."
-        full_name = u'%s %s' % (self.first_name, self.last_name)
+        full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def set_password(self, raw_password):
@@ -415,7 +415,7 @@ class AnonymousUser(object):
         return 'AnonymousUser'
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return str(self).encode('utf-8')
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)

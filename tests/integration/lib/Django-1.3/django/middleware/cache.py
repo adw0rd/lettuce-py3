@@ -51,6 +51,7 @@ More details about how the caching works:
 from django.conf import settings
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
 from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
+import collections
 
 
 class UpdateCacheMiddleware(object):
@@ -107,7 +108,7 @@ class UpdateCacheMiddleware(object):
         patch_response_headers(response, timeout)
         if timeout:
             cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)
-            if hasattr(response, 'render') and callable(response.render):
+            if hasattr(response, 'render') and isinstance(response.render, collections.Callable):
                 response.add_post_render_callback(
                     lambda r: self.cache.set(cache_key, r, timeout)
                 )

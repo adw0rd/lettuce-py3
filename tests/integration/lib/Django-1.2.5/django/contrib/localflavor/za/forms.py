@@ -18,14 +18,14 @@ class ZAIDField(Field):
     check for the birthdate
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid South African ID number'),
+        'invalid': _('Enter a valid South African ID number'),
     }
 
     def clean(self, value):
         super(ZAIDField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         # strip spaces and dashes
         value = value.strip().replace(' ', '').replace('-', '')
@@ -52,7 +52,7 @@ class ZAIDField(Field):
 
 class ZAPostCodeField(RegexField):
     default_error_messages = {
-        'invalid': _(u'Enter a valid South African postal code'),
+        'invalid': _('Enter a valid South African postal code'),
     }
 
     def __init__(self, *args, **kwargs):

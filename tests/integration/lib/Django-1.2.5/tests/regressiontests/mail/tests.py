@@ -5,7 +5,7 @@ import os
 import shutil
 import smtpd
 import sys
-from StringIO import StringIO
+from io import StringIO
 import tempfile
 import threading
 
@@ -23,7 +23,7 @@ from django.utils.functional import wraps
 def alter_django_settings(**kwargs):
     oldvalues = {}
     nonexistant = []
-    for setting, newvalue in kwargs.iteritems():
+    for setting, newvalue in kwargs.items():
         try:
             oldvalues[setting] = getattr(settings, setting)
         except AttributeError:
@@ -34,7 +34,7 @@ def alter_django_settings(**kwargs):
 
 def restore_django_settings(state):
     oldvalues, nonexistant = state
-    for setting, oldvalue in oldvalues.iteritems():
+    for setting, oldvalue in oldvalues.items():
         setattr(settings, setting, oldvalue)
     for setting in nonexistant:
         delattr(settings, setting)
@@ -128,7 +128,7 @@ class MailTests(TestCase):
         self.assertEqual(email.message()['To'], '=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com')
 
     def test_unicode_headers(self):
-        email = EmailMessage(u"Gżegżółka", "Content", "from@example.com", ["to@example.com"],
+        email = EmailMessage("Gżegżółka", "Content", "from@example.com", ["to@example.com"],
                              headers={"Sender": '"Firstname Sürname" <sender@example.com>',
                                       "Comments": 'My Sürname is non-ASCII'})
         message = email.message()
@@ -149,7 +149,7 @@ class MailTests(TestCase):
         msg.attach_alternative(html_content, "text/html")
         msg.encoding = 'iso-8859-1'
         self.assertEqual(msg.message()['To'], '=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>')
-        self.assertEqual(msg.message()['Subject'].encode(), u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?=')
+        self.assertEqual(msg.message()['Subject'].encode(), '=?iso-8859-1?q?Message_from_Firstname_S=FCrname?=')
 
     def test_encoding(self):
         """
@@ -351,7 +351,7 @@ class BaseEmailBackendTests(object):
         """
         Regression test for #14301
         """
-        self.assertTrue(send_mail('Subject', 'Content', 'from@öäü.com', [u'to@öäü.com']))
+        self.assertTrue(send_mail('Subject', 'Content', 'from@öäü.com', ['to@öäü.com']))
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), 'from@xn--4ca9at.com')
@@ -359,7 +359,7 @@ class BaseEmailBackendTests(object):
 
         self.flush_mailbox()
         m = EmailMessage('Subject', 'Content', 'from@öäü.com',
-                     [u'to@öäü.com'])
+                     ['to@öäü.com'])
         m.send()
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')

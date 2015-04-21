@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
+from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
 
 class SelectRelatedTests(TestCase):
 
@@ -151,14 +151,14 @@ class SelectRelatedTests(TestCase):
             world = Species.objects.filter(genus__name='Amanita')\
                 .select_related('genus__family')
             orders = [o.genus.family.order.name for o in world]
-            self.assertEqual(orders, [u'Agaricales'])
+            self.assertEqual(orders, ['Agaricales'])
         self.assertNumQueries(2, test)
 
     def test_field_traversal(self):
         def test():
             s = Species.objects.all().select_related('genus__family__order'
                 ).order_by('id')[0:1].get().genus.family.order.name
-            self.assertEqual(s, u'Diptera')
+            self.assertEqual(s, 'Diptera')
         self.assertNumQueries(1, test)
 
     def test_depth_fields_fails(self):

@@ -16,7 +16,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [u'A user with that username already exists.'])
+                         ['A user with that username already exists.'])
 
     def test_invalid_data(self):
         data = {
@@ -27,7 +27,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [u'This value may contain only letters, numbers and @/./+/-/_ characters.'])
+                         ['This value may contain only letters, numbers and @/./+/-/_ characters.'])
 
 
     def test_password_verification(self):
@@ -40,7 +40,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["password2"].errors,
-                         [u"The two password fields didn't match."])
+                         ["The two password fields didn't match."])
 
 
     def test_both_passwords(self):
@@ -49,16 +49,16 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['password1'].errors,
-                         [u'This field is required.'])
+                         ['This field is required.'])
         self.assertEqual(form['password2'].errors,
-                         [u'This field is required.'])
+                         ['This field is required.'])
 
 
         data['password2'] = 'test123'
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['password1'].errors,
-                         [u'This field is required.'])
+                         ['This field is required.'])
 
     def test_success(self):
         # The success case.
@@ -88,7 +88,7 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
-                         [u'Please enter a correct username and password. Note that both fields are case-sensitive.'])
+                         ['Please enter a correct username and password. Note that both fields are case-sensitive.'])
 
     def test_inactive_user(self):
         # The user is inactive.
@@ -99,7 +99,7 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
-                         [u'This account is inactive.'])
+                         ['This account is inactive.'])
 
 
     def test_success(self):
@@ -127,7 +127,7 @@ class SetPasswordFormTest(TestCase):
         form = SetPasswordForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
-                         [u"The two password fields didn't match."])
+                         ["The two password fields didn't match."])
 
     def test_success(self):
         user = User.objects.get(username='testclient')
@@ -153,7 +153,7 @@ class PasswordChangeFormTest(TestCase):
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["old_password"].errors,
-                         [u'Your old password was entered incorrectly. Please enter it again.'])
+                         ['Your old password was entered incorrectly. Please enter it again.'])
 
 
     def test_password_verification(self):
@@ -167,7 +167,7 @@ class PasswordChangeFormTest(TestCase):
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
-                         [u"The two password fields didn't match."])
+                         ["The two password fields didn't match."])
 
 
     def test_success(self):
@@ -184,7 +184,7 @@ class PasswordChangeFormTest(TestCase):
     def test_field_order(self):
         # Regression test - check the order of fields:
         user = User.objects.get(username='testclient')
-        self.assertEqual(PasswordChangeForm(user, {}).fields.keys(),
+        self.assertEqual(list(PasswordChangeForm(user, {}).fields.keys()),
                          ['old_password', 'new_password1', 'new_password2'])
 
 class UserChangeFormTest(TestCase):
@@ -197,7 +197,7 @@ class UserChangeFormTest(TestCase):
         form = UserChangeForm(data, instance=user)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['username'].errors,
-                         [u'This value may contain only letters, numbers and @/./+/-/_ characters.'])
+                         ['This value may contain only letters, numbers and @/./+/-/_ characters.'])
 
     def test_bug_14242(self):
         # A regression test, introduce by adding an optimization for the
@@ -233,7 +233,7 @@ class PasswordResetFormTest(TestCase):
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['email'].errors,
-                         [u'Enter a valid e-mail address.'])
+                         ['Enter a valid e-mail address.'])
 
     def test_nonexistant_email(self):
         # Test nonexistant email address
@@ -241,7 +241,7 @@ class PasswordResetFormTest(TestCase):
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors,
-                         {'email': [u"That e-mail address doesn't have an associated user account. Are you sure you've registered?"]})
+                         {'email': ["That e-mail address doesn't have an associated user account. Are you sure you've registered?"]})
 
     def test_cleaned_data(self):
         # Regression test

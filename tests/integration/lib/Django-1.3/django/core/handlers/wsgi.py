@@ -2,9 +2,9 @@ from pprint import pformat
 import sys
 from threading import Lock
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 import socket
 
 from django import http
@@ -117,7 +117,7 @@ class LimitedStream(object):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
-        path_info = force_unicode(environ.get('PATH_INFO', u'/'))
+        path_info = force_unicode(environ.get('PATH_INFO', '/'))
         if not path_info or path_info == script_name:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
@@ -126,7 +126,7 @@ class WSGIRequest(http.HttpRequest):
             #
             # (The comparison of path_info to script_name is to work around an
             # apparent bug in flup 1.0.1. Se Django ticket #8490).
-            path_info = u'/'
+            path_info = '/'
         self.environ = environ
         self.path_info = path_info
         self.path = '%s%s' % (script_name, path_info)
@@ -279,8 +279,8 @@ class WSGIHandler(base.BaseHandler):
         except KeyError:
             status_text = 'UNKNOWN STATUS CODE'
         status = '%s %s' % (response.status_code, status_text)
-        response_headers = [(str(k), str(v)) for k, v in response.items()]
-        for c in response.cookies.values():
+        response_headers = [(str(k), str(v)) for k, v in list(response.items())]
+        for c in list(response.cookies.values()):
             response_headers.append(('Set-Cookie', str(c.output(header=''))))
         start_response(status, response_headers)
         return response

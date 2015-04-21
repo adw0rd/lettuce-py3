@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from models import Reporter, Article, Writer
+from .models import Reporter, Article, Writer
 
 
 class M2MIntermediaryTests(TestCase):
@@ -22,7 +22,7 @@ class M2MIntermediaryTests(TestCase):
                 ("John Smith", "Main writer"),
                 ("Jane Doe", "Contributor"),
             ],
-            lambda w: (unicode(w.reporter), w.position)
+            lambda w: (str(w.reporter), w.position)
         )
         self.assertEqual(w1.reporter, r1)
         self.assertEqual(w2.reporter, r2)
@@ -34,5 +34,5 @@ class M2MIntermediaryTests(TestCase):
             r1.writer_set.all(), [
                 ("John Smith", "Main writer")
             ],
-            lambda w: (unicode(w.reporter), w.position)
+            lambda w: (str(w.reporter), w.position)
         )

@@ -23,7 +23,7 @@ class DEStateSelect(Select):
     A Select widget that uses a list of DE states as its choices.
     """
     def __init__(self, attrs=None):
-        from de_states import STATE_CHOICES
+        from .de_states import STATE_CHOICES
         super(DEStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class DEIdentityCardNumberField(Field):
@@ -64,7 +64,7 @@ class DEIdentityCardNumberField(Field):
     def clean(self, value):
         super(DEIdentityCardNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         match = re.match(id_re, value)
         if not match:
             raise ValidationError(self.error_messages['invalid'])
@@ -76,9 +76,9 @@ class DEIdentityCardNumberField(Field):
         if residence == '0000000000' or birthday == '0000000' or validity == '0000000':
             raise ValidationError(self.error_messages['invalid'])
 
-        all_digits = u"%s%s%s%s" % (residence, birthday, validity, checksum)
+        all_digits = "%s%s%s%s" % (residence, birthday, validity, checksum)
         if not self.has_valid_checksum(residence) or not self.has_valid_checksum(birthday) or \
             not self.has_valid_checksum(validity) or not self.has_valid_checksum(all_digits):
                 raise ValidationError(self.error_messages['invalid'])
 
-        return u'%s%s-%s-%s-%s' % (residence, origin, birthday, validity, checksum)
+        return '%s%s-%s-%s-%s' % (residence, origin, birthday, validity, checksum)

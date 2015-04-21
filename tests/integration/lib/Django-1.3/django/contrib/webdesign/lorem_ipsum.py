@@ -49,10 +49,10 @@ def sentence():
     """
     # Determine the number of comma-separated sections and number of words in
     # each section for this sentence.
-    sections = [u' '.join(random.sample(WORDS, random.randint(3, 12))) for i in range(random.randint(1, 5))]
-    s = u', '.join(sections)
+    sections = [' '.join(random.sample(WORDS, random.randint(3, 12))) for i in range(random.randint(1, 5))]
+    s = ', '.join(sections)
     # Convert to sentence case and add end punctuation.
-    return u'%s%s%s' % (s[0].upper(), s[1:], random.choice('?.'))
+    return '%s%s%s' % (s[0].upper(), s[1:], random.choice('?.'))
 
 def paragraph():
     """
@@ -60,7 +60,7 @@ def paragraph():
 
     The paragraph consists of between 1 and 4 sentences, inclusive.
     """
-    return u' '.join([sentence() for i in range(random.randint(1, 4))])
+    return ' '.join([sentence() for i in range(random.randint(1, 4))])
 
 def paragraphs(count, common=True):
     """
@@ -98,4 +98,4 @@ def words(count, common=True):
             word_list += random.sample(WORDS, c)
     else:
         word_list = word_list[:count]
-    return u' '.join(word_list)
+    return ' '.join(word_list)

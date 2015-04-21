@@ -17,7 +17,7 @@ from django.test import TestCase as DjangoTestCase
 from django.utils.html import conditional_escape
 from django.utils.translation import activate, deactivate
 
-import models
+from . import models
 
 
 class AdminFormfieldForDBFieldTests(TestCase):
@@ -160,7 +160,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         pk = band.pk
         band.delete()
         post_data = {
-            "band": u'%s' % pk,
+            "band": '%s' % pk,
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
@@ -244,15 +244,15 @@ class AdminFileWidgetTest(DjangoTestCase):
             url = "something?chapter=1&sect=2&copy=3&lang=en"
 
             def __unicode__(self):
-                return u'''something<div onclick="alert('oops')">.jpg'''
+                return '''something<div onclick="alert('oops')">.jpg'''
 
         widget = AdminFileWidget()
         field = StrangeFieldFile()
         output = widget.render('myfile', field)
         self.assertFalse(field.url in output)
-        self.assertTrue(u'href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"' in output)
-        self.assertFalse(unicode(field) in output)
-        self.assertTrue(u'something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg' in output)
+        self.assertTrue('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"' in output)
+        self.assertFalse(str(field) in output)
+        self.assertTrue('something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg' in output)
 
 
 
@@ -328,7 +328,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         self.assertEqual(w._has_changed(None, None), False)
         self.assertEqual(w._has_changed([], None), False)
-        self.assertEqual(w._has_changed(None, [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'2']), False)
-        self.assertEqual(w._has_changed([1, 2], [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'3']), True)
+        self.assertEqual(w._has_changed(None, ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '2']), False)
+        self.assertEqual(w._has_changed([1, 2], ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '3']), True)
