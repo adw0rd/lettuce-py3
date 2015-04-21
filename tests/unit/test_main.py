@@ -52,7 +52,7 @@ def test_terrain_import_exception():
 
     exc = Exception('foo bar')
     lettuce.fs.FileSystem._import('terrain').AndRaise(exc)
-    lettuce.exceptions.traceback.format_exc(exc). \
+    lettuce.exceptions.traceback.format_exc(). \
         AndReturn('I AM THE TRACEBACK FOR IMPORT ERROR')
 
     lettuce.sys.stderr.write(string)

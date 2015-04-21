@@ -50,7 +50,7 @@ class FeatureLoader(object):
                 module = __import__(to_load)
             except ValueError as e:
                 import traceback
-                err_msg = traceback.format_exc(e)
+                err_msg = traceback.format_exc()
                 if 'empty module name' in err_msg.lower():
                     continue
                 else:

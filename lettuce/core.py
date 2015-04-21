@@ -256,7 +256,7 @@ class Step(object):
         method_name = unicodedata.normalize('NFKD', method_name) \
                       .encode('ascii', 'ignore')
         method_name = '%s(step%s)' % (
-            "_".join(re.findall("\w+", method_name)).lower(),
+            "_".join(re.findall("\w+", method_name.decode())).lower(),
             attribute_names and (", %s" % ", ".join(attribute_names)) or "")
 
         return method_name, sentence
@@ -342,11 +342,11 @@ class Step(object):
         lines = strings.json_to_string(self.columns, self.non_unique_keys).splitlines()
         return "\n".join([(" " * self.table_indentation) + line for line in lines]) + "\n"
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Step: "%s">' % self.sentence
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return str(self)
 
     def _parse_remaining_lines(self, lines):
         multiline = strings.parse_multiline(lines)
@@ -637,11 +637,11 @@ class Scenario(object):
     def _calc_value_length(self, data):
         return self._calc_list_length(list(data.values()))
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Scenario: "%s">' % self.name
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return str(self)
 
     def matches_tags(self, tags):
         if tags is None:
@@ -1013,11 +1013,11 @@ class Feature(object):
         found = regex.findall(item)
         return found
 
-    def __unicode__(self):
+    def __str__(self):
         return '<%s: "%s">' % (self.language.first_of_feature, self.name)
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return str(self)
 
     def get_head(self):
         return "%s: %s" % (self.language.first_of_feature, self.name)
