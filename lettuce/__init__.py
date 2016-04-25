@@ -189,7 +189,7 @@ class Runner(object):
         except exceptions.LettuceSyntaxError as e:
             sys.stderr.write(e.msg)
             failed = True
-        except exceptions.NoDefinitionFound, e:
+        except exceptions.NoDefinitionFound as e:
             sys.stderr.write(e.msg)
             failed = True
         except:
