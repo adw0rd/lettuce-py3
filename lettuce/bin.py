@@ -30,8 +30,14 @@ def main(args=sys.argv[1:]):
 
     parser.add_option("-v", "--verbosity",
                       dest="verbosity",
-                      default=4,
+                      default=3,
                       help='The verbosity level')
+
+    parser.add_option("--no-color",
+                      action="store_true",
+                      dest="no_color",
+                      default=False,
+                      help="Don't colorize the command output.")
 
     parser.add_option("-s", "--scenarios",
                       dest="scenarios",
@@ -52,6 +58,13 @@ def main(args=sys.argv[1:]):
                       action="store_true",
                       default=False,
                       help="Run scenarios in a more random order to avoid interference")
+
+    parser.add_option("--root-dir",
+                      dest="root_dir",
+                      default="/",
+                      type="string",
+                      help="Tells lettuce not to search for features/steps "
+                      " above this directory.")
 
     parser.add_option("--with-xunit",
                       dest="enable_xunit",
@@ -115,6 +128,7 @@ def main(args=sys.argv[1:]):
         failfast=options.failfast,
         auto_pdb=options.auto_pdb,
         tags=tags,
+        root_dir=options.root_dir,
     )
 
     result = runner.run()
