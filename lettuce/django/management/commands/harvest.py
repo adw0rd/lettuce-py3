@@ -129,7 +129,7 @@ class Command(BaseCommand):
                           dest='verbosity',
                           default='3',
                           type='choice',
-                          choices=map(str, range(5)),
+                          choices=list(map(str, range(5))),
                           help=help_text)
         if StrictVersion(django.get_version()) < StrictVersion('1.7'):
             # Django 1.7 introduces the --no-color flag. We must add the flag
