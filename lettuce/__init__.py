@@ -73,7 +73,7 @@ try:
     terrain = fs.FileSystem._import("terrain")
     reload(terrain)
 except Exception as e:
-    if not "No module named terrain" in str(e):
+    if not "No module named 'terrain'" in str(e):
         string = 'Lettuce has tried to load the conventional environment ' \
             'module "terrain"\nbut it has errors, check its contents and ' \
             'try to run lettuce again.\n\nOriginal traceback below:\n\n'
