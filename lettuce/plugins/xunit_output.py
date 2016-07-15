@@ -23,7 +23,7 @@ from lettuce.strings import utf8_string
 
 
 def wrt_output(filename, content):
-    f = open(filename, "w")
+    f = open(filename, "wb")
     if isinstance(content, str):
         content = content.encode('utf-8')
 
