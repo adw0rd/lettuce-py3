@@ -58,6 +58,9 @@ class Command(BaseCommand):
         make_option('-P', '--port', type='int', dest='port',
             help="the port in which the HTTP server will run at"),
 
+        make_option('-H', '--host', action='store', dest='host', default='',
+            help="the host of remote webdriver"),
+
         make_option('-d', '--debug-mode', action='store_true', dest='debug', default=False,
             help="when put together with builtin HTTP server, forces django to run with settings.DEBUG=True"),
 
@@ -160,7 +163,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         setup_test_environment()
         settings.DEBUG = options.get('debug', False)
-        settings.LETTUCE_BROWSER = options.get('browser', 'firefox')
+        settings.LETTUCE_BROWSER = options.get('browser', 'chrome')
         settings.LETTUCE_FAILED_STEP_SLEEP = options.get('failed_step_sleep')
         settings.DEFAULT_TABLESPACE = options.get('tablespace')
         settings.DISABLE_JSCOMPILE = options.get('disable_jscompile')
@@ -200,7 +203,7 @@ class Command(BaseCommand):
 
         paths = self.get_paths(args, apps_to_run, apps_to_avoid)
         server = get_server(port=options['port'], threading=threading)
-
+        os.environ['REMOTE_HOST'] = options['host']
         if run_server:
             try:
                 server.start()
