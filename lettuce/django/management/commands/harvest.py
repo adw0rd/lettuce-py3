@@ -67,7 +67,7 @@ class Command(BaseCommand):
         make_option('-s', '--scenarios', action='store', dest='scenarios', default=None,
             help='Comma separated list of scenarios to run'),
 
-        make_option('-b', '--browser', action='store', dest='browser', default='firefox',
+        make_option('-b', '--browser', action='store', dest='browser', default='chrome',
             help='will set settings.LETTUCE_BROWSER. This will allow to choose browser from terrain without changing code (firefox|chrome)'),
 
         make_option('--failed-step-sleep', action='store', dest='failed_step_sleep', default=0,
