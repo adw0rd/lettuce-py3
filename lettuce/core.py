@@ -473,11 +473,13 @@ class Step(object):
 
                 if run_callbacks:
                     call_hook('before_each', 'step', step)
-
                 call_hook('before_output', 'step', step)
 
+                step_already_passed = getattr(step, 'passed', None)
+
                 if not steps_failed and not steps_undefined:
-                    step.run(ignore_case)
+                    if not step_already_passed:
+                        step.run(ignore_case)
                     steps_passed.append(step)
 
             except NoDefinitionFound as e:
