@@ -67,8 +67,10 @@ class Command(BaseCommand):
             help='PostgrSQL Tablespace')
         parser.add_argument('--disable-jscompile', action='store_true', dest='disable_jscompile', default=False,
             help='Disable command call "jscompile"')
-        parser.add_argument('--by-step', action='store', dest='by_step', default=False,
+        parser.add_argument('--by-step', action='store_true', dest='by_step', default=False,
             help='Go step by step with pause')
+        parser.add_argument('--headless', action='store_true', dest='headless', default=False,
+            help='Use headless browser')
         parser.add_argument("-t", "--tag",
                     dest="tags",
                     type=str,
@@ -158,6 +160,7 @@ class Command(BaseCommand):
         settings.DEFAULT_TABLESPACE = options.get('tablespace')
         settings.DISABLE_JSCOMPILE = options.get('disable_jscompile')
         settings.LETTUCE_BY_STEP = options.get('by_step', False)
+        settings.LETTUCE_HEADLESS = options.get('headless', False)
 
         verbosity = int(options.get('verbosity', 3))
         no_color = int(options.get('no_color', False))
