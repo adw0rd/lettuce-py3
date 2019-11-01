@@ -17,8 +17,9 @@
 import os
 import sys
 import django
+import argparse
 from distutils.version import StrictVersion
-from optparse import make_option
+# from optparse import parser.add_argument
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -38,106 +39,95 @@ class Command(BaseCommand):
     args = '[PATH to feature file or folder]'
     requires_model_validation = False
 
-    option_list = BaseCommand.option_list + (
-        make_option('-a', '--apps', action='store', dest='apps', default='',
-            help='Run ONLY the django apps that are listed here. Comma separated'),
-
-        make_option('-A', '--avoid-apps', action='store', dest='avoid_apps', default='',
-            help='AVOID running the django apps that are listed here. Comma separated'),
-
-        make_option('-S', '--no-server', action='store_true', dest='no_server', default=False,
-            help="will not run django's builtin HTTP server"),
-
-        make_option('--nothreading', action='store_false', dest='use_threading', default=True,
-            help='Tells Django to NOT use threading.'),
-
-        make_option('-T', '--test-server', action='store_true', dest='test_database',
+    def add_arguments(self, parser):
+        parser.add_argument('-a', '--apps', action='store', dest='apps', default='',
+            help='Run ONLY the django apps that are listed here. Comma separated')
+        parser.add_argument('-A', '--avoid-apps', action='store', dest='avoid_apps', default='',
+            help='AVOID running the django apps that are listed here. Comma separated')
+        parser.add_argument('-S', '--no-server', action='store_true', dest='no_server', default=False,
+            help="will not run django's builtin HTTP server")
+        parser.add_argument('--nothreading', action='store_false', dest='use_threading', default=True,
+            help='Tells Django to NOT use threading.')
+        parser.add_argument('-T', '--test-server', action='store_true', dest='test_database',
             default=getattr(settings, "LETTUCE_USE_TEST_DATABASE", False),
-            help="will run django's builtin HTTP server using the test databases"),
-
-        make_option('-P', '--port', type='int', dest='port',
-            help="the port in which the HTTP server will run at"),
-
-        make_option('-H', '--host', action='store', dest='host', default='',
-            help="the host of remote webdriver"),
-
-        make_option('-d', '--debug-mode', action='store_true', dest='debug', default=False,
-            help="when put together with builtin HTTP server, forces django to run with settings.DEBUG=True"),
-
-        make_option('-s', '--scenarios', action='store', dest='scenarios', default=None,
-            help='Comma separated list of scenarios to run'),
-
-        make_option('-b', '--browser', action='store', dest='browser', default='chrome',
-            help='will set settings.LETTUCE_BROWSER. This will allow to choose browser from terrain without changing code (firefox|chrome)'),
-
-        make_option('--failed-step-sleep', action='store', dest='failed_step_sleep', default=0,
-            help='When the step is failed, then we sleep for a specified number of seconds'),
-
-        make_option('--with-tablespace', action='store', dest='tablespace', default=0,
-            help='PostgrSQL Tablespace'),
-
-        make_option('--disable-jscompile', action='store_true', dest='disable_jscompile', default=False,
-            help='Disable command call "jscompile"'),
-
-        make_option('--by-step', action='store', dest='by_step', default=False,
-            help='Go step by step with pause'),
-
-        make_option("-t", "--tag",
+            help="will run django's builtin HTTP server using the test databases")
+        parser.add_argument('-P', '--port', type=int, dest='port',
+            help="the port in which the HTTP server will run at")
+        parser.add_argument('-H', '--host', action='store', dest='host', default='',
+            help="the host of remote webdriver")
+        parser.add_argument('-d', '--debug-mode', action='store_true', dest='debug', default=False,
+            help="when put together with builtin HTTP server, forces django to run with settings.DEBUG=True")
+        parser.add_argument('-s', '--scenarios', action='store', dest='scenarios', default=None,
+            help='Comma separated list of scenarios to run')
+        parser.add_argument('-b', '--browser', action='store', dest='browser', default='chrome',
+            help='will set settings.LETTUCE_BROWSER. This will allow to choose browser from terrain without changing code (firefox|chrome)')
+        parser.add_argument('--failed-step-sleep', action='store', dest='failed_step_sleep', default=0,
+            help='When the step is failed, then we sleep for a specified number of seconds')
+        parser.add_argument('--with-tablespace', action='store', dest='tablespace', default=0,
+            help='PostgrSQL Tablespace')
+        parser.add_argument('--disable-jscompile', action='store_true', dest='disable_jscompile', default=False,
+            help='Disable command call "jscompile"')
+        parser.add_argument('--by-step', action='store', dest='by_step', default=False,
+            help='Go step by step with pause')
+        parser.add_argument("-t", "--tag",
                     dest="tags",
-                    type="str",
+                    type=str,
                     action='append',
                     default=None,
                     help='Tells lettuce to run the specified tags only; '
                     'can be used multiple times to define more tags'
                     '(prefixing tags with "-" will exclude them and '
-                    'prefixing with "~" will match approximate words)'),
-
-        make_option('--with-xunit', action='store_true', dest='enable_xunit', default=False,
-            help='Output JUnit XML test results to a file'),
-
-        make_option('--smtp-queue', action='store_true', dest='smtp_queue', default=False,
-                    help='Use smtp for mail queue (usefull with --no-server option'),
-
-        make_option('--xunit-file', action='store', dest='xunit_file', default=None,
-            help='Write JUnit XML to this file. Defaults to lettucetests.xml'),
-
-        make_option('--with-subunit',
+                    'prefixing with "~" will match approximate words)')
+        parser.add_argument('--with-xunit', action='store_true', dest='enable_xunit', default=False,
+            help='Output JUnit XML test results to a file')
+        parser.add_argument('--smtp-queue', action='store_true', dest='smtp_queue', default=False,
+                    help='Use smtp for mail queue (usefull with --no-server option')
+        parser.add_argument('--xunit-file', action='store', dest='xunit_file', default=None,
+            help='Write JUnit XML to this file. Defaults to lettucetests.xml')
+        parser.add_argument('--with-subunit',
                     action='store_true',
                     dest='enable_subunit',
                     default=False,
-                    help='Output Subunit test results to a file'),
-
-        make_option('--subunit-file',
+                    help='Output Subunit test results to a file')
+        parser.add_argument('--subunit-file',
                     action='store',
                     dest='subunit_file',
                     default=None,
-                    help='Write Subunit to this file. Defaults to subunit.bin'),
-
-        make_option("--failfast", dest="failfast", default=False,
-                    action="store_true", help='Stop running in the first failure'),
-
-        make_option("--pdb", dest="auto_pdb", default=False,
-                    action="store_true", help='Launches an interactive debugger upon error'),
-
-    )
+                    help='Write Subunit to this file. Defaults to subunit.bin')
+        parser.add_argument("--failfast", dest="failfast", default=False,
+                    action="store_true", help='Stop running in the first failure')
+        parser.add_argument("--pdb", dest="auto_pdb", default=False,
+                    action="store_true", help='Launches an interactive debugger upon error')
 
     def create_parser(self, prog_name, subcommand):
         parser = super(Command, self).create_parser(prog_name, subcommand)
-        parser.remove_option('-v')
+
+        def parse_args(args=None, namespace=None):
+            args, argv = parser.parse_known_args(args, namespace)
+            return args
+
+        parser.parse_args = parse_args
+        # parser.remove_option('-v')
+        for action in parser._actions:
+            if action.option_strings == ['-v', '--verbosity']:
+                parser._remove_action(action)
+                parser._option_string_actions.pop('-v', None)
+                parser._option_string_actions.pop('--verbosity', None)
         help_text = ('Verbosity level; 0=no output, 1=only dots, 2=only '
                      'scenario names, 3=normal output, 4=normal output '
                      '(colorful, deprecated)')
-        parser.add_option('-v', '--verbosity',
+        parser.add_argument('-v', '--verbosity',
                           action='store',
                           dest='verbosity',
                           default='3',
-                          type='choice',
-                          choices=list(map(str, range(5))),
+                          type=int,
+                          choices=list(range(5)),
                           help=help_text)
+        parser.add_argument('paths', nargs='+', default=os.getcwd())
         if StrictVersion(django.get_version()) < StrictVersion('1.7'):
             # Django 1.7 introduces the --no-color flag. We must add the flag
             # to be compatible with older django versions
-            parser.add_option('--no-color',
+            parser.add_argument('--no-color',
                               action='store_true',
                               dest='no_color',
                               default=False,
@@ -181,7 +171,6 @@ class Command(BaseCommand):
         auto_pdb = options.get('auto_pdb', False)
         threading = options.get('use_threading', True)
         with_summary = options.get('summary_display', False)
-
         if test_database:
             migrate_south = getattr(settings, "SOUTH_TESTS_MIGRATE", True)
             try:
@@ -193,6 +182,7 @@ class Command(BaseCommand):
 
             from django.test.utils import get_runner
             self._testrunner = get_runner(settings)(interactive=False)
+
             self._testrunner.setup_test_environment()
             self._old_db_config = self._testrunner.setup_databases()
 
@@ -202,6 +192,8 @@ class Command(BaseCommand):
 
 
         paths = self.get_paths(args, apps_to_run, apps_to_avoid)
+        if not paths:
+            paths = options.get('paths', [])
         server = get_server(port=options['port'], threading=threading)
         os.environ['REMOTE_HOST'] = options['host']
         if run_server:
