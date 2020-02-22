@@ -94,7 +94,7 @@ class Runner(object):
                  enable_xunit=False, xunit_filename=None,
                  enable_subunit=False, subunit_filename=None,
                  tags=None, failfast=False, auto_pdb=False,
-                 smtp_queue=None, root_dir=None):
+                 smtp_queue=None, root_dir=None, **kwargs):
 
         """ lettuce.Runner will try to find a terrain.py file and
         import it from within `base_path`
@@ -117,19 +117,19 @@ class Runner(object):
 
         sys.path.remove(base_path)
 
-        if verbosity is 0:
+        if verbosity == 0:
             from lettuce.plugins import non_verbose as output
-        elif verbosity is 1:
+        elif verbosity == 1:
             from lettuce.plugins import dots as output
-        elif verbosity is 2:
+        elif verbosity == 2:
             from lettuce.plugins import scenario_names as output
         else:
-            if verbosity is 4:
+            if verbosity == 4:
                 from lettuce.plugins import colored_shell_output as output
                 msg = ('Deprecated in lettuce 2.2.21. Use verbosity 3 without '
                        '--no-color flag instead of verbosity 4')
                 warnings.warn(msg, DeprecationWarning)
-            elif verbosity is 3:
+            elif verbosity == 3:
                 if no_color:
                     from lettuce.plugins import shell_output as output
                 else:
